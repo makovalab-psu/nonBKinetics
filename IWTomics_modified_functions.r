@@ -306,7 +306,7 @@ plot_no_size_control <- function(x,type='boxplot',method='pearson',
               index_pos=c(min(index_pos),max(index_pos))
               #lines(x_plot[[id_feature]][rep(index_pos[1],each=2)]-0.5,c(0.5,1.5),col='black',lty=2)
               #lines(x_plot[[id_feature]][rep(index_pos[2],each=2)]+0.5,c(0.5,1.5),col='black',lty=2)
-              axis(side=2,at=seq_len(2*(length(id_regions_subset)-1)),labels=c('Feature','Sample size'),tick=FALSE,las=1,line=-2,...)
+              axis(side=2,at=seq_len(2*(length(id_regions_subset)-1)),labels=c('Feature','IPD values'),tick=FALSE,las=1,line=-2,...)
               axis(side=4,at=mean(seq_len(2*(length(id_regions_subset)-1))),labels=paste0('Total:\n',lengthRegions(x)[setdiff(id_regions_subset,c('Control','Control_new'))],' windows'),tick=FALSE,las=1,line=-2,...)
               x.rect=range(x_plot[[id_feature]])+c(-1,1)*diff(x_plot[[id_feature]])[1]/2
               rect(x.rect[1],seq_len(2*(length(id_regions_subset)-1))-0.5,x.rect[2],seq_len(2*(length(id_regions_subset)-1))+0.5,border='black',...)
