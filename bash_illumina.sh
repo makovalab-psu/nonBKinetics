@@ -33,7 +33,7 @@ samtools mpileup minus.bam -f ../../data/hg19_formated_by_wil.fa -l ${infile}.be
 #################################
 
 
-python mpileup2gff.py ${infile}.mp > ${infile}.split.gff
+python mpileup2gff_V2.py ${infile}.mp > ${infile}.split.gff
 bedtools intersect -wa -wb -b ${infile}.split.gff -a ${infile}.gff -loj > ${infile}.intersect
 
 python parse_intersect.py ${infile}.intersect > ${infile}.collapsed
