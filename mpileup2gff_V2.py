@@ -15,11 +15,11 @@ for line in infile:
 		chrom, pos, ref, alt, info = array[0], array[1], array[3], array[4], array[7]
 		if alt == "<*>":
 			DPR = re.search('[D][P][R][=][0-9,\,]+', info).group()[4:]
-						DPR = DPR.split(',')
+			DPR = DPR.split(',')
 			DPR = map(int, DPR)
-						DP = sum(DPR)
+			DP = sum(DPR)
 			key = str(chrom)+'|'+str(pos)+'|'+str(ref)+'|'+str(alt)+'|NoVar|'+str(DP)
-						collapsed.append(key)
+			collapsed.append(key)
 
 
 		if alt != "<*>":
