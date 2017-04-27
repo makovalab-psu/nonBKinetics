@@ -1,7 +1,8 @@
 import sys
 import re
 
-infile = open(sys.argv[1], 'rt')
+filename = sys.argv[1]
+infile = open(filename, 'rt')
 
 collapsed = []
 
@@ -50,4 +51,4 @@ for line in infile:
 
 for key in collapsed:
         chrom, pos, ref, alt, VT,DP= key.split('|')
-        print(str(chrom)+'\tIllumina\t'+str(VT)+'\t'+str(pos)+'\t'+str(pos)+'\t'+str(DP)+'\t'+str(ref)+'\t'+str(alt))
+        print(str(chrom)+'\t'+str(basename(filename))+'\t'+str(VT)+'\t'+str(pos)+'\t'+str(pos)+'\t'+str(DP)+'\t'+str(ref)+'\t'+str(alt))
