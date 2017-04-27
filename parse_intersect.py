@@ -13,7 +13,7 @@ for line in infile:
 	if key not in collapsed:
 		collapsed[key] = [0,0,0,0]
 	if VT != '.':
-		collapsed[key][0] += int(DP)
+		collapsed[key][0] += float(DP)
 
 		SNP = VT.count('SNP')
 		INS = VT.count('INS')
