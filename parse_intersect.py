@@ -4,6 +4,7 @@ from collections import OrderedDict
 infile = open(sys.argv[1], 'rt')
 collapsed = OrderedDict()
 
+error = 0
 
 for line in infile:
 	line = line.strip()
@@ -12,6 +13,8 @@ for line in infile:
 	key = str(chrom)+'|'+str(start)+'|'+str(end)
 	if key not in collapsed:
 		collapsed[key] = [0,0,0,0]
+	if VT == '.':
+		error += 1
 	if VT != '.':
 		collapsed[key][0] += float(DP)
 
