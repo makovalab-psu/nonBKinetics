@@ -1,3 +1,4 @@
+from os.path import basename
 import sys
 import re
 
