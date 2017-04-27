@@ -26,8 +26,8 @@ with open(motifFile, "r") as ifile:
 		DEL = 0
 		MISM = 0
 
-		print "---"
-		print line
+		#print "---"
+		#print line
 
 		m=line.rstrip() #line from motif file
 		#print m
@@ -41,7 +41,7 @@ with open(motifFile, "r") as ifile:
 		v=m_array[3].replace('[', '').replace(']', '').replace('\'', '').replace(' ', '')
 		variants=v.split(',')
 		number_of_variants=len(variants)
-		print ("number of variants: " + " " +str(number_of_variants))
+		#print ("number of variants: " + " " +str(number_of_variants))
 
 		for var in variants:
 			length=len(var)
@@ -73,6 +73,6 @@ with open(motifFile, "r") as ifile:
 			perc_mism=0
 
 		#reference,start,end,totalRows,insertionRows,deletionRows,mismatchRows,percErrorTotal,percErrorIns,percErrorDel,percErrorMism,$$
-		out=(chromosome + " " + str(start) + " " + str(end) + " " + str(l) + " " + str(INS) + " " + str(DEL) + " " + str(MISM) + " " + str(perc_total) + " " + str(perc_insertions) + " " + str(perc_deletions) + " " + str(perc_mism) + " " +"$$\n")
+		out=(chromosome + " " + str(int(start)) + " " + str(int(end)) + " " + str(int(l)) + " " + str(int(INS)) + " " + str(int(DEL)) + " " + str(int(MISM)) + " " + str(perc_total) + " " + str(perc_insertions) + " " + str(perc_deletions) + " " + str(perc_mism) + " " +"$$\n")
 		print(out)
 		f.write(out)
