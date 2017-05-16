@@ -22,7 +22,8 @@ barplot(
   col = colours()[1:6],
   ylim = c(0, 700),
   xlim = c(0, 700),
-  bg = "lightgray"
+  bg = "lightgray",
+  axes=FALSE
 )
 
 grid(col = "black", lty = 1)
@@ -58,6 +59,7 @@ print(data)
 
 #text(seq(0,700,100),700,labels=data[1,])
 mtext(c("AP","DR","IR","MR","Z","GQ+","GQ-"),side=3,las=1,adj=0,at=seq(40,700,100))
+mtext(c("P","I","DV","DG","T","",""),side=2,at=seq(640,0,-100))
 
 for (technology in seq(3, nrow(data), 1)) {
   print(technology)
