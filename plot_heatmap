@@ -5,7 +5,7 @@
 
 <<>>=
 #PLOT HEATMAP
-par(bg = "lightgray")
+par(bg = "lightgray",las=1)
 data <-
   as.data.frame(
     read.table(
@@ -56,10 +56,13 @@ rescale <- function(x)
   (x) / (max(x)) * 100
 print(data)
 
+#text(seq(0,700,100),700,labels=data[1,])
+mtext(c("AP","DR","IR","MR","Z","GQ+","GQ-"),side=3,las=1,adj=0,at=seq(40,700,100))
+
 for (technology in seq(3, nrow(data), 1)) {
   print(technology)
   result = getParametersForTechnology(data[technology, ])
-  print(paste(result$effect, result$col))
+  #print(paste(result$effect, result$col))
   
   i <- 1
   #print(x)
@@ -67,9 +70,8 @@ for (technology in seq(3, nrow(data), 1)) {
     y <- 900 - (technology * 100) #skip header
     size <- rescale(abs(result$effect))[i]
     #print(i)
-    print(paste(x, y, size))
-    #Sys.sleep(5)
-    polygon(c(x, x, x + (size), x + (size)), c(y, y + (size - 1), y + (size - 1), y), col = result$col[i])
+    #print(paste(x, y, size))
+    polygon(c(x, x, x + (size), x + (size)), c(y, y + (size), y + (size), y), col = result$col[i])
     i <- i + 1
   }
 }
