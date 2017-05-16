@@ -1,0 +1,77 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+<<>>=
+#PLOT HEATMAP
+par(bg = "lightgray")
+data <-
+  as.data.frame(
+    read.table(
+      "/Users/alice/Desktop/projects/kinetics/heatmap_pacbio/Table6.txt",
+      sep = "\t"
+    ),
+    optional = TRUE
+  )
+barplot(
+  c(0),
+  c(0),
+  xaxs = "i",
+  yaxs = "i",
+  col = colours()[1:6],
+  ylim = c(0, 700),
+  xlim = c(0, 700),
+  bg = "lightgray"
+)
+
+grid(col = "black", lty = 1)
+
+getParametersForTechnology <- function(technology) {
+  print(technology)
+  significance <- as.numeric(as.matrix(technology[seq(2, 15, 2)]))
+  effect <- as.numeric(as.matrix(technology[seq(3, 15, 2)]))
+  signs <- sign(effect)
+  significance[significance < 1e-5] = 1e-5
+  #significance[significance>0.05]=1 # threshold at 5%
+  log_pvalue = -log10(significance)
+  log_pvalue = signs * log_pvalue     # sign_difference -1 for negative differences, +1 for   positive differences
+  colfunc = colorRampPalette(c("red", "white", "navy"))(n = 100 - 1)
+  # 99 colors from blue to white to red.
+  # Blue will correspond to log_pvalue=-5
+  # white log_pvalue=0
+  # red log_pvalue=5
+  color_limits = seq (-5, 5, length.out = 100)
+  col = c(colfunc[unlist(lapply(log_pvalue, function(log)
+    which((log >= color_limits[1:99]) &
+            (log <= color_limits[2:100])
+    )[1]))])
+  col[significance > 0.05] <- "white"#non-significant not colored
+  
+  return(list(effect = effect, col = col))
+}
+
+
+rescale <- function(x)
+  (x) / (max(x)) * 100
+print(data)
+
+for (technology in seq(3, nrow(data), 1)) {
+  print(technology)
+  result = getParametersForTechnology(data[technology, ])
+  print(paste(result$effect, result$col))
+  
+  i <- 1
+  #print(x)
+  for (x in seq(0, 699, 100)) {
+    y <- 900 - (technology * 100) #skip header
+    size <- rescale(abs(result$effect))[i]
+    #print(i)
+    print(paste(x, y, size))
+    #Sys.sleep(5)
+    polygon(c(x, x, x + (size), x + (size)), c(y, y + (size - 1), y + (size - 1), y), col = result$col[i])
+    i <- i + 1
+  }
+}
+
+@
