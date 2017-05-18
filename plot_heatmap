@@ -5,7 +5,7 @@
 
 <<>>=
 #PLOT HEATMAP
-par(bg = "lightgray",las=1)
+par(bg = "lightgray",las=1,pty="s")
 data <-
   as.data.frame(
     read.table(
@@ -30,8 +30,9 @@ grid(col = "black", lty = 1)
 
 getParametersForTechnology <- function(technology) {
   print(technology)
-  significance <- as.numeric(as.matrix(technology[seq(2, 15, 2)]))
-  effect <- as.numeric(as.matrix(technology[seq(3, 15, 2)]))
+  significance <- as.numeric(as.matrix(technology[seq(2, 22, 3)]))
+  effect <- as.numeric(as.matrix(technology[seq(3, 22, 3)]))
+  zeros <- as.numeric(as.matrix(technology[seq(4, 22, 3)]))
   signs <- sign(effect)
   significance[significance < 1e-5] = 1e-5
   #significance[significance>0.05]=1 # threshold at 5%
@@ -49,7 +50,7 @@ getParametersForTechnology <- function(technology) {
     )[1]))])
   col[significance > 0.05] <- "white"#non-significant not colored
   
-  return(list(effect = effect, col = col))
+  return(list(effect = effect, col = col, zeros = zeros))
 }
 
 
@@ -71,9 +72,19 @@ for (technology in seq(3, nrow(data), 1)) {
   for (x in seq(0, 699, 100)) {
     y <- 900 - (technology * 100) #skip header
     size <- rescale(abs(result$effect))[i]
+    zero <- rescale(abs(result$zeros))[i]
     #print(i)
-    #print(paste(x, y, size))
-    polygon(c(x, x, x + (size), x + (size)), c(y, y + (size), y + (size), y), col = result$col[i])
+    print(paste(x, y, size, zero))
+    
+    if (size>20) {
+      #plot effect sizes
+      polygon(c(x, x, x + (size), x + (size)), c(y, y + (size), y + (size), y), col = result$col[i])
+    } else {
+      #plot non-zero differences
+      widthOfbar<-5
+      polygon(c(x + (zero-widthOfbar), x + (zero-widthOfbar),x + (zero), x + (zero)), c(y, y + (100), y + (100), y), col = result$col[i])
+    }
+
     i <- i + 1
   }
 }
