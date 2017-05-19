@@ -5,7 +5,7 @@
 
 <<>>=
 #PLOT HEATMAP
-par(bg = "lightgray",las=1,pty="s")
+par(bg = "lightgray", las = 1, pty = "s")
 data <-
   as.data.frame(
     read.table(
@@ -23,22 +23,19 @@ barplot(
   ylim = c(0, 700),
   xlim = c(0, 700),
   bg = "lightgray",
-  axes=FALSE
+  axes = FALSE
 )
 
 grid(col = "black", lty = 1)
 
-getParametersForTechnology <- function(technology) {
-  print(technology[,1])
-  significance <- as.numeric(as.matrix(technology[seq(2, 22, 3)]))
-  effect <- as.numeric(as.matrix(technology[seq(3, 22, 3)]))
-  zeros <- as.numeric(as.matrix(technology[seq(4, 22, 3)]))
-  signs <- sign(effect)
-  #signs[signs==0]<-sign(zeros)[signs==0]
-  significance[significance < 1e-5] = 1e-5
+
+getColor <- function(significance, sign) {
+  if (significance < 1e-5) {
+    significance <- 1e-5
+  }
   #significance[significance>0.05]=1 # threshold at 5%
   log_pvalue = -log10(significance)
-  log_pvalue = signs * log_pvalue     # sign_difference -1 for negative differences, +1 for   positive differences
+  log_pvalue = sign * log_pvalue     # sign_difference -1 for negative differences, +1 for   positive differences
   colfunc = colorRampPalette(c("red", "white", "navy"))(n = 100 - 1)
   # 99 colors from blue to white to red.
   # Blue will correspond to log_pvalue=-5
@@ -49,10 +46,30 @@ getParametersForTechnology <- function(technology) {
     which((log >= color_limits[1:99]) &
             (log <= color_limits[2:100])
     )[1]))])
-  col[significance > 0.05] <- "white"#non-significant not colored
+  if (significance > 0.05) {
+    col <- "white" #non-significant not colored
+  }
+  return(col)
+}
+
+getParametersForTechnology <- function(technology) {
+  print(technology[, 1])
+  decimal_points <- 4
+  significance <- as.numeric(as.matrix(technology[seq(2, 22, 3)]))
+  effect <-
+    round(as.numeric(as.matrix(technology[seq(3, 22, 3)])), decimal_points)
+  zeros <-
+    round(as.numeric(as.matrix(technology[seq(4, 22, 3)])), decimal_points)
+  signs <- sign(effect)
+  #signs[signs==0]<-sign(zeros)[signs==0]
   #todo: how to pick color when the test is based on the proportion of 0s?
-  print(paste(significance,effect,zeros))
-  return(list(effect = effect, col = col, zeros = zeros, significance = significance))
+  print(paste(significance, effect, zeros))
+  return(list(
+    effect = effect,
+    col = col,
+    zeros = zeros,
+    significance = significance
+  ))
 }
 
 
@@ -61,12 +78,20 @@ rescale <- function(x)
 print(data)
 
 #text(seq(0,700,100),700,labels=data[1,])
-mtext(c("GQ+","GQ-","AP","DR","IR","MR","Z"),side=3,las=1,adj=0,at=seq(40,700,100))
-mtext(c("I","DV","DG","T","","",""),side=2,at=seq(640,0,-100))
+mtext(
+  c("GQ+", "GQ-", "AP", "DR", "IR", "MR", "Z"),
+  side = 3,
+  las = 1,
+  adj = 0,
+  at = seq(40, 700, 100)
+)
+mtext(c("I", "DV", "DG", "T", "", "", ""),
+      side = 2,
+      at = seq(640, 0, -100))
 
 for (technology in seq(3, nrow(data), 1)) {
   print(technology)
-  result = getParametersForTechnology(data[technology,])
+  result = getParametersForTechnology(data[technology, ])
   #print(paste(result$effect, result$col))
   
   i <- 1
@@ -77,23 +102,39 @@ for (technology in seq(3, nrow(data), 1)) {
     zero <- rescale(abs(result$zeros))[i]
     #print(i)
     #print(paste(x, y, size, zero))
-    sizeToPlot<-100
+    sizeToPlot <- 100
     
     #if (size > 0) {
-      #plot effect sizes
-      polygon(c(x, x, x + (sizeToPlot), x + (sizeToPlot)), c(y, y + (sizeToPlot), y + (sizeToPlot), y), col = result$col[i])
-      
-      myColor="black"
-      if (result$significance[i]<0.05) {
-      #if (result$effect[i]==0) {
-          #result is significant, but effect is 0, difference due to proportion of errors
-          myColor=ifelse( result$zeros[i]>0, "red4", "slateblue4")
-        
-      }
-      
-      text(x+50,y+50,labels = paste(result$significance[i],"\nE:",round(result$effect[i],3),"\nZ:",round(result$zeros[i],3)),col= myColor)
+    #plot effect sizes
+    
+    signEffect <- sign(result$effect[i])
+    signZeros <- sign(result$zeros[i])
+    
+    backgroundColor <- "white"
+    if ((signEffect == -1 & signZeros== -1) | (signEffect == 1 & signZeros== 1)) {
+      backgroundColor <- getColor(result$significance[i], signEffect)
+    }
+    
+    polygon(c(x, x, x + (sizeToPlot), x + (sizeToPlot)), c(y, y + (sizeToPlot), y + (sizeToPlot), y), col = backgroundColor)
+    
+    text(x + 50,
+         y + 75,
+         labels = result$significance[i],
+         col = "black")
+    text(
+      x + 50,
+      y + 50,
+      labels = result$effect[i],
+      col = ifelse(result$effect[i] == 0, "black", (ifelse(result$effect[i] > 0, "red4", "slateblue4")))
+    )
+    text(
+      x + 50,
+      y + 25,
+      labels = result$zeros[i],
+      col = ifelse(result$effect[i] == 0, "black", (ifelse(result$effect[i] > 0, "red4", "slateblue4")))
+    )
     #} else {
-      #plot non-zero differences
+    #plot non-zero differences
     #  widthOfbar <- 5
     #  polygon(c(
     #    x + (zero - widthOfbar),
