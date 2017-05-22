@@ -9,7 +9,8 @@ par(bg = "lightgray", las = 1, pty = "s")
 data <-
   as.data.frame(
     read.table(
-      "/Users/alice/Desktop/projects/kinetics/heatmap_pacbio/Table6.test.txt",
+      "/Users/alice/Desktop/projects/kinetics/heatmap_pacbio/TableWindowsMISMATCHES.txt",
+      #"/Users/alice/Desktop/projects/kinetics/heatmap_pacbio/Table6.test.txt",
       sep = "\t"
     ),
     optional = TRUE
@@ -36,7 +37,7 @@ getColor <- function(significance, sign) {
   #significance[significance>0.05]=1 # threshold at 5%
   log_pvalue = -log10(significance)
   log_pvalue = sign * log_pvalue     # sign_difference -1 for negative differences, +1 for   positive differences
-  colfunc = colorRampPalette(c("red", "white", "navy"))(n = 100 - 1)
+  colfunc = colorRampPalette(c("navy", "white", "red"))(n = 100 - 1)
   # 99 colors from blue to white to red.
   # Blue will correspond to log_pvalue=-5
   # white log_pvalue=0
@@ -79,7 +80,7 @@ print(data)
 
 #text(seq(0,700,100),700,labels=data[1,])
 mtext(
-  c("GQ+", "GQ-", "AP", "DR", "IR", "MR", "Z"),
+  c("AP", "DR", "IR", "MR", "Z", "GQ+", "GQ-"),
   side = 3,
   las = 1,
   adj = 0,
@@ -87,11 +88,12 @@ mtext(
 )
 mtext(c("I", "DV", "DG", "T", "", "", ""),
       side = 2,
-      at = seq(640, 0, -100))
+      at = seq(640, 0,-100))
 
 for (technology in seq(3, nrow(data), 1)) {
   print(technology)
-  result = getParametersForTechnology(data[technology, ])
+  result = getParametersForTechnology(data[technology,])
+  #print(result)
   #print(paste(result$effect, result$col))
   
   i <- 1
@@ -110,39 +112,56 @@ for (technology in seq(3, nrow(data), 1)) {
     signEffect <- sign(result$effect[i])
     signZeros <- sign(result$zeros[i])
     
+    #print("signEffect:",signEffect,"signZeros:",signZeros)
+    
     backgroundColor <- "white"
-    if ((signEffect == -1 & signZeros== -1) | (signEffect == 1 & signZeros== 1)) {
-      backgroundColor <- getColor(result$significance[i], signEffect)
+    
+    if (!is.na(signEffect)) {
+      if (signEffect == 0) {
+        #pick color based on 0s
+        backgroundColor <- getColor(result$significance[i], signZeros)
+      } else {
+        if (signEffect*signZeros==-1) {
+          print("hard to interpret")
+          #-1&1 and 1&-1 are hard to interpret
+          #all other combinations unambigously pick background color
+        } else {
+          backgroundColor <- getColor(result$significance[i], signEffect)
+        }
+      }
+      polygon(c(x, x, x + (sizeToPlot), x + (sizeToPlot)), c(y, y + (sizeToPlot), y + (sizeToPlot), y), col = backgroundColor)
+      
+      text(x + 50,
+           y + 75,
+           labels = result$significance[i],
+           col = "black")
+      text(
+        x + 50,
+        y + 50,
+        labels = result$effect[i],
+        col = ifelse(result$effect[i] == 0, "black", (
+          ifelse(result$effect[i] > 0, "red4", "slateblue4")
+        ))
+      )
+      text(
+        x + 50,
+        y + 25,
+        labels = result$zeros[i],
+        col = ifelse(result$zeros[i] == 0, "black", (
+          ifelse(result$zeros[i] > 0, "red4", "slateblue4")
+        ))
+      )
+      #} else {
+      #plot non-zero differences
+      #  widthOfbar <- 5
+      #  polygon(c(
+      #    x + (zero - widthOfbar),
+      #    x + (zero - widthOfbar),
+      #    x + (zero),
+      #    x + (zero)
+      #  ), c(y, y + (100), y + (100), y), col = result$col[i])
+      #}
     }
-    
-    polygon(c(x, x, x + (sizeToPlot), x + (sizeToPlot)), c(y, y + (sizeToPlot), y + (sizeToPlot), y), col = backgroundColor)
-    
-    text(x + 50,
-         y + 75,
-         labels = result$significance[i],
-         col = "black")
-    text(
-      x + 50,
-      y + 50,
-      labels = result$effect[i],
-      col = ifelse(result$effect[i] == 0, "black", (ifelse(result$effect[i] > 0, "red4", "slateblue4")))
-    )
-    text(
-      x + 50,
-      y + 25,
-      labels = result$zeros[i],
-      col = ifelse(result$effect[i] == 0, "black", (ifelse(result$effect[i] > 0, "red4", "slateblue4")))
-    )
-    #} else {
-    #plot non-zero differences
-    #  widthOfbar <- 5
-    #  polygon(c(
-    #    x + (zero - widthOfbar),
-    #    x + (zero - widthOfbar),
-    #    x + (zero),
-    #    x + (zero)
-    #  ), c(y, y + (100), y + (100), y), col = result$col[i])
-    #}
     
     i <- i + 1
   }
