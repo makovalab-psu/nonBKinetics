@@ -4,12 +4,13 @@
 \SweaveOpts{concordance=TRUE}
 
 <<>>=
+options(scipen=10)
 #PLOT HEATMAP
 par(bg = "lightgray", las = 1, pty = "s")
 data <-
   as.data.frame(
     read.table(
-      "/Users/alice/Desktop/projects/kinetics/heatmap_pacbio/TableWindowsMISMATCHES.txt",
+      "/Users/alice/Desktop/projects/kinetics/heatmap_pacbio/NEW_features_mismatches.txt",
       #"/Users/alice/Desktop/projects/kinetics/heatmap_pacbio/Table6.test.txt",
       sep = "\t"
     ),
@@ -21,8 +22,8 @@ barplot(
   xaxs = "i",
   yaxs = "i",
   col = colours()[1:6],
-  ylim = c(0, 700),
-  xlim = c(0, 700),
+  ylim = c(0, 800),
+  xlim = c(0, 800),
   bg = "lightgray",
   axes = FALSE
 )
@@ -78,15 +79,19 @@ rescale <- function(x)
   (x) / (max(x)) * 100
 print(data)
 
-#text(seq(0,700,100),700,labels=data[1,])
-mtext(
-  c("AP", "DR", "IR", "MR", "Z", "GQ+", "GQ-"),
-  side = 3,
-  las = 1,
-  adj = 0,
-  at = seq(40, 700, 100)
-)
-mtext(c("I", "DV", "DG", "T", "", "", ""),
+par(xpd=TRUE)
+motifs<-unique(as.character(unlist(data[1,])))
+text(seq(50,700,100),800,labels=motifs[2:length(motifs)],srt=90)
+
+
+#mtext(
+#  c("AP", "DR", "IR", "MR", "Z", "GQ+", "GQ-"),
+#  side = 3,
+#  las = 1,
+#  adj = 0,
+#  at = seq(40, 700, 100)
+#)
+mtext(c("P","I", "DV", "DG", "T", "", ""),
       side = 2,
       at = seq(640, 0,-100))
 
@@ -129,7 +134,13 @@ for (technology in seq(3, nrow(data), 1)) {
           backgroundColor <- getColor(result$significance[i], signEffect)
         }
       }
+      
+    }
+      
+    if (!is.na(result$significance[i])) {
       polygon(c(x, x, x + (sizeToPlot), x + (sizeToPlot)), c(y, y + (sizeToPlot), y + (sizeToPlot), y), col = backgroundColor)
+    }
+      
       
       text(x + 50,
            y + 75,
@@ -161,7 +172,7 @@ for (technology in seq(3, nrow(data), 1)) {
       #    x + (zero)
       #  ), c(y, y + (100), y + (100), y), col = result$col[i])
       #}
-    }
+    
     
     i <- i + 1
   }
