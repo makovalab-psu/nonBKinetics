@@ -6,7 +6,7 @@
 <<>>=
 options(scipen=10)
 #PLOT HEATMAP
-par(bg = "lightgray", las = 1, pty = "s")
+par(bg = "white", las = 1, pty = "s")
 data <-
   as.data.frame(
     read.table(
@@ -22,13 +22,12 @@ barplot(
   xaxs = "i",
   yaxs = "i",
   col = colours()[1:6],
-  ylim = c(0, 800),
-  xlim = c(0, 800),
-  bg = "lightgray",
+  ylim = c(0, 700),
+  xlim = c(0, 700),
+  bg = "white",
   axes = FALSE
 )
 
-grid(col = "black", lty = 1)
 
 
 getColor <- function(significance, sign) {
@@ -119,48 +118,54 @@ for (technology in seq(3, nrow(data), 1)) {
     
     #print("signEffect:",signEffect,"signZeros:",signZeros)
     
-    backgroundColor <- "white"
+    backgroundColor1 <- "white"
+    backgroundColor2 <- "white"
     
     if (!is.na(signEffect)) {
       if (signEffect == 0) {
         #pick color based on 0s
-        backgroundColor <- getColor(result$significance[i], signZeros)
+        backgroundColor1 <- getColor(result$significance[i], signZeros)
+        backgroundColor2<- backgroundColor1
       } else {
         if (signEffect*signZeros==-1) {
           print("hard to interpret")
           #-1&1 and 1&-1 are hard to interpret
+          
+          backgroundColor1 <- getColor(result$significance[i], signEffect)
+          backgroundColor2<- getColor(result$significance[i], signZeros)
+          
           #all other combinations unambigously pick background color
         } else {
-          backgroundColor <- getColor(result$significance[i], signEffect)
+          backgroundColor1 <- getColor(result$significance[i], signEffect)
+          backgroundColor2<- backgroundColor1
         }
       }
       
     }
       
     if (!is.na(result$significance[i])) {
-      polygon(c(x, x, x + (sizeToPlot), x + (sizeToPlot)), c(y, y + (sizeToPlot), y + (sizeToPlot), y), col = backgroundColor)
+      #upper left
+      polygon(c(x, x, x + (sizeToPlot), x), c(y, y + (sizeToPlot), y + (sizeToPlot), y), col = backgroundColor1, lty=0)
+      #bottom right
+      polygon(c(x, x+(sizeToPlot), x + (sizeToPlot), x), c(y,y,y + (sizeToPlot), y), col = backgroundColor2, lty=0)
     }
       
       
-      text(x + 50,
-           y + 75,
-           labels = result$significance[i],
-           col = "black")
+      #text(x + 50,
+      #     y + 75,
+      #     labels = result$significance[i],
+      #     col = "red")
       text(
-        x + 50,
-        y + 50,
+        x + 33,
+        y + 70,
         labels = result$effect[i],
-        col = ifelse(result$effect[i] == 0, "black", (
-          ifelse(result$effect[i] > 0, "red4", "slateblue4")
-        ))
+        col = ifelse(result$significance[i] >0.05, "white","black")
       )
       text(
-        x + 50,
-        y + 25,
+        x + 70,
+        y + 33,
         labels = result$zeros[i],
-        col = ifelse(result$zeros[i] == 0, "black", (
-          ifelse(result$zeros[i] > 0, "red4", "slateblue4")
-        ))
+        col = ifelse(result$significance[i] >0.05, "white","black")
       )
       #} else {
       #plot non-zero differences
@@ -177,5 +182,5 @@ for (technology in seq(3, nrow(data), 1)) {
     i <- i + 1
   }
 }
-
+grid(col = "black", lty = 1)
 @
