@@ -465,7 +465,7 @@ plotTest_same_sample_size <- function(regionsFeatures,alpha=0.05,scale_threshold
       pval_scale_threshold=adjusted_pval(regionsFeatures,i,id_feature,scale_threshold_i)[[1]][[1]]
       plot(1,type="n",xlim=c(x_plot[1]-diff(x_plot[1:2])/2,rev(x_plot)[1]+diff(x_plot[1:2])/2),ylim=c(0,1),ylab="p-value",xlab=xlab,xaxs="i",
            main=paste0("Adjusted p-values - Threshold ",scale_threshold_i[[id_feature]]),mgp=c(3,0.8,0),...)
-      low.p.value=which((pval_scale_threshold<0.05)&(!is.infinite(pval_scale_threshold)))
+      low.p.value=which((pval_scale_threshold<=alpha)&(!is.infinite(pval_scale_threshold)))
       if(length(low.p.value)){
         for(j in seq_along(low.p.value))
           rect(x_plot[low.p.value[j]]-diff(x_plot[1:2])/2,par("usr")[3],

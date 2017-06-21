@@ -1,0 +1,186 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+<<>>=
+options(scipen=10)
+#PLOT HEATMAP
+par(bg = "white", las = 1, pty = "s")
+data <-
+  as.data.frame(
+    read.table(
+      "/Users/alice/Desktop/projects/kinetics/heatmap_pacbio/NEW_features_mismatches.txt",
+      #"/Users/alice/Desktop/projects/kinetics/heatmap_pacbio/Table6.test.txt",
+      sep = "\t"
+    ),
+    optional = TRUE
+  )
+barplot(
+  c(0),
+  c(0),
+  xaxs = "i",
+  yaxs = "i",
+  col = colours()[1:6],
+  ylim = c(0, 700),
+  xlim = c(0, 700),
+  bg = "white",
+  axes = FALSE
+)
+
+
+
+getColor <- function(significance, sign) {
+  if (significance < 1e-5) {
+    significance <- 1e-5
+  }
+  #significance[significance>0.05]=1 # threshold at 5%
+  log_pvalue = -log10(significance)
+  log_pvalue = sign * log_pvalue     # sign_difference -1 for negative differences, +1 for   positive differences
+  colfunc = colorRampPalette(c("navy", "white", "red"))(n = 100 - 1)
+  # 99 colors from blue to white to red.
+  # Blue will correspond to log_pvalue=-5
+  # white log_pvalue=0
+  # red log_pvalue=5
+  color_limits = seq (-5, 5, length.out = 100)
+  col = c(colfunc[unlist(lapply(log_pvalue, function(log)
+    which((log >= color_limits[1:99]) &
+            (log <= color_limits[2:100])
+    )[1]))])
+  if (significance > 0.05) {
+    col <- "white" #non-significant not colored
+  }
+  return(col)
+}
+
+getParametersForTechnology <- function(technology) {
+  print(technology[, 1])
+  decimal_points <- 4
+  significance <- as.numeric(as.matrix(technology[seq(2, 22, 3)]))
+  effect <-
+    round(as.numeric(as.matrix(technology[seq(3, 22, 3)])), decimal_points)
+  zeros <-
+    round(as.numeric(as.matrix(technology[seq(4, 22, 3)])), decimal_points)
+  signs <- sign(effect)
+  #signs[signs==0]<-sign(zeros)[signs==0]
+  #todo: how to pick color when the test is based on the proportion of 0s?
+  print(paste(significance, effect, zeros))
+  return(list(
+    effect = effect,
+    col = col,
+    zeros = zeros,
+    significance = significance
+  ))
+}
+
+
+rescale <- function(x)
+  (x) / (max(x)) * 100
+print(data)
+
+par(xpd=TRUE)
+motifs<-unique(as.character(unlist(data[1,])))
+text(seq(50,700,100),800,labels=motifs[2:length(motifs)],srt=90)
+
+
+#mtext(
+#  c("AP", "DR", "IR", "MR", "Z", "GQ+", "GQ-"),
+#  side = 3,
+#  las = 1,
+#  adj = 0,
+#  at = seq(40, 700, 100)
+#)
+mtext(c("P","I", "DV", "DG", "T", "", ""),
+      side = 2,
+      at = seq(640, 0,-100))
+
+for (technology in seq(3, nrow(data), 1)) {
+  print(technology)
+  result = getParametersForTechnology(data[technology,])
+  #print(result)
+  #print(paste(result$effect, result$col))
+  
+  i <- 1
+  #print(x)
+  for (x in seq(0, 699, 100)) {
+    y <- 900 - (technology * 100) #skip header
+    size <- rescale(abs(result$effect))[i]
+    zero <- rescale(abs(result$zeros))[i]
+    #print(i)
+    #print(paste(x, y, size, zero))
+    sizeToPlot <- 100
+    
+    #if (size > 0) {
+    #plot effect sizes
+    
+    signEffect <- sign(result$effect[i])
+    signZeros <- sign(result$zeros[i])
+    
+    #print("signEffect:",signEffect,"signZeros:",signZeros)
+    
+    backgroundColor1 <- "white"
+    backgroundColor2 <- "white"
+    
+    if (!is.na(signEffect)) {
+      if (signEffect == 0) {
+        #pick color based on 0s
+        backgroundColor1 <- getColor(result$significance[i], signZeros)
+        backgroundColor2<- backgroundColor1
+      } else {
+        if (signEffect*signZeros==-1) {
+          print("hard to interpret")
+          #-1&1 and 1&-1 are hard to interpret
+          
+          backgroundColor1 <- getColor(result$significance[i], signEffect)
+          backgroundColor2<- getColor(result$significance[i], signZeros)
+          
+          #all other combinations unambigously pick background color
+        } else {
+          backgroundColor1 <- getColor(result$significance[i], signEffect)
+          backgroundColor2<- backgroundColor1
+        }
+      }
+      
+    }
+      
+    if (!is.na(result$significance[i])) {
+      #upper left
+      polygon(c(x, x, x + (sizeToPlot), x), c(y, y + (sizeToPlot), y + (sizeToPlot), y), col = backgroundColor1, lty=0)
+      #bottom right
+      polygon(c(x, x+(sizeToPlot), x + (sizeToPlot), x), c(y,y,y + (sizeToPlot), y), col = backgroundColor2, lty=0)
+    }
+      
+      
+      #text(x + 50,
+      #     y + 75,
+      #     labels = result$significance[i],
+      #     col = "red")
+      text(
+        x + 33,
+        y + 70,
+        labels = result$effect[i],
+        col = ifelse(result$significance[i] >0.05, "white","black")
+      )
+      text(
+        x + 70,
+        y + 33,
+        labels = result$zeros[i],
+        col = ifelse(result$significance[i] >0.05, "white","black")
+      )
+      #} else {
+      #plot non-zero differences
+      #  widthOfbar <- 5
+      #  polygon(c(
+      #    x + (zero - widthOfbar),
+      #    x + (zero - widthOfbar),
+      #    x + (zero),
+      #    x + (zero)
+      #  ), c(y, y + (100), y + (100), y), col = result$col[i])
+      #}
+    
+    
+    i <- i + 1
+  }
+}
+grid(col = "black", lty = 1)
+@
