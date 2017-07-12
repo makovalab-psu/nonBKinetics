@@ -10,8 +10,7 @@ par(bg = "white", las = 1, pty = "s")
 data <-
   as.data.frame(
     read.table(
-      "/Users/alice/Desktop/projects/kinetics/heatmap_pacbio/NEW_features_mismatches.txt",
-      #"/Users/alice/Desktop/projects/kinetics/heatmap_pacbio/Table6.test.txt",
+      "feature_type.txt",
       sep = "\t"
     ),
     optional = TRUE
@@ -56,12 +55,19 @@ getColor <- function(significance, sign) {
 getParametersForTechnology <- function(technology) {
   print(technology[, 1])
   decimal_points <- 4
-  significance <- as.numeric(as.matrix(technology[seq(2, 22, 3)]))
+  columns<-8
+  signs <- as.numeric(as.matrix(technology[seq(6, (7*columns)+1, columns)]))
+  significance <- as.numeric(as.matrix(technology[seq(7, (7*columns)+1, columns)]))
   effect <-
-    round(as.numeric(as.matrix(technology[seq(3, 22, 3)])), decimal_points)
+    round(as.numeric(as.matrix(technology[seq(8, (7*columns)+1, columns)])), decimal_points)
   zeros <-
-    round(as.numeric(as.matrix(technology[seq(4, 22, 3)])), decimal_points)
-  signs <- sign(effect)
+    round(as.numeric(as.matrix(technology[seq(9, (7*columns)+1, columns)])), decimal_points)
+  
+  mean_features <- as.numeric(as.matrix(technology[seq(2, (7*columns)+1, columns)]))
+  mean_controls <- as.numeric(as.matrix(technology[seq(3, (7*columns)+1, columns)]))
+  
+  real_perc_diff <- round(as.numeric(mean_features-mean_controls)/mean_controls, decimal_points)
+
   #signs[signs==0]<-sign(zeros)[signs==0]
   #todo: how to pick color when the test is based on the proportion of 0s?
   print(paste(significance, effect, zeros))
@@ -69,7 +75,9 @@ getParametersForTechnology <- function(technology) {
     effect = effect,
     col = col,
     zeros = zeros,
-    significance = significance
+    significance = significance,
+    signs = signs,
+    real_perc_diff = real_perc_diff
   ))
 }
 
@@ -97,7 +105,7 @@ mtext(c("P","I", "DV", "DG", "T", "", ""),
 for (technology in seq(3, nrow(data), 1)) {
   print(technology)
   result = getParametersForTechnology(data[technology,])
-  #print(result)
+  print(result)
   #print(paste(result$effect, result$col))
   
   i <- 1
@@ -113,60 +121,89 @@ for (technology in seq(3, nrow(data), 1)) {
     #if (size > 0) {
     #plot effect sizes
     
-    signEffect <- sign(result$effect[i])
-    signZeros <- sign(result$zeros[i])
+    #signEffect <- sign(result$effect[i])
+    #signZeros <- sign(result$zeros[i])
+    #signs <- result$signs[i]
+    #signEffect<-signs #overwrite colors with total mean differences
+    #signZeros<-signs #overwrite colors with total mean differences
     
     #print("signEffect:",signEffect,"signZeros:",signZeros)
     
     backgroundColor1 <- "white"
     backgroundColor2 <- "white"
     
-    if (!is.na(signEffect)) {
-      if (signEffect == 0) {
-        #pick color based on 0s
-        backgroundColor1 <- getColor(result$significance[i], signZeros)
-        backgroundColor2<- backgroundColor1
-      } else {
-        if (signEffect*signZeros==-1) {
-          print("hard to interpret")
-          #-1&1 and 1&-1 are hard to interpret
-          
-          backgroundColor1 <- getColor(result$significance[i], signEffect)
-          backgroundColor2<- getColor(result$significance[i], signZeros)
-          
-          #all other combinations unambigously pick background color
-        } else {
-          backgroundColor1 <- getColor(result$significance[i], signEffect)
-          backgroundColor2<- backgroundColor1
-        }
-      }
+    #if (!is.na(signEffect)) {
+    #  if (signEffect == 0) {
+    #    #pick color based on 0s
+    #    backgroundColor1 <- getColor(result$significance[i], signZeros)
+    #    backgroundColor2<- backgroundColor1
+    #  } else {
+    #    if (signEffect*signZeros==-1) {
+    #      print("hard to interpret")
+    #      #-1&1 and 1&-1 are hard to interpret
+    #      
+    #      backgroundColor1 <- getColor(result$significance[i], signEffect)
+    #      backgroundColor2<- getColor(result$significance[i], signZeros)
+    #      
+    #      #all other combinations unambigously pick background color
+    #    } else {
+    #      backgroundColor1 <- getColor(result$significance[i], signEffect)
+    #      backgroundColor2<- backgroundColor1
+    #    }
+    #  }
       
-    }
+    #}
       
     if (!is.na(result$significance[i])) {
       #upper left
-      polygon(c(x, x, x + (sizeToPlot), x), c(y, y + (sizeToPlot), y + (sizeToPlot), y), col = backgroundColor1, lty=0)
+      #polygon(c(x, x, x + (sizeToPlot), x), c(y, y + (sizeToPlot), y + (sizeToPlot), y), col = backgroundColor1, lty=0)
       #bottom right
-      polygon(c(x, x+(sizeToPlot), x + (sizeToPlot), x), c(y,y,y + (sizeToPlot), y), col = backgroundColor2, lty=0)
+      #polygon(c(x, x+(sizeToPlot), x + (sizeToPlot), x), c(y,y,y + (sizeToPlot), y), col = backgroundColor2, lty=0)
+      
+      #plot just rectangle
+      polygon(c(x, x, x + (sizeToPlot), x + (sizeToPlot)), c(y, y + (sizeToPlot), y + (sizeToPlot), y), col = getColor(result$significance[i], result$signs[i]), lty=0)
     }
       
-      
-      #text(x + 50,
-      #     y + 75,
-      #     labels = result$significance[i],
-      #     col = "red")
-      text(
-        x + 33,
-        y + 70,
-        labels = result$effect[i],
-        col = ifelse(result$significance[i] >0.05, "white","black")
+    cell_value<-result$real_perc_diff[i]*100
+    #print(cell_value)
+    #if (!is.na(cell_value)) {
+    #  if (abs(cell_value)<1) {
+    #    if (sign(cell_value)==1) {
+    #      cell_value<-"~1"
+    #    } else {
+    #      cell_value<-"~-1"
+    #    }
+    #  } else {
+    #    #the rounding should take place
+    #    cell_value<-round(cell_value)
+    #  }
+    #}
+    if (!is.na(cell_value)) {
+      cell_value<-round(cell_value)
+      if (cell_value==0) {
+        cell_value<-paste0("~",cell_value,"%")
+      } else {
+        cell_value<-paste0(cell_value,"%")
+      }
+    }
+      text(x + 50,
+           y + 50,
+           labels = cell_value,
+           col = ifelse(result$significance[i] >0.05, "black","white"),
+           cex=1.75
       )
-      text(
-        x + 70,
-        y + 33,
-        labels = result$zeros[i],
-        col = ifelse(result$significance[i] >0.05, "white","black")
-      )
+      #text(
+      #  x + 33,
+      #  y + 70,
+      #  labels = result$effect[i]*100,
+      #  col = ifelse(result$significance[i] >0.05, "white","gray")
+      #)
+      #text(
+      #  x + 70,
+      #  y + 33,
+      #  labels = result$zeros[i]*100,
+      #  col = ifelse(result$significance[i] >0.05, "white","gray")
+      #)
       #} else {
       #plot non-zero differences
       #  widthOfbar <- 5
