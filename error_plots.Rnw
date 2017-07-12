@@ -411,7 +411,7 @@ run <- function(directory, filenames, paired, ITER) {
   
   #OUTPUT TABLES
   print("PRINT TABLES-------------")
-  names <- names(TOTALpvalue)
+  names <- c("APhasedRepeatsFeatureOnly.mf", "DirectRepeatsFeatureOnly.mf", "InvertedRepeatsFeatureOnly.mf", "MirrorRepeatsFeatureOnly.mf", "ZDNAMotifsFeatureOnly.mf", "GQuadPlusFeatureOnly.mf", "GQuadMinusFeatureOnly.mf")
   par(mfrow = c(1, 1), cex = 1.4)
   directory <- paste0(getwd(), "/")
   variables <- basename(getwd())
@@ -464,10 +464,10 @@ run <- function(directory, filenames, paired, ITER) {
         significance,
         effectSize,
         nonzeros,
-        sep = " "
+        sep = "\t"
       )
     summary <-
-      as.data.frame(as.matrix(rbind(names, results), optional = TRUE))
+      as.data.frame(as.matrix(rbind(rep(names,each=8), results), optional = TRUE))
     fn <- paste0(directory, basename(variables), "_", i, ".txt")
     print(fn)
     write.table(
@@ -483,44 +483,44 @@ run <- function(directory, filenames, paired, ITER) {
   
 }
 
-TOTAL <- hash()
-INSERTION <- hash()
-DELETION <- hash()
-MISMATCHES <- hash()
-
-TOTALcontrols <- hash()
-INSERTIONcontrols <- hash()
-DELETIONcontrols <- hash()
-MISMATCHEScontrols <- hash()
-
-TOTALpvalue <- hash()
-INSERTIONpvalue <- hash()
-DELETIONpvalue <- hash()
-MISMATCHESpvalue <- hash()
-
-TOTALnonzeros <- hash()
-INSERTIONnonzeros <- hash()
-DELETIONnonzeros <- hash()
-MISMATCHESnonzeros <- hash()
-
-TOTALeffectSize <- hash()
-INSERTIONeffectSize <- hash()
-DELETIONeffectSize <- hash()
-MISMATCHESeffectSize <- hash()
-
 set.seed(3)
 
 directories <-
   c(
-    "/Users/alice/Desktop/projects/kinetics/errors_will/june1/features/illumina",
-    "/Users/alice/Desktop/projects/kinetics/errors_will/june1/features/pacbio",
-    "/Users/alice/Desktop/projects/kinetics/errors_will/june1/features/diversity",
-    "/Users/alice/Desktop/projects/kinetics/errors_will/june1/features/divergence",
-    "/Users/alice/Desktop/projects/kinetics/errors_will/june1/features/TCGA"
+    "/Users/alice/Desktop/projects/kinetics/errors_will/old_June30/june1/features/illumina",
+    "/Users/alice/Desktop/projects/kinetics/errors_will/old_June30/june1/features/pacbio",
+    "/Users/alice/Desktop/projects/kinetics/errors_will/old_June30/june1/features/diversity",
+    "/Users/alice/Desktop/projects/kinetics/errors_will/old_June30/june1/features/divergence",
+    "/Users/alice/Desktop/projects/kinetics/errors_will/old_June30/june1/features/TCGA"
   )
 
 for (directory in directories) {
   setwd(directory)
+  
+  TOTAL <- hash()
+  INSERTION <- hash()
+  DELETION <- hash()
+  MISMATCHES <- hash()
+  
+  TOTALcontrols <- hash()
+  INSERTIONcontrols <- hash()
+  DELETIONcontrols <- hash()
+  MISMATCHEScontrols <- hash()
+  
+  TOTALpvalue <- hash()
+  INSERTIONpvalue <- hash()
+  DELETIONpvalue <- hash()
+  MISMATCHESpvalue <- hash()
+  
+  TOTALnonzeros <- hash()
+  INSERTIONnonzeros <- hash()
+  DELETIONnonzeros <- hash()
+  MISMATCHESnonzeros <- hash()
+  
+  TOTALeffectSize <- hash()
+  INSERTIONeffectSize <- hash()
+  DELETIONeffectSize <- hash()
+  MISMATCHESeffectSize <- hash()
   
   filenames <- list.files(pattern = "*.mf", full.names = FALSE)
   filenames <- filenames[grep("EmptyTmp", filenames, invert = TRUE)]
