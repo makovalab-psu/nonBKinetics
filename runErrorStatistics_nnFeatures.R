@@ -23,26 +23,24 @@ getWindow <- function(arguments) {
   end <- as.numeric(arguments[3])
   
   rates <- (getErrorRate(start, end))
-  percErrorTotal <- (rates[[2]] + rates[[3]] + rates[[4]]) / rates[[1]] *
-    100
-  percErrorIns <- (rates[[2]]) / rates[[1]] * 100
-  percErrorDel <- (rates[[3]]) / rates[[1]] * 100
-  percErrorMism <- (rates[[4]]) / rates[[1]] * 100
+  percErrorTotal <- (rates$mismatchRows + rates$insertionRows + rates$deletionRows) / rates$totalRows
+  percErrorIns <- rates$insertionRows / rates$totalRows
+  percErrorDel <- rates$deletionRows / rates$totalRows
+  percErrorMism <- rates$mismatchRows / rates$totalRows
   
   return(
     paste(
       reference,
       start,
       end,
-      rates[[1]],
-      rates[[2]],
-      rates[[3]],
-      rates[[4]],
       percErrorTotal,
+      percErrorMism,
       percErrorIns,
       percErrorDel,
-      percErrorMism,
-      paste0("$$"),
+      rates$totalRows,
+      rates$mismatchRows,
+      rates$insertionRows,
+      rates$deletionRows,
       sep = " "
     )
   )
@@ -64,17 +62,32 @@ getErrorRate <- function(start, end) {
     if (nrow(w) > 0) {
       totalRows <- nrow(w)
       
-      insertionRows <- nrow(w[as.character(w$ref) == "-", ])
-      deletionRows <- nrow(w[as.character(w$read) == "-", ])
+      
+    insertion_lengths <-
+      unlist(lapply(unique(w$idx), function(x)
+        (rle(w[idx == x]$ref)$lengths[rle(w[idx == x]$ref)$values == "-"])))
+    if (!length(insertion_lengths) > 0) {
+      insertion_lengths <- NA
+    }
+    
+    deletion_lengths <-
+      unlist(lapply(unique(w$idx), function(x)
+        (rle(w[idx == x]$read)$lengths[rle(w[idx == x]$read)$values == "-"])))
+    if (!length(deletion_lengths) > 0) {
+      deletion_lengths <- NA
+    }
+      
+      insertionRows <- length(insertion_lengths)
+      deletionRows <- length(deletion_lengths)
       mismatchRows <-
         nrow(w[as.character(w$ref) != as.character(w$read) &
                  (as.character(w$ref) != "-") & (as.character(w$read) != "-"), ])
       
       return(list(
-        totalRows,
-        insertionRows,
-        deletionRows,
-        mismatchRows
+        totalRows=totalRows,
+        mismatchRows=mismatchRows,
+        insertionRows=insertionRows,
+        deletionRows=deletionRows
       ))
     }
   }
@@ -140,4 +153,3 @@ for (motif in list) {
 proc.time() - ptm #stop timer
 
 print("Done.")
-traceback()
