@@ -7,14 +7,25 @@
 options(scipen=10)
 #PLOT HEATMAP
 par(bg = "white", las = 1, pty = "s")
-data <-
-  as.data.frame(
-    read.table(
-      "feature_type.txt",
-      sep = "\t"
-    ),
-    optional = TRUE
+
+errorType<-"MISMATCHES" #CHANGE THE ERROR TYPE HERE
+root_folder<-"/Users/alice/Desktop/projects/kinetics/errors_will/52x/"
+file_list <-
+  c(
+  paste(root_folder,"illumina/illumina_",errorType,".txt",sep=""),
+  paste(root_folder,"pacbio/pacbio_",errorType,".txt",sep=""),
+  paste(root_folder,"diversity/diversity_",errorType,".txt",sep=""),
+  paste(root_folder,"divergence/divergence_",errorType,".txt",sep=""),
+  paste(root_folder,"TCGA/TCGA_",errorType,".txt",sep="")
   )
+
+dataset <- do.call("rbind",lapply(file_list,
+FUN=function(files){read.table(files,
+header=FALSE, sep="\t")}))
+
+interesting_rows<-c(1,2,seq(3,nrow(dataset),by=3))
+data<-dataset[interesting_rows,] #remove excessive headers
+
 barplot(
   c(0),
   c(0),
@@ -24,7 +35,7 @@ barplot(
   ylim = c(0, 700),
   xlim = c(0, 700),
   bg = "white",
-  axes = FALSE
+  axes = FALSE,sub=errorType
 )
 
 
@@ -88,7 +99,7 @@ print(data)
 
 par(xpd=TRUE)
 motifs<-unique(as.character(unlist(data[1,])))
-text(seq(50,700,100),800,labels=motifs[2:length(motifs)],srt=90)
+text(seq(50,700,100),730,labels=motifs[2:length(motifs)],srt=90)
 
 
 #mtext(
@@ -100,7 +111,7 @@ text(seq(50,700,100),800,labels=motifs[2:length(motifs)],srt=90)
 #)
 mtext(c("P","I", "DV", "DG", "T", "", ""),
       side = 2,
-      at = seq(640, 0,-100))
+      at = seq(540, 0,-100))
 
 for (technology in seq(3, nrow(data), 1)) {
   print(technology)
@@ -111,7 +122,7 @@ for (technology in seq(3, nrow(data), 1)) {
   i <- 1
   #print(x)
   for (x in seq(0, 699, 100)) {
-    y <- 900 - (technology * 100) #skip header
+    y <- 800 - (technology * 100) #skip header
     size <- rescale(abs(result$effect))[i]
     zero <- rescale(abs(result$zeros))[i]
     #print(i)
@@ -219,5 +230,5 @@ for (technology in seq(3, nrow(data), 1)) {
     i <- i + 1
   }
 }
-grid(col = "black", lty = 1)
+grid(7,7,col = "black", lty = 1)
 @
