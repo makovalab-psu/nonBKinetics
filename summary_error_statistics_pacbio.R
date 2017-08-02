@@ -7,8 +7,11 @@
 directory <-"/Users/alice/Desktop/projects/kinetics/errors_will/plot_summary_statistics"
 setwd(directory)
 par(mfrow=c(3,3))
-filenames <- list.files(pattern = "*.mf", full.names = FALSE)
-filenames <- filenames[grep("EmptyTmp", filenames, invert = TRUE)]
+#filenames <- sort(list.files(pattern = "*.mf", full.names = FALSE))
+#filenames <- filenames[grep("EmptyTmp", filenames, invert = TRUE)]
+
+filenames<-c("APhasedRepeatsFeatureOnly.mf", "DirectRepeatsFeatureOnly.mf", "InvertedRepeatsFeatureOnly.mf", "MirrorRepeatsFeatureOnly.mf", "ZDNAMotifsFeatureOnly.mf", "GQuadPlusFeatureOnly.mf", "GQuadMinusFeatureOnly.mf")
+
   
 for (file in filenames) {
   print(file)
