@@ -61,8 +61,7 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired, parametric=FALSE) {
   TwoPart <- function(data,
                       group,
                       test = "t.test",
-                      point.mass = 0,
-                      paired=TRUE) {
+                      point.mass = 0) {
     Index1 <- c(group == 1)
     Group1 <- data[Index1]
     Group0 <- data[!Index1]
@@ -80,20 +79,12 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired, parametric=FALSE) {
       T2 <- 0
       difference = NA
       difference_perc = NA
-      if(paired){
-        B2 <- mcnemar.test(table(Group1 == point.mass,Group0 == point.mass))$statistic
-      }else{
-        B2 <- prop.test(pointmass, obs)$statistic
-      }
+      B2 <- prop.test(pointmass, obs)$statistic
     } else if ((success[1] == 1) | (success[2] == 1)) {
       T2 <- 0
       difference = NA
       difference_perc = NA
-      if(paired){
-        B2 <- mcnemar.test(table(Group1 == point.mass,Group0 == point.mass))$statistic
-      }else{
-        B2 <- prop.test(pointmass, obs)$statistic
-      }
+      B2 <- prop.test(pointmass, obs)$statistic
     } else {
       uniq1 <- length(unique(Group1[Group1 != point.mass]))
       uniq2 <- length(unique(Group0[Group0 != point.mass]))
@@ -104,11 +95,7 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired, parametric=FALSE) {
         if (sum(pointmass) == 0) {
           B2 <- 0
         } else {
-          if(paired){
-            B2 <- mcnemar.test(table(Group1 == point.mass,Group0 == point.mass))$statistic
-          }else{
-            B2 <- prop.test(pointmass, obs)$statistic
-          }
+          B2 <- prop.test(pointmass, obs)$statistic
         }
       } else if (sum(pointmass) == 0) {
         B2 <- 0
@@ -119,11 +106,7 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired, parametric=FALSE) {
           T2 <- t.test(data~group)$statistic^2
         }
       } else {
-        if(paired){
-          B2 <- mcnemar.test(table(Group1 == point.mass,Group0 == point.mass))$statistic
-        }else{
           B2 <- prop.test(pointmass, obs)$statistic
-        }
         contIndex <- data != point.mass
         cont <- data[contIndex]
         cGroup <- group[contIndex]
@@ -180,14 +163,14 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired, parametric=FALSE) {
       }
       #temp=Reduce(cbind,by(data, groups_perm, quantile, probs=c(.05, .25, .5, .75, .95),na.rm=TRUE))
       #temp=sum((temp[,2]-temp[,1])^2)
-      temp = TwoPart(data, groups_perm, test = "t.test", paired)$statistic  
+      temp = TwoPart(data, groups_perm, test = "t.test")$statistic  
       return(temp)
     }))
   }
   
   #test.diff <- Reduce(cbind,by(data, groups, quantile, probs=c(.05, .25, .5, .75, .95),na.rm=TRUE))
   #test.diff=sum((test.diff[,2]-test.diff[,1])^2)
-  two.part = TwoPart(data, groups, test = "t.test",paired)   
+  two.part = TwoPart(data, groups, test = "t.test")   
   test.diff = two.part$statistic
   sign_difference = sign(two.part$difference)
   effectSize = two.part$difference
