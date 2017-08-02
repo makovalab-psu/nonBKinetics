@@ -8,7 +8,7 @@ options(scipen=10)
 #PLOT HEATMAP
 par(bg = "white", las = 1, pty = "s")
 
-errorType<-"MISMATCHES" #CHANGE THE ERROR TYPE HERE
+errorType<-"INSERTION" #CHANGE THE ERROR TYPE HERE
 root_folder<-"/Users/alice/Desktop/projects/kinetics/errors_will/52x/"
 file_list <-
   c(
