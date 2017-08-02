@@ -1,5 +1,5 @@
 <<plot error profiles for different motifs>>=
-options(scipen = 10)
+  options(scipen = 10)
 options(error = traceback)
 options(show.error.locations = TRUE)
 par(
@@ -19,7 +19,7 @@ testCoordinates <- function(data, dataEmpty) {
   return(all.equal(feature_lengths, control_lengths))
 }
 
-getPvalue <- function(grp.1, grp.2, file, i, ITER, paired) {
+getPvalue <- function(grp.1, grp.2, file, i, ITER, paired, parametric=FALSE) {
   print(mean(grp.1))
   print(mean(grp.2))
   
@@ -60,8 +60,9 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired) {
   # Function for calculating two-part statistics
   TwoPart <- function(data,
                       group,
-                      test = "quantiles",
-                      point.mass = 0) {
+                      test = "t.test",
+                      point.mass = 0,
+                      paired=TRUE) {
     Index1 <- c(group == 1)
     Group1 <- data[Index1]
     Group0 <- data[!Index1]
@@ -79,12 +80,20 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired) {
       T2 <- 0
       difference = NA
       difference_perc = NA
-      B2 <- prop.test(pointmass, obs)$statistic
+      if(paired){
+        B2 <- mcnemar.test(table(Group1 == point.mass,Group0 == point.mass))$statistic
+      }else{
+        B2 <- prop.test(pointmass, obs)$statistic
+      }
     } else if ((success[1] == 1) | (success[2] == 1)) {
       T2 <- 0
       difference = NA
       difference_perc = NA
-      B2 <- prop.test(pointmass, obs)$statistic
+      if(paired){
+        B2 <- mcnemar.test(table(Group1 == point.mass,Group0 == point.mass))$statistic
+      }else{
+        B2 <- prop.test(pointmass, obs)$statistic
+      }
     } else {
       uniq1 <- length(unique(Group1[Group1 != point.mass]))
       uniq2 <- length(unique(Group0[Group0 != point.mass]))
@@ -95,71 +104,57 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired) {
         if (sum(pointmass) == 0) {
           B2 <- 0
         } else {
-          B2 <- prop.test(pointmass, obs)$statistic
+          if(paired){
+            B2 <- mcnemar.test(table(Group1 == point.mass,Group0 == point.mass))$statistic
+          }else{
+            B2 <- prop.test(pointmass, obs)$statistic
+          }
         }
       } else if (sum(pointmass) == 0) {
         B2 <- 0
-        if (test == "mean") {
+        if (test == "t.test") {
           T2 <- Reduce(c, by(data, group, mean, na.rm = TRUE))
           difference <- T2[2] - T2[1]
           difference_perc <- difference / T2[1]
-          T2 <- (T2[2] - T2[1]) ^ 2
-        }
-        if (test == "quantiles") {
-          T2 <-
-            Reduce(cbind,
-                   by(
-                     data,
-                     group,
-                     quantile,
-                     probs = c(.05, .25, .5, .75, .95),
-                     na.rm = TRUE
-                   ))
-          difference <- sum(T2[, 2] - T2[, 1]) / nrow(T2)
-          difference_perc <- difference / mean(T2[, 1])
-          T2 <- sum((T2[, 2] - T2[, 1]) ^ 2)
+          T2 <- t.test(data~group)$statistic^2
         }
       } else {
-        B2 <- prop.test(pointmass, obs)$statistic
+        if(paired){
+          B2 <- mcnemar.test(table(Group1 == point.mass,Group0 == point.mass))$statistic
+        }else{
+          B2 <- prop.test(pointmass, obs)$statistic
+        }
         contIndex <- data != point.mass
         cont <- data[contIndex]
         cGroup <- group[contIndex]
         n1c <- sum(cGroup == 1)
         n2c <- sum(cGroup == 0)
-        if (test == "mean") {
+        if (test == "t.test") {
           T2 <- Reduce(c, by(cont, cGroup, mean, na.rm = TRUE))
           difference <- T2[2] - T2[1]
           difference_perc <- difference / T2[1]
-          T2 <- (T2[2] - T2[1]) ^ 2
-        }
-        if (test == "quantiles") {
-          T2 <-
-            Reduce(cbind,
-                   by(
-                     cont,
-                     cGroup,
-                     quantile,
-                     probs = c(.05, .25, .5, .75, .95),
-                     na.rm = TRUE
-                   ))
-          difference <- sum(T2[, 2] - T2[, 1]) / nrow(T2)
-          difference_perc <- difference / mean(T2[, 1])
-          T2 <- sum((T2[, 2] - T2[, 1]) ^ 2)
+          T2 <- t.test(cont~cGroup)$statistic^2
         }
       }
     }
     X2 <- B2 + T2
     statistic = X2
+    if ((T2==0)|(B2==0)) {
+      X2pv <- 1-pchisq(X2,1)
+    } else {
+      X2pv <- 1-pchisq(X2,2)
+    }
     return(
       list(
         statistic = statistic,
         difference = difference,
         difference_perc = difference_perc,
-        nonZeros_perc = nonZeros_perc
+        nonZeros_perc = nonZeros_perc,
+        param_pval = X2pv
       )
     )
   }
-  
+
   groups <- c(rep(1, length(grp.1)), rep(0, length(grp.2)))
   data <- c(grp.1, grp.2)
   
@@ -172,32 +167,38 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired) {
   #s<- sample(groups, length(groups), FALSE)
   #diff(by(data, s, getMQuantile))
   
-  max.iter <- ITER - 1 #500
-  examples <- unlist(lapply(1:max.iter, function(x) {
-    if (paired) {
-      perm = which(sample(c(TRUE, FALSE), length(grp.1), replace = TRUE))
-      groups_perm = groups
-      groups_perm[perm] = groups[length(grp.1) + perm]
-      groups_perm[length(grp.1) + perm] = groups[perm]
-    } else{
-      groups_perm = sample(groups)
-    }
-    #temp=Reduce(cbind,by(data, groups_perm, quantile, probs=c(.05, .25, .5, .75, .95),na.rm=TRUE))
-    #temp=sum((temp[,2]-temp[,1])^2)
-    temp = TwoPart(data, groups_perm, test = "mean")$statistic  ###HERE!!!### "quantiles" or "mean"
-    return(temp)
-  }))
+  if(!parametric){
+    max.iter <- ITER - 1 #500
+    examples <- unlist(lapply(1:max.iter, function(x) {
+      if (paired) {
+        perm = which(sample(c(TRUE, FALSE), length(grp.1), replace = TRUE))
+        groups_perm = groups
+        groups_perm[perm] = groups[length(grp.1) + perm]
+        groups_perm[length(grp.1) + perm] = groups[perm]
+      } else{
+        groups_perm = sample(groups)
+      }
+      #temp=Reduce(cbind,by(data, groups_perm, quantile, probs=c(.05, .25, .5, .75, .95),na.rm=TRUE))
+      #temp=sum((temp[,2]-temp[,1])^2)
+      temp = TwoPart(data, groups_perm, test = "t.test", paired)$statistic  
+      return(temp)
+    }))
+  }
   
   #test.diff <- Reduce(cbind,by(data, groups, quantile, probs=c(.05, .25, .5, .75, .95),na.rm=TRUE))
   #test.diff=sum((test.diff[,2]-test.diff[,1])^2)
-  two.part = TwoPart(data, groups, test = "mean")   ###HERE!!!### "quantiles" or "mean"
+  two.part = TwoPart(data, groups, test = "t.test",paired)   
   test.diff = two.part$statistic
   sign_difference = sign(two.part$difference)
   effectSize = two.part$difference
   effectSize_perc = two.part$difference_perc
-  # two-tailed test
-  pvalue <-
-    (sum(examples >= test.diff) + 1) / (max.iter + 1) #from http://danielnee.com/tag/p-value/
+  if(parametric){
+    pvalue=two.part$param_pval
+  }else{
+    # two-tailed test
+    pvalue <-
+      (sum(examples >= test.diff) + 1) / (max.iter + 1) #from http://danielnee.com/tag/p-value/
+  }
   
   #hist(
   # examples,
@@ -228,8 +229,8 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired) {
   )
 }
 
-run <- function(directory, filenames, paired, ITER) {
-  print(paste(directory, filenames, paired, ITER))
+run <- function(directory, filenames, paired, ITER, parametric=FALSE) {
+  print(paste(directory, filenames, paired, ITER, parametric))
   
   #PLOT
   for (i in c("TOTAL", "MISMATCHES", "INSERTION", "DELETION")) {
@@ -348,7 +349,7 @@ run <- function(directory, filenames, paired, ITER) {
         missing <- which(is.na(df$values) |
                            is.na(df$valuesEmpty))
         filled <- !(1:(length(values)) %in% missing)
-        result = getPvalue(values[filled], valuesEmpty[filled], file, i, ITER, paired) #should be TRUE for paired test when using features of variable length
+        result = getPvalue(values[filled], valuesEmpty[filled], file, i, ITER, paired, parametric) #should be TRUE for paired test when using features of variable length
         print(result)
         print(
           paste(
@@ -470,7 +471,7 @@ run <- function(directory, filenames, paired, ITER) {
         "p-value",
         "effect-size",
         "zero-effect"
-        )
+      )
     
     results <-
       paste(
@@ -493,7 +494,7 @@ run <- function(directory, filenames, paired, ITER) {
       print(paste("File",fn,"already exists and will be removed before writing to it."))
       file.remove(fn) #remove file if exists
     }
-      
+    
     motifs<-paste(rep(names, each = 8), collapse = "\t")
     write.table(
       paste("FEATURES",motifs,sep="\t"),
@@ -574,16 +575,17 @@ for (directory in directories) {
   filenames <- list.files(pattern = "*.mf", full.names = FALSE)
   filenames <- filenames[grep("EmptyTmp", filenames, invert = TRUE)]
   paired <- TRUE
-  ITER <- 5
+  ITER <- 1000
+  parametric=TRUE # if FALSE, permutational pvalue, otherwise approximate parametric pvalue
   
-  run(directory, filenames, paired, ITER)
+  run(directory, filenames, paired, ITER, parametric)
   #traceback()
 }
 
 
 
 @
-
-
-
-\end{document}
+  
+  
+  
+  \end{document}
