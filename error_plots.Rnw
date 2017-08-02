@@ -412,6 +412,12 @@ run <- function(directory, filenames, paired, ITER) {
   #OUTPUT TABLES
   print("PRINT TABLES-------------")
   names <- c("APhasedRepeatsFeatureOnly.mf", "DirectRepeatsFeatureOnly.mf", "InvertedRepeatsFeatureOnly.mf", "MirrorRepeatsFeatureOnly.mf", "ZDNAMotifsFeatureOnly.mf", "GQuadPlusFeatureOnly.mf", "GQuadMinusFeatureOnly.mf")
+  
+  if (length(names)<2) {
+    print("The number of motifs to be analyzed is too low. Please add more motifs. ERROR.")
+    warning("The number of motifs to be analyzed is too low. Please add more motifs. ERROR.")
+  }
+  
   par(mfrow = c(1, 1), cex = 1.4)
   directory <- paste0(getwd(), "/")
   variables <- basename(getwd())
@@ -454,6 +460,18 @@ run <- function(directory, filenames, paired, ITER) {
     signs <- sign(as.numeric(meanFeatures) - as.numeric(meanControls))
     nonzeros <- values(get(paste0(i, "nonzeros")))[names]
     
+    results_headers <-
+      c(
+        "mean_features",
+        "mean_controls",
+        "nonZeros_mean_features",
+        "nonZeros_mean_controls",
+        "sign",
+        "p-value",
+        "effect-size",
+        "zero-effect"
+        )
+    
     results <-
       paste(
         meanFeatures,
@@ -466,17 +484,48 @@ run <- function(directory, filenames, paired, ITER) {
         nonzeros,
         sep = "\t"
       )
-    summary <-
-      as.data.frame(as.matrix(rbind(rep(names,each=8), results), optional = TRUE))
+    #summary <-
+    #  as.data.frame(as.matrix(rbind(rep(names,each=8), results), optional = TRUE))
     fn <- paste0(directory, basename(variables), "_", i, ".txt")
     print(fn)
+    
+    if (file.exists(fn)) {
+      print(paste("File",fn,"already exists and will be removed before writing to it."))
+      file.remove(fn) #remove file if exists
+    }
+      
+    motifs<-paste(rep(names, each = 8), collapse = "\t")
     write.table(
-      summary,
+      paste("FEATURES",motifs,sep="\t"),
       fn,
+      append = TRUE,
       sep = "\t",
       row.names = FALSE,
       col.names = FALSE,
-      append = FALSE,
+      quote = FALSE
+    )
+    
+    #write headers
+    headers<-paste(rep(results_headers, length(names)), collapse = "\t")
+    write.table(
+      paste("parameters",headers,sep="\t"),
+      fn,
+      append = TRUE,
+      sep = "\t",
+      row.names = FALSE,
+      col.names = FALSE,
+      quote = FALSE
+    )
+    
+    #append actual results
+    computed_values<-paste(results,collapse="\t")
+    write.table(
+      paste(basename(variables),computed_values,sep="\t"), #collapse results to a single line
+      fn,
+      append = TRUE,
+      sep = "\t",
+      row.names = FALSE,
+      col.names = FALSE,
       quote = FALSE
     )
   }
@@ -487,11 +536,11 @@ set.seed(3)
 
 directories <-
   c(
-    "/Users/alice/Desktop/projects/kinetics/errors_will/old_June30/june1/features/illumina",
-    "/Users/alice/Desktop/projects/kinetics/errors_will/old_June30/june1/features/pacbio",
-    "/Users/alice/Desktop/projects/kinetics/errors_will/old_June30/june1/features/diversity",
-    "/Users/alice/Desktop/projects/kinetics/errors_will/old_June30/june1/features/divergence",
-    "/Users/alice/Desktop/projects/kinetics/errors_will/old_June30/june1/features/TCGA"
+    "/Users/alice/Desktop/projects/kinetics/errors_will/52x/illumina",
+    "/Users/alice/Desktop/projects/kinetics/errors_will/52x/pacbio",
+    "/Users/alice/Desktop/projects/kinetics/errors_will/52x/diversity",
+    "/Users/alice/Desktop/projects/kinetics/errors_will/52x/divergence",
+    "/Users/alice/Desktop/projects/kinetics/errors_will/52x/TCGA"
   )
 
 for (directory in directories) {
@@ -525,7 +574,7 @@ for (directory in directories) {
   filenames <- list.files(pattern = "*.mf", full.names = FALSE)
   filenames <- filenames[grep("EmptyTmp", filenames, invert = TRUE)]
   paired <- TRUE
-  ITER <- 1000
+  ITER <- 5
   
   run(directory, filenames, paired, ITER)
   #traceback()
