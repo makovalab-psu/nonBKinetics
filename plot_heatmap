@@ -16,7 +16,7 @@ shape<-"triangles" #triangles|rectangles
 #
 #triangles: 
 #           upper left color is picked based on proportion of 0s
-#           bottom right color is bicked based on differerence of non-zero means of motifs versus controls
+#           bottom right color is picked based on differerence of non-zero means of motifs versus controls
 
 root_folder<-"/Users/alice/Desktop/projects/kinetics/errors_will/52x/"
 file_list <-
