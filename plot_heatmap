@@ -177,7 +177,7 @@ for (technology in seq(3, nrow(data), 1)) {
         x + 50,
         y + 50,
         labels = cell_value,
-        col = ifelse(result$significance[i] > 0.05, "black", "white"),
+        col = ifelse(result$significance[i] > 0.05, NA, "white"),
         cex = 1.75
       )
     } else {
@@ -187,14 +187,14 @@ for (technology in seq(3, nrow(data), 1)) {
           x + 33,
           y + 70,
           labels = round(result$zeros[i],2),
-          col = ifelse(result$significance[i] > 0.05, "black", "white")
+          col = ifelse(result$significance[i] > 0.05, NA, "white")
         )
         #bottom right
         text(
           x + 70,
           y + 33,
           labels = round(result$effect[i],2),
-          col = ifelse(result$significance[i] > 0.05, "black", "white")
+          col = ifelse(result$significance[i] > 0.05, NA, "white")
         )
       } else {
         warning("Shape type (rectangles|triangles) was not set. ERROR.")
