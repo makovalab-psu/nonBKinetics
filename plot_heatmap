@@ -169,38 +169,38 @@ for (technology in seq(3, nrow(data), 1)) {
           warning("Shape type (rectangles|triangles) was not set. ERROR.")
         }
       }
-    }
     
-    #PLOT LABELS INSIDE THE CELLS
-    if (shape == "rectangles") {
-      if(result$significance[i] > 0.05)
-        text(
-          x + 50,
-          y + 50,
-          labels = cell_value,
-          col = ifelse(result$significance[i] > 0.05, "black", "white"),
-          cex = 1.75
-        )
-    } else {
-      if (shape == "triangles") {
-        #upper left
+      #PLOT LABELS INSIDE THE CELLS
+      if (shape == "rectangles") {
         if(result$significance[i] > 0.05)
           text(
-            x + 33,
-            y + 70,
-            labels = round(result$zeros[i],2),
-            col = ifelse(result$significance[i] > 0.05, "black", "white")
-          )
-        #bottom right
-        result$significance[i] > 0.05
-          text(
-            x + 70,
-            y + 33,
-            labels = round(result$effect[i],2),
-            col = ifelse(result$significance[i] > 0.05, "black", "white")
+            x + 50,
+            y + 50,
+            labels = cell_value,
+            col = ifelse(result$significance[i] > 0.05, "black", "white"),
+            cex = 1.75
           )
       } else {
-        warning("Shape type (rectangles|triangles) was not set. ERROR.")
+        if (shape == "triangles") {
+          #upper left
+          if(result$significance[i] > 0.05)
+            text(
+              x + 33,
+              y + 70,
+              labels = round(result$zeros[i],2),
+              col = ifelse(result$significance[i] > 0.05, "black", "white")
+            )
+          #bottom right
+          result$significance[i] > 0.05
+            text(
+              x + 70,
+              y + 33,
+              labels = round(result$effect[i],2),
+              col = ifelse(result$significance[i] > 0.05, "black", "white")
+            )
+        } else {
+          warning("Shape type (rectangles|triangles) was not set. ERROR.")
+        }
       }
     }
 
