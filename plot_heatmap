@@ -8,7 +8,7 @@ options(scipen=10)
 #PLOT HEATMAP
 par(bg = "white", las = 1, pty = "s")
 
-errorType<-"INSERTION" #CHANGE THE ERROR TYPE HERE
+errorType<-"DELETION" #CHANGE THE ERROR TYPE HERE
 shape<-"rectangles" #triangles|rectangles
 
 #rectangles: 
@@ -165,9 +165,9 @@ for (technology in seq(3, nrow(data), 1)) {
     if (!is.na(cell_value)) {
       cell_value<-round(cell_value)
       if (cell_value==0) {
-        cell_value<-paste0("~",cell_value,"%")
+        cell_value<-paste0("~",cell_value,"")
       } else {
-        cell_value<-paste0(cell_value,"%")
+        cell_value<-paste0(cell_value,"")
       }
     }
     
