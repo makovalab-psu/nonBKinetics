@@ -8,8 +8,8 @@ options(scipen=10)
 #PLOT HEATMAP
 par(bg = "white", las = 1, pty = "s")
 
-errorType<-"MISMATCHES" #CHANGE THE ERROR TYPE HERE
-shape<-"triangles" #triangles|rectangles
+errorType<-"INSERTION" #CHANGE THE ERROR TYPE HERE
+shape<-"rectangles" #triangles|rectangles
 
 #rectangles: 
 #           color is based on difference of total means of motifs versus features
@@ -56,6 +56,14 @@ text(seq(50,700,100),730,labels=motifs[2:length(motifs)],srt=90)
 mtext(gsub( "_.*$", "", basename(file_list)), #infer method names from file names
       side = 2,
       at = seq(540, 140,-100))
+
+#TODO: add control that headers here match headers from the other input
+folddiff <- read.table(
+        paste(root_folder,"folddif_",errorType,".txt",sep=""),
+        row.names = 1,
+        header = T,
+        fill = TRUE
+      )
 
 
 getColor <- function(significance, sign) {
@@ -152,7 +160,7 @@ for (technology in seq(3, nrow(data), 1)) {
       }
     }
       
-    cell_value<-result$real_perc_diff[i]*100
+    cell_value<-as.numeric(folddiff[technology-2,i]) #fold differences from additional input
 
     if (!is.na(cell_value)) {
       cell_value<-round(cell_value)
