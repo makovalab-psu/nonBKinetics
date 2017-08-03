@@ -58,6 +58,7 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired, parametric=FALSE) {
     as.numeric((feature_non_zero - control_non_zero) / control_non_zero)
   
   # Function for calculating two-part statistics
+  # Modified from Taylor, Pollard (2009) Hypothesis Tests for Point-Mass Mixture Data with Application to `Omics Data with Many Zero Values
   TwoPart <- function(data,
                       group,
                       test = "t.test",
