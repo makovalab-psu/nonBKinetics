@@ -8,12 +8,21 @@ options(scipen=10)
 #PLOT HEATMAP
 par(bg = "white", las = 1, pty = "s")
 
-errorType<-"INSERTION" #CHANGE THE ERROR TYPE HERE
+errorType<-"MISMATCHES" #CHANGE THE ERROR TYPE HERE
+shape<-"triangles" #triangles|rectangles
+
+#rectangles: 
+#           color is based on difference of total means of motifs versus features
+#
+#triangles: 
+#           upper left color is picked based on proportion of 0s
+#           bottom right color is bicked based on differerence of non-zero means of motifs versus controls
+
 root_folder<-"/Users/alice/Desktop/projects/kinetics/errors_will/52x/"
 file_list <-
   c(
-  paste(root_folder,"illumina/illumina_",errorType,".txt",sep=""),
   paste(root_folder,"pacbio/pacbio_",errorType,".txt",sep=""),
+  paste(root_folder,"illumina/illumina_",errorType,".txt",sep=""),
   paste(root_folder,"diversity/diversity_",errorType,".txt",sep=""),
   paste(root_folder,"divergence/divergence_",errorType,".txt",sep=""),
   paste(root_folder,"TCGA/TCGA_",errorType,".txt",sep="")
@@ -26,6 +35,10 @@ header=FALSE, sep="\t")}))
 interesting_rows<-c(1,2,seq(3,nrow(dataset),by=3))
 data<-dataset[interesting_rows,] #remove excessive headers
 
+par(xpd=TRUE)
+motifs<-unique(as.character(unlist(data[1,])))
+
+#plot background canvas
 barplot(
   c(0),
   c(0),
@@ -38,6 +51,11 @@ barplot(
   axes = FALSE,sub=errorType
 )
 
+#plot labels
+text(seq(50,700,100),730,labels=motifs[2:length(motifs)],srt=90)
+mtext(gsub( "_.*$", "", basename(file_list)), #infer method names from file names
+      side = 2,
+      at = seq(540, 140,-100))
 
 
 getColor <- function(significance, sign) {
@@ -79,39 +97,15 @@ getParametersForTechnology <- function(technology) {
   
   real_perc_diff <- round(as.numeric(mean_features-mean_controls)/mean_controls, decimal_points)
 
-  #signs[signs==0]<-sign(zeros)[signs==0]
-  #todo: how to pick color when the test is based on the proportion of 0s?
   print(paste(significance, effect, zeros))
   return(list(
     effect = effect,
-    col = col,
     zeros = zeros,
     significance = significance,
     signs = signs,
     real_perc_diff = real_perc_diff
   ))
 }
-
-
-rescale <- function(x)
-  (x) / (max(x)) * 100
-print(data)
-
-par(xpd=TRUE)
-motifs<-unique(as.character(unlist(data[1,])))
-text(seq(50,700,100),730,labels=motifs[2:length(motifs)],srt=90)
-
-
-#mtext(
-#  c("AP", "DR", "IR", "MR", "Z", "GQ+", "GQ-"),
-#  side = 3,
-#  las = 1,
-#  adj = 0,
-#  at = seq(40, 700, 100)
-#)
-mtext(c("P","I", "DV", "DG", "T", "", ""),
-      side = 2,
-      at = seq(540, 0,-100))
 
 for (technology in seq(3, nrow(data), 1)) {
   print(technology)
@@ -123,72 +117,43 @@ for (technology in seq(3, nrow(data), 1)) {
   #print(x)
   for (x in seq(0, 699, 100)) {
     y <- 800 - (technology * 100) #skip header
-    size <- rescale(abs(result$effect))[i]
-    zero <- rescale(abs(result$zeros))[i]
-    #print(i)
-    #print(paste(x, y, size, zero))
     sizeToPlot <- 100
-    
-    #if (size > 0) {
-    #plot effect sizes
-    
-    #signEffect <- sign(result$effect[i])
-    #signZeros <- sign(result$zeros[i])
-    #signs <- result$signs[i]
-    #signEffect<-signs #overwrite colors with total mean differences
-    #signZeros<-signs #overwrite colors with total mean differences
-    
-    #print("signEffect:",signEffect,"signZeros:",signZeros)
     
     backgroundColor1 <- "white"
     backgroundColor2 <- "white"
-    
-    #if (!is.na(signEffect)) {
-    #  if (signEffect == 0) {
-    #    #pick color based on 0s
-    #    backgroundColor1 <- getColor(result$significance[i], signZeros)
-    #    backgroundColor2<- backgroundColor1
-    #  } else {
-    #    if (signEffect*signZeros==-1) {
-    #      print("hard to interpret")
-    #      #-1&1 and 1&-1 are hard to interpret
-    #      
-    #      backgroundColor1 <- getColor(result$significance[i], signEffect)
-    #      backgroundColor2<- getColor(result$significance[i], signZeros)
-    #      
-    #      #all other combinations unambigously pick background color
-    #    } else {
-    #      backgroundColor1 <- getColor(result$significance[i], signEffect)
-    #      backgroundColor2<- backgroundColor1
-    #    }
-    #  }
-      
-    #}
-      
+
     if (!is.na(result$significance[i])) {
-      #upper left
-      #polygon(c(x, x, x + (sizeToPlot), x), c(y, y + (sizeToPlot), y + (sizeToPlot), y), col = backgroundColor1, lty=0)
-      #bottom right
-      #polygon(c(x, x+(sizeToPlot), x + (sizeToPlot), x), c(y,y,y + (sizeToPlot), y), col = backgroundColor2, lty=0)
-      
-      #plot just rectangle
-      polygon(c(x, x, x + (sizeToPlot), x + (sizeToPlot)), c(y, y + (sizeToPlot), y + (sizeToPlot), y), col = getColor(result$significance[i], result$signs[i]), lty=0)
+      if (shape == "rectangles") {
+        polygon(
+          c(x, x, x + (sizeToPlot), x + (sizeToPlot)),
+          c(y, y + (sizeToPlot), y + (sizeToPlot), y),
+          col = getColor(result$significance[i], result$signs[i]),
+          lty = 0
+        )
+      } else {
+        if (shape == "triangles") {
+          #upper left
+          polygon(
+            c(x, x, x + (sizeToPlot), x),
+            c(y, y + (sizeToPlot), y + (sizeToPlot), y),
+            col = getColor(result$significance[i], sign(result$zeros[i])),
+            lty = 0
+          )
+          #bottom right
+          polygon(
+            c(x, x + (sizeToPlot), x + (sizeToPlot), x),
+            c(y, y, y + (sizeToPlot), y),
+            col = getColor(result$significance[i], sign(result$effect[i])),
+            lty = 0
+          )
+        } else {
+          warning("Shape type (rectangles|triangles) was not set. ERROR.")
+        }
+      }
     }
       
     cell_value<-result$real_perc_diff[i]*100
-    #print(cell_value)
-    #if (!is.na(cell_value)) {
-    #  if (abs(cell_value)<1) {
-    #    if (sign(cell_value)==1) {
-    #      cell_value<-"~1"
-    #    } else {
-    #      cell_value<-"~-1"
-    #    }
-    #  } else {
-    #    #the rounding should take place
-    #    cell_value<-round(cell_value)
-    #  }
-    #}
+
     if (!is.na(cell_value)) {
       cell_value<-round(cell_value)
       if (cell_value==0) {
@@ -203,29 +168,7 @@ for (technology in seq(3, nrow(data), 1)) {
            col = ifelse(result$significance[i] >0.05, "black","white"),
            cex=1.75
       )
-      #text(
-      #  x + 33,
-      #  y + 70,
-      #  labels = result$effect[i]*100,
-      #  col = ifelse(result$significance[i] >0.05, "white","gray")
-      #)
-      #text(
-      #  x + 70,
-      #  y + 33,
-      #  labels = result$zeros[i]*100,
-      #  col = ifelse(result$significance[i] >0.05, "white","gray")
-      #)
-      #} else {
-      #plot non-zero differences
-      #  widthOfbar <- 5
-      #  polygon(c(
-      #    x + (zero - widthOfbar),
-      #    x + (zero - widthOfbar),
-      #    x + (zero),
-      #    x + (zero)
-      #  ), c(y, y + (100), y + (100), y), col = result$col[i])
-      #}
-    
+
     
     i <- i + 1
   }
