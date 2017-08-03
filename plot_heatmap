@@ -129,13 +129,24 @@ for (technology in seq(3, nrow(data), 1)) {
     
     backgroundColor1 <- "white"
     backgroundColor2 <- "white"
+    
+    cell_value<-as.numeric(folddiff[technology-2,i]) #fold differences from additional input
 
+    if (!is.na(cell_value)) {
+      cell_value<-round(cell_value,2)
+    #  if (cell_value==0) {
+    #    cell_value<-paste0("~",cell_value,"")
+    #  } else {
+    #    cell_value<-paste0(cell_value,"")
+    #  }
+    }
+    
     if (!is.na(result$significance[i])) {
       if (shape == "rectangles") {
         polygon(
           c(x, x, x + (sizeToPlot), x + (sizeToPlot)),
           c(y, y + (sizeToPlot), y + (sizeToPlot), y),
-          col = getColor(result$significance[i], result$signs[i]),
+          col = getColor(result$significance[i], sign(cell_value)),
           lty = 0
         )
       } else {
@@ -159,17 +170,6 @@ for (technology in seq(3, nrow(data), 1)) {
         }
       }
     }
-      
-    cell_value<-as.numeric(folddiff[technology-2,i]) #fold differences from additional input
-
-    if (!is.na(cell_value)) {
-      cell_value<-round(cell_value)
-      if (cell_value==0) {
-        cell_value<-paste0("~",cell_value,"")
-      } else {
-        cell_value<-paste0(cell_value,"")
-      }
-    }
     
     #PLOT LABELS INSIDE THE CELLS
     if (shape == "rectangles") {
@@ -186,14 +186,14 @@ for (technology in seq(3, nrow(data), 1)) {
         text(
           x + 33,
           y + 70,
-          labels = result$zeros[i] * 100,
+          labels = round(result$zeros[i],2),
           col = ifelse(result$significance[i] > 0.05, "black", "white")
         )
         #bottom right
         text(
           x + 70,
           y + 33,
-          labels = result$effect[i] * 100,
+          labels = round(result$effect[i],2),
           col = ifelse(result$significance[i] > 0.05, "black", "white")
         )
       } else {
