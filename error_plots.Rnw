@@ -33,6 +33,7 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired, parametric=FALSE) {
   tmp_dataEmpty[gsub("ERRORS", "", gsub(".mf.txt", "", file))] = grp.2 #controls
   assign(paste0(i, "controls"), tmp_dataEmpty)
   
+  # percentage of non-zero
   feature_non_zero <-
     (length(grp.1) - (table(grp.1)["0"])) / length(grp.1)
   control_non_zero <-
@@ -54,6 +55,7 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired, parametric=FALSE) {
       control_non_zero
     )
   )
+  # fold-change of percentage of non-zero
   nonZeros_perc <-
     as.numeric(sign(feature_non_zero - control_non_zero) * max(c(feature_non_zero, control_non_zero)) /min(c(feature_non_zero, control_non_zero)))
   
@@ -103,7 +105,7 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired, parametric=FALSE) {
         if (test == "t.test") {
           T2 <- Reduce(c, by(data, group, mean, na.rm = TRUE))
           difference <- T2[2] - T2[1]
-          difference_perc <- difference / T2[1]
+          difference_perc <- sign(T2[2] - T2[1]) * max(c(T2[2], T2[1])) /min(c(T2[2], T2[1])) # fold-change of non-zero means
           T2 <- t.test(data~group)$statistic^2
         }
       } else {
@@ -116,7 +118,7 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired, parametric=FALSE) {
         if (test == "t.test") {
           T2 <- Reduce(c, by(cont, cGroup, mean, na.rm = TRUE))
           difference <- T2[2] - T2[1]
-          difference_perc <- difference / T2[1]
+          difference_perc <- sign(T2[2] - T2[1]) * max(c(T2[2], T2[1])) /min(c(T2[2], T2[1])) # fold-change of non-zero means
           T2 <- t.test(cont~cGroup)$statistic^2
         }
       }
