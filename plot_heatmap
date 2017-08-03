@@ -162,12 +162,36 @@ for (technology in seq(3, nrow(data), 1)) {
         cell_value<-paste0(cell_value,"%")
       }
     }
-      text(x + 50,
-           y + 50,
-           labels = cell_value,
-           col = ifelse(result$significance[i] >0.05, "black","white"),
-           cex=1.75
+    
+    #PLOT LABELS INSIDE THE CELLS
+    if (shape == "rectangles") {
+      text(
+        x + 50,
+        y + 50,
+        labels = cell_value,
+        col = ifelse(result$significance[i] > 0.05, "black", "white"),
+        cex = 1.75
       )
+    } else {
+      if (shape == "triangles") {
+        #upper left
+        text(
+          x + 33,
+          y + 70,
+          labels = result$zeros[i] * 100,
+          col = ifelse(result$significance[i] > 0.05, "black", "white")
+        )
+        #bottom right
+        text(
+          x + 70,
+          y + 33,
+          labels = result$effect[i] * 100,
+          col = ifelse(result$significance[i] > 0.05, "black", "white")
+        )
+      } else {
+        warning("Shape type (rectangles|triangles) was not set. ERROR.")
+      }
+    }
 
     
     i <- i + 1
