@@ -172,7 +172,7 @@ for (technology in seq(3, nrow(data), 1)) {
     
       #PLOT LABELS INSIDE THE CELLS
       if (shape == "rectangles") {
-        if(result$significance[i] > 0.05)
+        if(result$significance[i] <= 0.05)
           text(
             x + 50,
             y + 50,
@@ -183,7 +183,7 @@ for (technology in seq(3, nrow(data), 1)) {
       } else {
         if (shape == "triangles") {
           #upper left
-          if(result$significance[i] > 0.05)
+          if(result$significance[i] <= 0.05)
             text(
               x + 33,
               y + 70,
@@ -191,7 +191,7 @@ for (technology in seq(3, nrow(data), 1)) {
               col = ifelse(result$significance[i] > 0.05, "black", "white")
             )
           #bottom right
-          result$significance[i] > 0.05
+          if(result$significance[i] <= 0.05)
             text(
               x + 70,
               y + 33,
