@@ -8,17 +8,20 @@ featureList="APhasedRepeats DirectRepeats GQuadPlus GQuadMinus InvertedRepeats M
 # Compute pileup on the forward-strand alignments.
 #
 # inputs:
-#	- "samtools" must be in the executable PATH
-#	- The current directory must contain, for each feature,
-#		alignments/${aligner}/${feature}.${chrom}.features.plus.bam
-#		alignments/${aligner}/${feature}.${chrom}.features.plus.bai
-#		alignments/${aligner}/${feature}.for_${chrom}.controls.plus.bam
-#		alignments/${aligner}/${feature}.for_${chrom}.controls.plus.bai
-#
+#   - "samtools" must be in the executable PATH
+#   - The current directory must contain, for each feature,
+#   	alignments/${aligner}/${feature}.${chrom}.features.plus.bam
+#   	alignments/${aligner}/${feature}.${chrom}.features.plus.bai
+#   	alignments/${aligner}/${feature}.for_${chrom}.controls.plus.bam
+#   	alignments/${aligner}/${feature}.for_${chrom}.controls.plus.bai
+#   - The directory containing the current directory must also contain, for
+#     each feature,
+#       features/${feature}.${chrom}.features.mf.bed \
+#       features/${feature}.for_${chrom}.controls.mf.bed \
 # outputs:
-#	- For each feature, these files are written
-#		alignments/${aligner}/${feature}.${chrom}.features.plus.pileup.gz
-#		alignments/${aligner}/${feature}.for_${chrom}.controls.plus.pileup.gz
+#   - For each feature, these files are written
+#   	alignments/${aligner}/${feature}.${chrom}.features.plus.pileup.gz
+#   	alignments/${aligner}/${feature}.for_${chrom}.controls.plus.pileup.gz
 
 time echo ${featureList} | tr " " "\n" \
   | while read feature ; do

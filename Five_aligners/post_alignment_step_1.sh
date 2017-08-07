@@ -9,19 +9,19 @@ featureList="APhasedRepeats DirectRepeats GQuadPlus GQuadMinus InvertedRepeats M
 # each feature.
 #
 # inputs:
-#	- "samtools" must be in the executable PATH
-#	- The current directory must contain, for each feature,
-#		alignments/${aligner}/${feature}.for_${chrom}.${chr}.controls.bam
-#	  where chr is any chromosome that contained controls corresponding to the
-#	  features on ${chrom}, e.g. chr1, chr2, chr3, etc. These files were
-#	  created by, e.g., align_with_bwa, align_with_bowtie, etc.
-#	- The current directory must contain a subdirectory named temp.samtools,
-#	  and within that there must be a subdirectory named ${aligner}
+#   - "samtools" must be in the executable PATH
+#   - The current directory must contain, for each feature,
+#   	alignments/${aligner}/${feature}.for_${chrom}.${chr}.controls.bam
+#     where chr is any chromosome that contained controls corresponding to the
+#     features on ${chrom}, e.g. chr1, chr2, chr3, etc. These files were
+#     created by, e.g., align_with_bwa, align_with_bowtie, etc.
+#   - The current directory must contain a subdirectory named temp.samtools,
+#     and within that there must be a subdirectory named ${aligner}
 #
 # outputs:
-#	- For each feature, these files are written
-#		alignments/${aligner}/${feature}.for_${chrom}.controls.bam
-#		alignments/${aligner}/${feature}.for_${chrom}.controls.bai
+#   - For each feature, these files are written
+#   	alignments/${aligner}/${feature}.for_${chrom}.controls.bam
+#   	alignments/${aligner}/${feature}.for_${chrom}.controls.bai
 
 time echo ${featureList} | tr " " "\n" \
   | while read feature ; do

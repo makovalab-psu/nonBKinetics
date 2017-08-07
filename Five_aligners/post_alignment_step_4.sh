@@ -8,16 +8,16 @@ featureList="APhasedRepeats DirectRepeats GQuadPlus GQuadMinus InvertedRepeats M
 # Post-process the pileup files for forward-strand alignments.
 #
 # inputs:
-#	- "samtools" must be in the executable PATH
-#	- "mpileup2gff_aligners" must be in the executable PATH
-#	- The current directory must contain, for each feature,
-#		alignments/${aligner}/${feature}.${chrom}.features.plus.pileup.gz
-#		alignments/${aligner}/${feature}.for_${chrom}.controls.plus.pileup.gz
+#   - "samtools" must be in the executable PATH
+#   - "mpileup2gff_aligners" must be in the executable PATH
+#   - The current directory must contain, for each feature,
+#   	alignments/${aligner}/${feature}.${chrom}.features.plus.pileup.gz
+#   	alignments/${aligner}/${feature}.for_${chrom}.controls.plus.pileup.gz
 #
 # outputs:
-#	- For each feature, these files are written
-#		alignments/${aligner}/${feature}.${chrom}.features.plus.split.gff
-#		alignments/${aligner}/${feature}.for_${chrom}.controls.plus.split.gff
+#   - For each feature, these files are written
+#   	alignments/${aligner}/${feature}.${chrom}.features.plus.split.gff
+#   	alignments/${aligner}/${feature}.for_${chrom}.controls.plus.split.gff
 
 time echo ${featureList} | tr " " "\n" \
   | while read feature ; do
