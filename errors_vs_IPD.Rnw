@@ -74,10 +74,15 @@ loadData <- function(fileErrors, fileIPDs) {
   
   return(list(
     ipd_median = median(means,na.rm=TRUE),
+    ipd_quantiles = quantile(means,na.rm=TRUE),
     totalERRORS = mean(mergedData[["TOTAL"]],na.rm=TRUE),
+    totalERRORSquantile = quantile(mergedData[["TOTAL"]],na.rm=TRUE),
     mismatchesERRORS = mean(mergedData[["MISMATCHES"]],na.rm=TRUE),
+    mismatchesERRORSquantile = quantile(mergedData[["MISMATCHES"]],na.rm=TRUE),
     insertionERRORS = mean(mergedData[["INSERTION"]],na.rm=TRUE),
-    deletionERRORS = mean(mergedData[["DELETION"]],na.rm=TRUE)
+    insertionERRORSquantile = quantile(mergedData[["INSERTION"]],na.rm=TRUE),
+    deletionERRORS = mean(mergedData[["DELETION"]],na.rm=TRUE),
+    deletionERRORSquantile = quantile(mergedData[["DELETION"]],na.rm=TRUE)
   ))
 }
 
@@ -92,33 +97,46 @@ getResults <- function(file) {
 setwd("/Users/alice/Desktop/projects/kinetics/errors_vs_IPD")
 filenames <- list.files(pattern = "*.mf", full.names = FALSE)
 
-file<-"DirectRepeatsFeatureOnly.mf"
-
-
 results<-as.data.frame(sapply(filenames, getResults,simplify=TRUE))
 
 for (type in c("totalERRORS", "mismatchesERRORS", "insertionERRORS", "deletionERRORS")) { 
   e<-unlist(results[type,])
   i<-unlist(results["ipd_median",])
+  quantIPD<-as.data.frame(unlist(results["ipd_quantiles",]))
   plot(
   e,
   i,
   xaxs = "i",
   yaxs = "i",
-  ylim = c(-1, 1),
-  xlim = c(round(min(e),2),round(max(e),2)),
+  ylim = c(round(min(quantIPD),2)-0.1,round(max(quantIPD),2)+0.1),
+  xlim = c(round(min(e),2)-0.01,round(max(e),2)+0.01),
   xlab="ERRORS",
   ylab="log(meanIPD)",
   main=type,
   sub="errors vs IPDs",
-  col="gray",
-  pch=21
+  col="black",
+  pch=16
   )
-  text(e,i+0.05,labels=gsub("FeatureOnly.mf","",colnames(results)),cex=0.75)
+  text(e,i+abs(mean(i)/10),labels=gsub("FeatureOnly.mf","",gsub("Repeats","",colnames(results))),cex=0.75)
+  
+  q25thIPD<-quantIPD[seq(2,nrow(quantIPD),5),]
+  q75thIPD<-quantIPD[seq(4,nrow(quantIPD),5),]
+  
+  quantERROR<-as.data.frame(unlist(results[paste(type,"quantile",sep=""),]))
+  q25thERROR<-quantERROR[seq(2,nrow(quantERROR),5),]
+  q75thERROR<-quantERROR[seq(4,nrow(quantERROR),5),]
+  rect(q25thERROR,q25thIPD,q75thERROR,q75thIPD,col=adjustcolor( "red", alpha.f = 0.2))
 }
 
 
 @
+
+
+
+
+
+
+
 
 
 \end{document}
