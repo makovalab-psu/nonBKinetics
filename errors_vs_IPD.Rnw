@@ -7,7 +7,7 @@
 <<>>=
 
 runRegression <- function(vectorErrors, vectorIPDs) {
-  mylm <- lm(log(vectorIPDs + 0.0001) ~ vectorErrors)
+  mylm <- lm(log(vectorIPDs + 0.01) ~ vectorErrors)
   summary(mylm)
   pvalue <-
     as.numeric(round(coef(summary(mylm))[, "Pr(>|t|)"][2], 3))
