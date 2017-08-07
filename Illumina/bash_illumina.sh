@@ -6,7 +6,7 @@ export PATH="/nfs/brubeck.bx.psu.edu/scratch5/wilfried/src/bedtools2-master/bin:
 export PATH="//nfs/brubeck.bx.psu.edu/scratch5/wilfried/src/bedops/bin:$PATH"
 
 
-infile=$1   # Monika's .mf files
+infile=$1   # Monika's .mf files # current paths: /nfs/brubeck.bx.psu.edu/scratch6/wilfried/kinetics/mfRun
 
 #####PATHS#####
 
@@ -28,7 +28,7 @@ python format_to_gff.py ${infile}
 gff2bed < ${infile}.gff > ${infile}.bed
 
 
-###CHOSE ONE OF THE FOLLOWINGS### Run this for each .mf file
+###CHOSE ONE OF THE FOLLOWINGS### Run this for each .mf file # currently running on plus.bam
 samtools mpileup ${PATHTOBAMS}HG002.hs37d5.60x.1.bam -B -C 0  -f ${PATHTOREF}data/hg19_formated_by_wil.fa -l ${infile}.bed -uv -t  INFO/DPR > ${infile}.mp
 
 samtools mpileup ${PATHTOBAMS}plus.bam -B -C 0 -f ${PATHTOREF}data/hg19_formated_by_wil.fa -l ${infile}.bed -uv -t  INFO/DPR > ${infile}.mp
