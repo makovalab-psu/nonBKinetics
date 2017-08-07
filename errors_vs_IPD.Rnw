@@ -1,0 +1,88 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+
+<<>>=
+
+runRegression <- function(vectorErrors, vectorIPDs) {
+  mylm <- lm(log(vectorIPDs + 0.0001) ~ vectorErrors)
+  summary(mylm)
+  pvalue <-
+    as.numeric(round(coef(summary(mylm))[, "Pr(>|t|)"][2], 3))
+  slope <-
+    as.numeric(round(coef(summary(mylm))[, "Estimate"][2], 3))
+  rsquare <- as.numeric(round(summary(mylm)$r.squared, 3))
+  
+  return(list(
+    pvalue = pvalue,
+    slope = slope,
+    rsquare = rsquare
+  ))
+}
+
+loadData <- function(fileErrors, fileIPDs) {
+  dataE <-
+    read.table(fileErrors,
+               header = F,
+               fill = TRUE)
+  colnames(dataE) <-
+    c("chr",
+      "start",
+      "end",
+      "TOTAL",
+      "MISMATCHES",
+      "INSERTION",
+      "DELETION")
+  
+  #remove chr if it's present
+  dataE$chr <- sub("chr", "", dataE$chr)
+  
+  no_col <- max(count.fields(fileIPDs, sep = "\t"))
+  dataI <-
+    read.table(
+      fileIPDs,
+      sep = "\t",
+      fill = TRUE,
+      header = F,
+      col.names = c("chr", "start", "end", "length", seq(1, no_col, 1))
+    )
+  
+  #remove chr if it's present
+  dataI$chr <- sub("chr", "", dataI$chr)
+  
+  mergedData <-
+    merge(as.data.frame(dataE),
+          as.data.frame(dataI),
+          by = c("chr", "start", "end"))
+  
+  means <- as.numeric(apply(mergedData[,9:no_col],1,mean,na.rm=TRUE))
+  medians <- as.numeric(apply(mergedData[,9:no_col],1,median,na.rm=TRUE))
+  
+    for (type in c("TOTAL", "MISMATCHES", "INSERTION", "DELETION")) {
+      regression_on_means<-runRegression(mergedData[[type]],means)
+      regression_on_medians<-runRegression(mergedData[[type]],medians)
+      
+      print(paste(type,"pvalue (means):",regression_on_means$pvalue,"pvalue (medians):",regression_on_medians$pvalue))
+    }
+}
+
+setwd("/Users/alice/Desktop/projects/kinetics/errors_vs_IPD")
+filenames <- list.files(pattern = "*.mf", full.names = FALSE)
+
+file<-"DirectRepeatsFeatureOnly.mf"
+
+for (file in filenames) {
+  print("-------")
+  file_with_IPDs <-file
+  file_with_errors <- gsub(".mf",".collapsed",file)
+  print(paste(file_with_errors,file_with_IPDs))
+  loadData(file_with_errors,file_with_IPDs)
+}
+
+@
+
+
+
+\end{document}
