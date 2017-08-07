@@ -1,5 +1,9 @@
 #!/bin/bash
 
+#SBATCH -C new
+#SBATCH -t 0
+#SBATCH --ntasks=8
+
 export PATH="/galaxy/home/wilfried/Anaconda/bin:$PATH"
 export PATH="/nfs/brubeck.bx.psu.edu/scratch5/wilfried/src/samtools-1.3.1:$PATH"
 export PATH="/nfs/brubeck.bx.psu.edu/scratch5/wilfried/src/bedtools2-master/bin:$PATH"
