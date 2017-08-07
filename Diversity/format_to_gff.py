@@ -9,4 +9,3 @@ for line in infile:
         chrom, start, end, feat, length = array[0], array[1], array[2], array[3], array[4]
 
         outfile.write(chrom[3:]+'\tABCC\tGQuad\t'+str(start)+'\t'+str(end)+'\t0\t+\t.\t.\n')
-
