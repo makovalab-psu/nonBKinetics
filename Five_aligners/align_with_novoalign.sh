@@ -44,7 +44,7 @@ time ls -lrth reads/*.features.fastq \
         2> alignments/novoalign/${feature}.${chrom}.${kind}.log.txt \
         | samtools view -Sb - \
         | samtools sort \
-            -T temp.samtools/novoalign/farf.novoalign.${feature}.${chrom}.${kind} \
+            -T temp.samtools/novoalign/temp.novoalign.${feature}.${chrom}.${kind} \
             -o alignments/novoalign/${feature}.${chrom}.${kind}.bam
       done
 
@@ -63,6 +63,6 @@ time ls -lrth reads/*.controls.fastq \
         2> alignments/novoalign/${feature}.${forChrom}.${chr}.${kind}.log.txt \
         | samtools view -Sb - \
         | samtools sort \
-            -T temp.samtools/novoalign/farf.novoalign.${feature}.${forChrom}.${chr}.${kind} \
+            -T temp.samtools/novoalign/temp.novoalign.${feature}.${forChrom}.${chr}.${kind} \
             -o alignments/novoalign/${feature}.${forChrom}.${chr}.${kind}.bam
       done

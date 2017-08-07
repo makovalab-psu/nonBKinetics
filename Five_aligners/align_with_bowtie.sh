@@ -42,7 +42,7 @@ time ls -lrth reads/*.features.fastq \
             -U reads/${feature}.${chrom}.${kind}.fastq \
         | samtools view -Sb - \
         | samtools sort \
-            -T temp.samtools/bowtie/farf.bowtie.${feature}.${chrom}.${kind} \
+            -T temp.samtools/bowtie/temp.bowtie.${feature}.${chrom}.${kind} \
             -o alignments/bowtie/${feature}.${chrom}.${kind}.bam
       done
 
@@ -59,6 +59,6 @@ time ls -lrth reads/*.controls.fastq \
             -U reads/${feature}.${forChrom}.${chr}.${kind}.fastq \
         | samtools view -Sb - \
         | samtools sort \
-            -T temp.samtools/bowtie/farf.bowtie.${feature}.${forChrom}.${chr}.${kind} \
+            -T temp.samtools/bowtie/temp.bowtie.${feature}.${forChrom}.${chr}.${kind} \
             -o alignments/bowtie/${feature}.${forChrom}.${chr}.${kind}.bam
       done

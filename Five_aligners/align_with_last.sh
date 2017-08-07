@@ -58,7 +58,7 @@ time ls -lrth reads/*.features.fastq \
                      }' chrom=${chrom} chromLen=${chromLen} \
         | samtools view -Sb - \
         | samtools sort \
-            -T temp.samtools/last/farf.last.${feature}.${chrom}.${kind} \
+            -T temp.samtools/last/temp.last.${feature}.${chrom}.${kind} \
             -o alignments/last/${feature}.${chrom}.${kind}.bam
       done
 
@@ -90,6 +90,6 @@ time ls -lrth reads/*.controls.fastq \
                      }' chrom=${chr} chrLen=${chrLen} \
         | samtools view -Sb - \
         | samtools sort \
-            -T temp.samtools/last/farf.last.${feature}.${forChrom}.${chr}.${kind} \
+            -T temp.samtools/last/temp.last.${feature}.${forChrom}.${chr}.${kind} \
             -o alignments/last/${feature}.${forChrom}.${chr}.${kind}.bam
       done

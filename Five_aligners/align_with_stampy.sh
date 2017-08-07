@@ -45,7 +45,7 @@ time ls -lrth reads/*.features.fastq \
         2> alignments/stampy/${feature}.${chrom}.${kind}.log.txt \
         | samtools view -Sb - \
         | samtools sort \
-            -T temp.samtools/stampy/farf.stampy.${feature}.${chrom}.${kind} \
+            -T temp.samtools/stampy/temp.stampy.${feature}.${chrom}.${kind} \
             -o alignments/stampy/${feature}.${chrom}.${kind}.bam
       done
 
@@ -65,6 +65,6 @@ time ls -lrth reads/*.controls.fastq \
         2> alignments/stampy/${feature}.${forChrom}.${chr}.${kind}.log.txt \
         | samtools view -Sb - \
         | samtools sort \
-            -T temp.samtools/stampy/farf.stampy.${feature}.${forChrom}.${chr}.${kind} \
+            -T temp.samtools/stampy/temp.stampy.${feature}.${forChrom}.${chr}.${kind} \
             -o alignments/stampy/${feature}.${forChrom}.${chr}.${kind}.bam
       done
