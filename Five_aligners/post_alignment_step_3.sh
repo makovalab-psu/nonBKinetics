@@ -14,8 +14,6 @@ featureList="APhasedRepeats DirectRepeats GQuadPlus GQuadMinus InvertedRepeats M
 #   	alignments/${aligner}/${feature}.${chrom}.features.plus.bai
 #   	alignments/${aligner}/${feature}.for_${chrom}.controls.plus.bam
 #   	alignments/${aligner}/${feature}.for_${chrom}.controls.plus.bai
-#   - The directory containing the current directory must also contain, for
-#     each feature,
 #       features/${feature}.${chrom}.features.mf.bed \
 #       features/${feature}.for_${chrom}.controls.mf.bed \
 # outputs:
@@ -29,7 +27,7 @@ time echo ${featureList} | tr " " "\n" \
       samtools mpileup -B -C 0 \
         alignments/${aligner}/${feature}.${chrom}.features.plus.bam \
         -f ${bwa_index_dir}/hg19.unmasked.fa \
-        -l ../features/${feature}.${chrom}.features.mf.bed \
+        -l features/${feature}.${chrom}.features.mf.bed \
         -uv -t INFO/DPR \
         | gzip \
         > alignments/${aligner}/${feature}.${chrom}.features.plus.pileup.gz
@@ -37,7 +35,7 @@ time echo ${featureList} | tr " " "\n" \
       samtools mpileup -B -C 0 \
         alignments/${aligner}/${feature}.for_${chrom}.controls.plus.bam \
         -f ${bwa_index_dir}/hg19.unmasked.fa \
-        -l ../features/${feature}.for_${chrom}.controls.mf.bed \
+        -l features/${feature}.for_${chrom}.controls.mf.bed \
         -uv -t INFO/DPR \
         | gzip \
         > alignments/${aligner}/${feature}.for_${chrom}.controls.plus.pileup.gz

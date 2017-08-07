@@ -12,8 +12,6 @@ featureList="APhasedRepeats DirectRepeats GQuadPlus GQuadMinus InvertedRepeats M
 #   - The current directory must contain, for each feature,
 #   	alignments/${aligner}/${feature}.${chrom}.features.plus.split.gff
 #   	alignments/${aligner}/${feature}.for_${chrom}.controls.plus.split.gff
-#   - The directory containing the current directory must also contain, for
-#     each feature,
 #       features/${feature}.${chrom}.features.mf.gff
 #       features/${feature}.for_${chrom}.controls.mf.gff
 # outputs:
@@ -26,14 +24,14 @@ time echo ${featureList} | tr " " "\n" \
       echo "=== ${feature} ==="
       bedtools intersect -wa -wb \
           -b alignments/${aligner}/${feature}.${chrom}.features.plus.split.gff \
-          -a ../features/${feature}.${chrom}.features.mf.gff \
+          -a features/${feature}.${chrom}.features.mf.gff \
           -loj \
         | gzip \
         > alignments/${aligner}/${feature}.${chrom}.features.plus.intersect.gz
       #
       bedtools intersect -wa -wb \
           -b alignments/${aligner}/${feature}.for_${chrom}.controls.plus.split.gff \
-          -a ../features/${feature}.for_${chrom}.controls.mf.gff \
+          -a features/${feature}.for_${chrom}.controls.mf.gff \
           -loj \
         | gzip \
         > alignments/${aligner}/${feature}.for_${chrom}.controls.plus.intersect.gz
