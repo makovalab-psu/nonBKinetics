@@ -6,8 +6,12 @@
 
 <<>>=
 
+log_mean <- function(data) {
+return(log(mean(data,na.rm=TRUE)+0.01))
+}
+
 runRegression <- function(vectorErrors, vectorIPDs) {
-  mylm <- lm(log(vectorIPDs + 0.01) ~ vectorErrors)
+  mylm <- lm(vectorIPDs ~ vectorErrors)
   summary(mylm)
   pvalue <-
     as.numeric(round(coef(summary(mylm))[, "Pr(>|t|)"][2], 3))
@@ -58,15 +62,31 @@ loadData <- function(fileErrors, fileIPDs) {
           as.data.frame(dataI),
           by = c("chr", "start", "end"))
   
-  means <- as.numeric(apply(mergedData[,9:no_col],1,mean,na.rm=TRUE))
-  medians <- as.numeric(apply(mergedData[,9:no_col],1,median,na.rm=TRUE))
+  means <- as.numeric(apply(mergedData[,9:no_col],1,log_mean))
+  #medians <- as.numeric(apply(mergedData[,9:no_col],1,median,na.rm=TRUE))
   
     for (type in c("TOTAL", "MISMATCHES", "INSERTION", "DELETION")) {
       regression_on_means<-runRegression(mergedData[[type]],means)
-      regression_on_medians<-runRegression(mergedData[[type]],medians)
+      #regression_on_medians<-runRegression(mergedData[[type]],medians)
       
       print(paste(type,"pvalue (means):",regression_on_means$pvalue,"pvalue (medians):",regression_on_medians$pvalue))
     }
+  
+  return(list(
+    ipd_median = median(means,na.rm=TRUE),
+    totalERRORS = mean(mergedData[["TOTAL"]],na.rm=TRUE),
+    mismatchesERRORS = mean(mergedData[["MISMATCHES"]],na.rm=TRUE),
+    insertionERRORS = mean(mergedData[["INSERTION"]],na.rm=TRUE),
+    deletionERRORS = mean(mergedData[["DELETION"]],na.rm=TRUE)
+  ))
+}
+
+getResults <- function(file) {
+  file_with_IPDs <-file
+  file_with_errors <- gsub(".mf",".collapsed",file)
+  print(paste(file_with_errors,file_with_IPDs))
+  result<-loadData(file_with_errors,file_with_IPDs)
+  return(result)
 }
 
 setwd("/Users/alice/Desktop/projects/kinetics/errors_vs_IPD")
@@ -74,16 +94,31 @@ filenames <- list.files(pattern = "*.mf", full.names = FALSE)
 
 file<-"DirectRepeatsFeatureOnly.mf"
 
-for (file in filenames) {
-  print("-------")
-  file_with_IPDs <-file
-  file_with_errors <- gsub(".mf",".collapsed",file)
-  print(paste(file_with_errors,file_with_IPDs))
-  loadData(file_with_errors,file_with_IPDs)
+
+results<-as.data.frame(sapply(filenames, getResults,simplify=TRUE))
+
+for (type in c("totalERRORS", "mismatchesERRORS", "insertionERRORS", "deletionERRORS")) { 
+  e<-unlist(results[type,])
+  i<-unlist(results["ipd_median",])
+  plot(
+  e,
+  i,
+  xaxs = "i",
+  yaxs = "i",
+  ylim = c(-1, 1),
+  xlim = c(round(min(e),2),round(max(e),2)),
+  xlab="ERRORS",
+  ylab="log(meanIPD)",
+  main=type,
+  sub="errors vs IPDs",
+  col="gray",
+  pch=21
+  )
+  text(e,i+0.05,labels=gsub("FeatureOnly.mf","",colnames(results)),cex=0.75)
 }
 
-@
 
+@
 
 
 \end{document}
