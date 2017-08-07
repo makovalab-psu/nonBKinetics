@@ -39,5 +39,5 @@ samtools mpileup ${PATHTOBAMS}minus.bam -B -C 0 -f ${PATHTOREF}data/hg19_formate
 
 python mpileup2gff_V2.py ${infile}.mp > ${infile}.split.gff
 bedtools intersect -wa -wb -b ${infile}.split.gff -a ${infile}.gff -loj > ${infile}.intersect
-
 python parse_intersect.py ${infile}.intersect > ${infile}.collapsed
+python error_rate.py ${infile}.mp
