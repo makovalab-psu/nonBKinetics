@@ -16,6 +16,7 @@ runRegression <- function(vectorErrors, vectorIPDs) {
   rsquare <- as.numeric(round(summary(mylm)$r.squared, 3))
   
   return(list(
+    res_lm = mylm,
     pvalue = pvalue,
     slope = slope,
     rsquare = rsquare
