@@ -6,12 +6,11 @@ export PATH="/galaxy/home/wilfried/Anaconda/bin:$PATH"
 export PATH="/nfs/brubeck.bx.psu.edu/scratch5/wilfried/src/bedtools2-master/bin:$PATH"
 
 inp=$1
-outp=$2
 
 #####CREATE WG.gff######
-python vcf_extract.py $inp $outp #vcfs in /nfs/brubeck.bx.psu.edu/scratch5/wilfried/kinetics/Clean/1kG/VCF/ #vcf_extract needs updating
+python vcf_extract.py $inp > chrN #vcfs in /nfs/brubeck.bx.psu.edu/scratch5/wilfried/kinetics/Clean/1kG/VCF/ # N in chrN depends on inputed VCF file
 cat chr* > WG
-python WG_to_gff.py WG
+python WG_to_gff.py WG 
 
 
 ########POLARIZING INDELS#########
