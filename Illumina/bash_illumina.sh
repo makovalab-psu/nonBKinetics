@@ -8,16 +8,20 @@ export PATH="//nfs/brubeck.bx.psu.edu/scratch5/wilfried/src/bedops/bin:$PATH"
 
 infile=$1   # Monika's .mf files
 
+#####PATHS#####
+
+PATHTOBAMS='/nfs/brubeck.bx.psu.edu/scratch5/wilfried/kinetics/Clean/illumina/' 
+PATHTOREF='/nfs/brubeck.bx.psu.edu/scratch5/wilfried/kinetics/data/'
 
 ###CHOSE ONE OF THE FOLLOWINGS### Run this only once
-samtools sort HG002.hs37d5.60x.1.bam -o HG002.60x.sorted
-samtools index HG002.60x.sorted
+samtools sort ${PATHTOBAMS}HG002.hs37d5.60x.1.bam -o ${PATHTOBAMS}HG002.60x.sorted
+samtools index ${PATHTOBAMS}HG002.60x.sorted
 
-samtools view -b -F 16 HG002.60x.sorted > plus.bam
-samtools index plus.bam
+samtools view -b -F 16 ${PATHTOBAMS}HG002.60x.sorted > ${PATHTOBAMS}plus.bam
+samtools index ${PATHTOBAMS}plus.bam
 
-samtools view -b -f 16 HG002.60x.sorted > minus.bam
-samtools index minus.bam
+samtools view -b -f 16 ${PATHTOBAMS}HG002.60x.sorted > ${PATHTOBAMS}minus.bam
+samtools index ${PATHTOBAMS}minus.bam
 ################################# Run this for each .mf file
 
 python format_to_gff.py ${infile}
@@ -25,11 +29,11 @@ gff2bed < ${infile}.gff > ${infile}.bed
 
 
 ###CHOSE ONE OF THE FOLLOWINGS### Run this for each .mf file
-samtools mpileup HG002.hs37d5.60x.1.bam -B -C 0  -f ../../data/hg19_formated_by_wil.fa -l ${infile}.bed -uv -t  INFO/DPR > ${infile}.mp
+samtools mpileup ${PATHTOBAMS}HG002.hs37d5.60x.1.bam -B -C 0  -f ${PATHTOREF}data/hg19_formated_by_wil.fa -l ${infile}.bed -uv -t  INFO/DPR > ${infile}.mp
 
-samtools mpileup plus.bam -B -C 0 -f ../../data/hg19_formated_by_wil.fa -l ${infile}.bed -uv -t  INFO/DPR > ${infile}.mp
+samtools mpileup ${PATHTOBAMS}plus.bam -B -C 0 -f ${PATHTOREF}data/hg19_formated_by_wil.fa -l ${infile}.bed -uv -t  INFO/DPR > ${infile}.mp
 
-samtools mpileup minus.bam -B -C 0 -f ../../data/hg19_formated_by_wil.fa -l ${infile}.bed -uv -t  INFO/DPR > ${infile}.mp
+samtools mpileup ${PATHTOBAMS}minus.bam -B -C 0 -f ${PATHTOREF}data/hg19_formated_by_wil.fa -l ${infile}.bed -uv -t  INFO/DPR > ${infile}.mp
 ################################# Run this for each .mf file
 
 
