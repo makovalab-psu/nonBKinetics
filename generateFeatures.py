@@ -28,7 +28,7 @@ else:
 
 			m_array=m.split('\t')
 
-			print (m_array[0:4])
+			#print (m_array[0:4])
 
 			window_start=int(m_array[1])
 			window_end=int(m_array[2])
@@ -39,12 +39,12 @@ else:
 			#print ("motif length: " + str(length))
 
 			if (length % 2 == 0): #even 
-				print "even"
+				#print "even"
 				feature_start = window_start + (50 - math.trunc(length / 2))
 				feature_stop = window_start + (50 + math.trunc(length / 2)-1)
 				IPDsubset = tail[(50 - math.trunc(length / 2)):(50 + math.trunc(length / 2))]
 			else: #odd
-				print "odd"
+				#print "odd"
 				feature_start = window_start + (50 - math.trunc(length / 2))
 				feature_stop = window_start + (50 + math.trunc(length / 2))
 				IPDsubset = tail[(50 - math.trunc(length / 2)):(50 + math.trunc(length / 2))]
