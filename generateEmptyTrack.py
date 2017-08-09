@@ -10,9 +10,9 @@ def get_arg(index):
 	try:
 	    sys.argv[index]
 	except IndexError:
-	    return ""
+	    return False
 	else:
-	    return sys.argv[index]
+	    return sys.argv[3]
 
 ######################################
 #python generateEmptyTrack.py motifFile
@@ -25,7 +25,11 @@ print motifFile
 num_lines = open(motifFile).read().count('\n')
 
 print num_lines
-outputEmpty=outputDirectory + "/" + basename(motifFile) + "EmptyTmp"
+
+if(get_arg(3)==False):
+	outputEmpty=basename(motifFile) + "EmptyTmp"
+else:
+	outputEmpty=outputDirectory + "/" + basename(motifFile) + "EmptyTmp"
 
 if (os.path.exists(outputEmpty)):
 	sys.exit('The output file already exists and won\'t be overwritten!')
