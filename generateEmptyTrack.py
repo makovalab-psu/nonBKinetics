@@ -9,6 +9,7 @@ import math
 ######################################
 #python generateEmptyTrack.py motifFile
 motifFile=str(sys.argv[1])
+emptyFile=str(sys.argv[2]) #file containing ALL the controls
 ######################################
 
 print motifFile
@@ -18,7 +19,7 @@ print num_lines
 outputEmpty=motifFile + "EmptyTmp"
 
 #sample same number of empty lines as are in motif file
-bashCommand = "shuf -n " + str(num_lines) + " " + "Empty.mf"
+bashCommand = "shuf -n " + str(num_lines) + " " + emptyFile
 print bashCommand
 
 p = sp.Popen(bashCommand.split(), stdin = sp.PIPE, stdout = sp.PIPE, stderr = sp.PIPE)
@@ -48,12 +49,12 @@ for i in range(0,num_lines):
 		#print ("motif length: " + str(length))
 
 	if (length % 2 == 0): #even 
-		print "even"
+		#print "even"
 		feature_start = window_start + (50 - math.trunc(length / 2))
 		feature_stop = window_start + (50 + math.trunc(length / 2)-1)
 		IPDsubset = tail[(50 - math.trunc(length / 2)):(50 + math.trunc(length / 2))]
 	else: #odd
-		print "odd"
+		#print "odd"
 		feature_start = window_start + (50 - math.trunc(length / 2))
 		feature_stop = window_start + (50 + math.trunc(length / 2))
 		IPDsubset = tail[(50 - math.trunc(length / 2)):(50 + math.trunc(length / 2))]
