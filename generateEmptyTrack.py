@@ -73,7 +73,7 @@ else:
 			#print "odd"
 			feature_start = window_start + (50 - math.trunc(length / 2))
 			feature_stop = window_start + (50 + math.trunc(length / 2))
-			IPDsubset = tail[(50 - math.trunc(length / 2)):(50 + math.trunc(length / 2))]
+			IPDsubset = tail[(50 - math.trunc(length / 2)):(50 + math.trunc(length / 2) + 1)] #center is 51st nucleotide
 		res=(e_array[0] + "\t" + str(feature_start) + "\t" + str(feature_stop) + "\t" + str(length)+ "\t" + '\t'.join(IPDsubset))
 		#print res
 		f.write(res+"\n")
