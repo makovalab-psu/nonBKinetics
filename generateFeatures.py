@@ -28,7 +28,7 @@ else:
 
 			m_array=m.split('\t')
 
-			print (m_array[0:4])
+			#print (m_array[0:4])
 
 			window_start=int(m_array[1])
 			window_end=int(m_array[2])
