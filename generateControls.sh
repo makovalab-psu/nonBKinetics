@@ -6,9 +6,9 @@ for i in {1..10}; do
 echo "$i "; 
 	directory="control"${i}; mkdir -p $directory; 
 	for a in forward/*; do 
-		echo $a; python generateEmptyTrack.py $a forward/Empty.mf $directory &
+		echo $a; python generateEmptyTrack.py $a forward/Empty.mf $directory;
 	done;
-	wait
+	sed -i 's/^chr//g' *mf*
 done; 
 
 #sort the files into appropriate folders
