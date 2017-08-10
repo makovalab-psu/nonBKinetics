@@ -78,6 +78,3 @@ else:
 		#print res
 		f.write(res+"\n")
 		#print "***"
-
-
-
