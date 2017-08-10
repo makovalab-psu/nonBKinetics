@@ -28,7 +28,7 @@ else:
 
 			m_array=m.split('\t')
 
-			#print (m_array[0:4])
+			print (m_array[0:4])
 
 			window_start=int(m_array[1])
 			window_end=int(m_array[2])
@@ -42,12 +42,12 @@ else:
 				#print "even"
 				feature_start = window_start + (50 - math.trunc(length / 2))
 				feature_stop = window_start + (50 + math.trunc(length / 2)-1)
-				IPDsubset = tail[(50 - math.trunc(length / 2)):(50 + math.trunc(length / 2))]
+				IPDsubset = tail[(50 - math.trunc(length / 2)):(50 + math.trunc(length / 2))] #center is 51st nucleotide
 			else: #odd
 				#print "odd"
 				feature_start = window_start + (50 - math.trunc(length / 2))
 				feature_stop = window_start + (50 + math.trunc(length / 2))
-				IPDsubset = tail[(50 - math.trunc(length / 2)):(50 + math.trunc(length / 2))]
+				IPDsubset = tail[(50 - math.trunc(length / 2)):(50 + math.trunc(length / 2) + 1)] #center is 51st nucleotide
 			res=(m_array[0] + "\t" + str(feature_start) + "\t" + str(feature_stop) + "\t" + str(length)+ "\t" + '\t'.join(IPDsubset))
 			#print res
 			f.write(res+"\n")
