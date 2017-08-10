@@ -11,6 +11,6 @@ export PATH="/nfs/brubeck.bx.psu.edu/scratch5/wilfried/src/bedtools2-master/bin:
 bedtools intersect -v -a ${motif_gff} -b ${reference_vcf} >${filtered_motif_gff}
 echo "Filtering "
 echo -n `wc -l ${motif_gff}`
-echo "resulting in "
+echo " resulting in "
 echo -n `wc -l ${filtered_motif_gff}`
-echo "windows"
+echo " windows"
