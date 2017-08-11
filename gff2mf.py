@@ -21,6 +21,7 @@ def get_arg(index):
         return sys.argv[3]
 
 ######################################
+#This script will convert filtered gff files back to mf files
 #python gff2mf.py originalmfFile gffFile
 originalMfFile=str(sys.argv[1])
 gffFile=str(sys.argv[2])
