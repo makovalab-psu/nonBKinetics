@@ -27,6 +27,10 @@ gffFile=str(sys.argv[2])
 mode=get_arg(3) #optional argument 'keep|remove' picks the subsetting mode
 ######################################
 
+gffDict=defaultdict()
+outputEmpty=gffFile.replace(".gff",".mf")
+outputEmpty=basename(outputEmpty)
+
 if(get_arg(3)==False):
     mode="keep"
 else:
@@ -37,12 +41,12 @@ print("Note that the script will only work if two files have same formatting (10
 
 if (mode=="keep"):
     print("Mode is to subset to MATCHING LINES.")
+    print("Output written to " + outputEmpty)
 else:
     print("Mode is to subset to NON-MATCHING LINES.")
+    outputEmpty=outputEmpty.replace(".mf","_complement.mf")
+    print("Output written to " + outputEmpty)
 
-gffDict=defaultdict()
-outputEmpty=gffFile.replace(".gff",".mf")
-outputEmpty=basename(outputEmpty)
 
 # Do not overwrite existing file
 if (os.path.exists(outputEmpty)):
@@ -89,14 +93,12 @@ def walk_original(originalMfFile, gffDict):
                 if (mode=="keep"):
                     fout.write(line_with_ipds)
             else:
-                print(flattenned + "not in the dictionary")
                 if (mode!="keep"):
                     fout.write(line_with_ipds)
     f.close()
     fout.close()
 
 gffDict = load_unoriginal(gffFile)
-print(gffDict.keys())
 walk_original(originalMfFile, gffDict)
 
 
