@@ -33,6 +33,7 @@ else:
     mode=get_arg(3)
 
 print("originalMfFile: " + originalMfFile + "; " + "gffFile: " + gffFile)
+print("Note that the script will only work if two files have same formatting (100bp vs FeatureOnly)")
 
 if (mode=="keep"):
     print("Mode is to subset to MATCHING LINES.")
@@ -79,19 +80,17 @@ def walk_original(originalMfFile, gffDict):
     original_gffDict = []
     fout = open(outputEmpty, 'w')
     with open(originalMfFile) as f:
-        i=0
         for line_with_ipds in f:
-            i=i+1 #line_with_ipds number
             array_with_ipds=line_with_ipds.rstrip().split("\t", 3)
             left = array_with_ipds[0:3]
             key=str(left)
             flattenned = ' '.join( left )
-            print(flattenned)
-            if (mode=="keep"):
-                if gffDict.has_key(flattenned):
+            if (gffDict.has_key(flattenned)==True):
+                if (mode=="keep"):
                     fout.write(line_with_ipds)
             else:
-                if !(gffDict.has_key(flattenned)):
+                print(flattenned + "not in the dictionary")
+                if (mode!="keep"):
                     fout.write(line_with_ipds)
     f.close()
     fout.close()
