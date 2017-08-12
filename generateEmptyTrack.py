@@ -59,21 +59,25 @@ else:
 		window_start=int(e_array[1]) #coordinates from empty file
 		window_end=int(e_array[2]) #coordinates from empty file
 		length=int(m_array[3]) #length from motif file
+
 		tail=e_array[4:len(e_array)]
-			#print ("tail: " + str(tail))
 
-			#print ("motif length: " + str(length))
-
-		if (length % 2 == 0): #even 
-			#print "even"
+		if (length>100):
+			length=100 #if feature larger than the window used for extraction, use full 100bp instead
 			feature_start = window_start + (50 - math.trunc(length / 2))
 			feature_stop = window_start + (50 + math.trunc(length / 2)-1)
-			IPDsubset = tail[(50 - math.trunc(length / 2)):(50 + math.trunc(length / 2))]
-		else: #odd
-			#print "odd"
-			feature_start = window_start + (50 - math.trunc(length / 2))
-			feature_stop = window_start + (50 + math.trunc(length / 2))
-			IPDsubset = tail[(50 - math.trunc(length / 2)):(50 + math.trunc(length / 2) + 1)] #center is 51st nucleotide
+			IPDsubset = tail #all IPD values should be copied
+		else:
+			if (length % 2 == 0): #even 
+				#print "even"
+				feature_start = window_start + (50 - math.trunc(length / 2))
+				feature_stop = window_start + (50 + math.trunc(length / 2)-1)
+				IPDsubset = tail[(50 - math.trunc(length / 2)):(50 + math.trunc(length / 2))]
+			else: #odd
+				#print "odd"
+				feature_start = window_start + (50 - math.trunc(length / 2))
+				feature_stop = window_start + (50 + math.trunc(length / 2))
+				IPDsubset = tail[(50 - math.trunc(length / 2)):(50 + math.trunc(length / 2) + 1)] #center is 51st nucleotide
 		res=(e_array[0] + "\t" + str(feature_start) + "\t" + str(feature_stop) + "\t" + str(length)+ "\t" + '\t'.join(IPDsubset))
 		#print res
 		f.write(res+"\n")
