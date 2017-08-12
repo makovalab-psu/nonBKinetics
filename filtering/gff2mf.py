@@ -30,7 +30,6 @@ mode=get_arg(3) #optional argument 'keep|remove' picks the subsetting mode
 
 gffDict=defaultdict()
 outputEmpty=gffFile.replace(".gff",".mf")
-outputEmpty=basename(outputEmpty)
 
 if(get_arg(3)==False):
     mode="keep"
