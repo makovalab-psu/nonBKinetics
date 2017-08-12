@@ -6,15 +6,16 @@ import subprocess as sp
 import itertools
 from itertools import izip
 import math
+import re
 
 ######################################
 #python generateFeatures.py motifFile
 motifFile=str(sys.argv[1])
 ######################################
-FeatureOnlyFile=motifFile.replace("_filtered","FeatureOnly.mf")
+FeatureOnlyFile=re.sub('$', 'FeatureOnly.mf', motifFile)
 
 if (os.path.exists(FeatureOnlyFile)):
-	sys.exit('The output file already exists and won\'t be overwritten!')
+	sys.exit('The output file ' + FeatureOnlyFile + ' already exists and won\'t be overwritten!')
 else:
 	print motifFile
 	print FeatureOnlyFile
@@ -34,20 +35,23 @@ else:
 			window_end=int(m_array[2])
 			length=int(m_array[3])
 			tail=m_array[4:len(m_array)]
-			#print ("tail: " + str(tail))
 
-			#print ("motif length: " + str(length))
-
-			if (length % 2 == 0): #even 
-				#print "even"
+			if (length>100):
+				length=100
 				feature_start = window_start + (50 - math.trunc(length / 2))
 				feature_stop = window_start + (50 + math.trunc(length / 2)-1)
-				IPDsubset = tail[(50 - math.trunc(length / 2)):(50 + math.trunc(length / 2))] #center is 51st nucleotide
-			else: #odd
-				#print "odd"
-				feature_start = window_start + (50 - math.trunc(length / 2))
-				feature_stop = window_start + (50 + math.trunc(length / 2))
-				IPDsubset = tail[(50 - math.trunc(length / 2)):(50 + math.trunc(length / 2) + 1)] #center is 51st nucleotide
+				IPDsubset = tail #all IPD values should be copied
+			else: 
+				if (length % 2 == 0): #even 
+					#print "even"
+					feature_start = window_start + (50 - math.trunc(length / 2))
+					feature_stop = window_start + (50 + math.trunc(length / 2)-1)
+					IPDsubset = tail[(50 - math.trunc(length / 2)):(50 + math.trunc(length / 2))] #center is 51st nucleotide
+				else: #odd
+					#print "odd"
+					feature_start = window_start + (50 - math.trunc(length / 2))
+					feature_stop = window_start + (50 + math.trunc(length / 2))
+					IPDsubset = tail[(50 - math.trunc(length / 2)):(50 + math.trunc(length / 2) + 1)] #center is 51st nucleotide
 			res=(m_array[0] + "\t" + str(feature_start) + "\t" + str(feature_stop) + "\t" + str(length)+ "\t" + '\t'.join(IPDsubset))
 			#print res
 			f.write(res+"\n")
