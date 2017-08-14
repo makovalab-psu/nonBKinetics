@@ -215,8 +215,8 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired, parametric=FALSE) {
   )
 }
 
-run <- function(directory, filenames, paired, ITER, parametric=FALSE) {
-  print(paste(directory, filenames, paired, ITER, parametric))
+run <- function(directory, control_directory, filenames, paired, ITER, parametric=FALSE) {
+  print(paste(directory, control_directory, filenames, paired, ITER, parametric))
   
   #PLOT
   for (i in c("TOTAL", "MISMATCHES", "INSERTION", "DELETION")) {
@@ -262,8 +262,9 @@ run <- function(directory, filenames, paired, ITER, parametric=FALSE) {
       #)
       
       #load empty windows
-      emptyFile <- gsub(".mf", ".mfEmptyTmp", file)
+      emptyFile <- gsub("FeatureOnly.mf.collapsed", "EmptyTmp.collapsed", basename(file))
       emptyFile <- gsub("merged_", "", emptyFile)
+      emptyFile <-paste0(control_directory,"/",emptyFile) #the control file is in the control directory
       
       if (file.exists(emptyFile)) {
         print(paste("empty file exists, will use matching file", emptyFile))
@@ -395,10 +396,16 @@ run <- function(directory, filenames, paired, ITER, parametric=FALSE) {
   
   save.image(file = basename(getwd()))
   
+  search_for_motif_name <-function(m) {
+    grep(m,names(TOTAL), value=TRUE)  
+  }
+  
   
   #OUTPUT TABLES
   print("PRINT TABLES-------------")
-  names <- c("APhasedRepeatsFeatureOnly.mf", "DirectRepeatsFeatureOnly.mf", "InvertedRepeatsFeatureOnly.mf", "MirrorRepeatsFeatureOnly.mf", "ZDNAMotifsFeatureOnly.mf", "GQuadPlusFeatureOnly.mf", "GQuadMinusFeatureOnly.mf")
+  mfs <- c("APhasedRepeats", "DirectRepeats", "InvertedRepeats", "MirrorRepeats", "ZDNAMotifs", "GQuadPlus", "GQuadMinus")
+  names<-unlist(lapply(mfs,search_for_motif_name)) #specific name for each folder
+  
   
   if (length(names)<2) {
     print("The number of motifs to be analyzed is too low. Please add more motifs. ERROR.")
@@ -407,7 +414,7 @@ run <- function(directory, filenames, paired, ITER, parametric=FALSE) {
   
   par(mfrow = c(1, 1), cex = 1.4)
   directory <- paste0(getwd(), "/")
-  variables <- basename(getwd())
+  variables <- basename(dirname(getwd()))
   
   for (i in c("TOTAL", "MISMATCHES", "INSERTION", "DELETION")) {
     print(i)
@@ -473,7 +480,7 @@ run <- function(directory, filenames, paired, ITER, parametric=FALSE) {
       )
     #summary <-
     #  as.data.frame(as.matrix(rbind(rep(names,each=8), results), optional = TRUE))
-    fn <- paste0(directory, basename(variables), "_", i, ".txt")
+    fn <- paste0(control_directory,basename(variables),"_", i, ".txt")
     print(fn)
     
     if (file.exists(fn)) {
@@ -523,11 +530,19 @@ set.seed(3)
 
 directories <-
   c(
-    "/Users/alice/Desktop/projects/kinetics/errors_will/52x/illumina",
-    "/Users/alice/Desktop/projects/kinetics/errors_will/52x/pacbio",
-    "/Users/alice/Desktop/projects/kinetics/errors_will/52x/diversity",
-    "/Users/alice/Desktop/projects/kinetics/errors_will/52x/divergence",
-    "/Users/alice/Desktop/projects/kinetics/errors_will/52x/TCGA"
+    "/Users/alice/Desktop/projects/kinetics/errors_will/52xAugust14/illumina/joint",
+    "/Users/alice/Desktop/projects/kinetics/errors_will/52x/pacbio_mp",
+    "/Users/alice/Desktop/projects/kinetics/errors_will/52xAugust14/diversity/RM",
+    "/Users/alice/Desktop/projects/kinetics/errors_will/52xAugust14/divergence/RM",
+    "/Users/alice/Desktop/projects/kinetics/errors_will/52xAugust14/TCGA/RM"
+  )
+
+directories <-
+  c(
+    "/Users/alice/Desktop/projects/kinetics/errors_will/52xAugust14/illumina/joint",
+    "/Users/alice/Desktop/projects/kinetics/errors_will/52xAugust14/diversity/RM",
+    "/Users/alice/Desktop/projects/kinetics/errors_will/52xAugust14/divergence/RM",
+    "/Users/alice/Desktop/projects/kinetics/errors_will/52xAugust14/TCGA/RM"
   )
 
 for (directory in directories) {
@@ -558,13 +573,18 @@ for (directory in directories) {
   DELETIONeffectSize <- hash()
   MISMATCHESeffectSize <- hash()
   
-  filenames <- list.files(pattern = "*.mf", full.names = FALSE)
-  filenames <- filenames[grep("EmptyTmp", filenames, invert = TRUE)]
+  filenames <- list.files(pattern = "*.collapsed", full.names = FALSE)
+  filenames <- filenames[grep("Empty", filenames, invert = TRUE)]
   paired <- TRUE
   ITER <- 1000
   parametric=TRUE # if FALSE, permutational pvalue, otherwise approximate parametric pvalue
   
-  run(directory, filenames, paired, ITER, parametric)
+  #RUN THE CODE FOR ALL CONTROLS TO GENERATE 10 p-values
+  for (i in 1:10) {
+    print(i)
+    control_directory<-gsub("$",paste0("_control",i),directory)
+    run(directory, control_directory, filenames, paired, ITER, parametric)
+  }
   #traceback()
 }
 
