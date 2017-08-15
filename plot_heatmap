@@ -5,10 +5,11 @@
 
 <<>>=
 options(scipen=10)
+library(data.table)
 #PLOT HEATMAP
 par(bg = "white", las = 1, pty = "s")
 
-errorType<-"DELETION" #CHANGE THE ERROR TYPE HERE
+errorType<-"INSERTION" #CHANGE THE ERROR TYPE HERE
 shape<-"rectangles" #triangles|rectangles
 
 #rectangles: 
@@ -18,7 +19,17 @@ shape<-"rectangles" #triangles|rectangles
 #           upper left color is picked based on proportion of 0s
 #           bottom right color is picked based on differerence of non-zero means of motifs versus controls
 
-root_folder<-"/Users/alice/Desktop/projects/kinetics/errors_will/52x/"
+getVectorOfResults <- function(type,root_folder,extension) {
+  filenames <- list.files(paste0(root_folder,type), pattern=extension, full.names=TRUE)
+  list <- rbindlist(lapply(filenames,fread))
+  dftmp <- as.data.frame(list[seq(2,nrow(list),2),2:ncol(list)])
+  pvalues<-data.matrix(dftmp[,seq(6,ncol(dftmp),8)])
+  
+  dftmp<-c(type,as.vector(colMeans(data.matrix(dftmp))))
+  return(list(dataMatrix=dftmp,pvalues=pvalues))
+}
+
+root_folder<-"/Users/alice/Desktop/projects/kinetics/errors_will/52xAugust14/"
 file_list <-
   c(
   paste(root_folder,"pacbio/pacbio_",errorType,".txt",sep=""),
@@ -28,15 +39,48 @@ file_list <-
   paste(root_folder,"TCGA/TCGA_",errorType,".txt",sep="")
   )
 
-dataset <- do.call("rbind",lapply(file_list,
-FUN=function(files){read.table(files,
-header=FALSE, sep="\t")}))
+extension<-paste0(errorType,".txt")
+Pacbio <- c("pacbio",rep(NA,56))
+Illumina <- getVectorOfResults("illumina",root_folder,extension)
+Diversity <- getVectorOfResults("diversity",root_folder,extension)
+Divergence <- getVectorOfResults("divergence",root_folder,extension)
+TCGA <- getVectorOfResults("TCGA",root_folder,extension)
 
-interesting_rows<-c(1,2,seq(3,nrow(dataset),by=3))
-data<-dataset[interesting_rows,] #remove excessive headers
+dataPacBio<-Pacbio
+dataIllumina<-Illumina$dataMatrix
+dataDiversity<-Diversity$dataMatrix
+dataDivergence<-Divergence$dataMatrix
+dataTCGA<-TCGA$dataMatrix
+
+#NOTE THAT ORDER OF P-VALUES LISTED HERE IS RANDOM, NOT 1..10
+print("Pacbio pvalues")
+print(as.data.frame(Pacbio$pvalues))
+print("Illumina pvalues")
+print(as.data.frame(Illumina$pvalues))
+print("Diversity pvalues")
+print(as.data.frame(Diversity$pvalues))
+print("Divergence pvalues")
+print(as.data.frame(Divergence$pvalues))
+print("TCGA pvalues")
+print(as.data.frame(TCGA$pvalues))
+
+header<-as.data.frame(read.table(paste0(root_folder,"header.txt"),header=FALSE,sep="\t"))
+
+require(reshape2)
+df<-t(melt(data.frame(dataPacBio,dataIllumina,dataDiversity,dataDivergence,dataTCGA)))
+df<-rbind(header,df)
+
+#dataset <- do.call("rbind",lapply(file_list,
+#FUN=function(files){read.table(files,
+#header=FALSE, sep="\t")}))
+#interesting_rows<-c(1,2,seq(3,nrow(dataset),by=3))
+#data<-dataset[interesting_rows,] #remove excessive headers
+
+data<-df #NEW DATASET
 
 par(xpd=TRUE)
 motifs<-unique(as.character(unlist(data[1,])))
+mfs<-c("APhasedRepeats", "DirectRepeats", "InvertedRepeats", "MirrorRepeats", "ZDNAMotifs", "GQuadPlus", "GQuadMinus")
 
 #plot background canvas
 barplot(
@@ -52,7 +96,7 @@ barplot(
 )
 
 #plot labels
-text(seq(50,700,100),730,labels=motifs[2:length(motifs)],srt=90)
+text(seq(50,700,100),730,labels=mfs,srt=90)
 mtext(gsub( "_.*$", "", basename(file_list)), #infer method names from file names
       side = 2,
       at = seq(540, 140,-100))
@@ -64,6 +108,7 @@ folddiff <- read.table(
         header = T,
         fill = TRUE
       )
+
 
 
 getColor <- function(significance, sign) {
