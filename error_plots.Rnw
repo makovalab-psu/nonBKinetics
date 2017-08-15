@@ -184,6 +184,7 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired, parametric=FALSE) {
     # two-tailed test
     pvalue <-
       (sum(examples >= test.diff) + 1) / (max.iter + 1) #from http://danielnee.com/tag/p-value/
+    pvalue_param=two.part$param_pval
   }
   
   #hist(
