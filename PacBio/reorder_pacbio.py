@@ -22,9 +22,8 @@ motifFileWithErrors=str(sys.argv[2])
 print("motifFileWithIPds: " + motifFileWithIPds + "; " + "motifFileWithErrors: " + motifFileWithErrors)
 
 errorDict=defaultdict()
-outputEmpty=motifFileWithErrors.replace("merged_","ordered_")
-outputEmpty=basename(outputEmpty)
-outputEmpty=("reordered." + outputEmpty)
+outputEmpty=motifFileWithErrors.replace("merged_","")
+outputEmpty=re.sub('$', '.collapsed', outputEmpty)
 
 # Do not overwrite existing file
 if (os.path.exists(outputEmpty)):
@@ -84,7 +83,10 @@ ordered_errorDict = walk_ordered(motifFileWithIPds, errorDict)
 # Write results
 fout = open(outputEmpty, 'w')
 for item in ordered_errorDict:
-    fout.write(item + '\n')
+    #fout.write(item + '\n')
+    out_item=str(item)
+    out_item=item.split(" ")[0:4] #remove last 4 columns as they are not needed in plotting script working with .collapsed files
+    fout.write(str(' '.join(out_item)) + '\n')
 fout.close()
 
 
