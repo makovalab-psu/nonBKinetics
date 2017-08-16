@@ -21,12 +21,18 @@ for motif in "${array[@]}"; do
 	cat ${folder_to_merge}/*${motif}*.txt >${outputname}
 	echo "files merged and written to"
 	echo $outputname
-	echo "This output file will be reordered based on following matching file with IPD values:"
+
 	mf_file=${original_mf_folder}/*${motif}*.mf*
 	echo $mf_file
-	python reorder_pacbio.py ${mf_file} ${outputname}
-	echo ".collapsed file have been produced"
-	echo ""
-	echo "====================="
-	echo ""
+
+	if [ -f $mf_file ]; then
+		echo "This output file will be reordered based on following matching file with IPD values:"
+		python reorder_pacbio.py ${mf_file} ${outputname}
+		echo ".collapsed file have been produced"
+		echo ""
+		echo "====================="
+		echo ""
+	else
+		echo "Matching .mf file does not exist, .collapsed file won't be created."
+	fi
 done; 
