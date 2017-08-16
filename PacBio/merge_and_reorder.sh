@@ -5,7 +5,13 @@ original_mf_folder=$2
 
 for motif in "${array[@]}"; do 
 	echo $motif;
-	outputname=${folder_to_merge}/merged_${folder_to_merge}_${motif}.txt
+
+	#are we dealing with controls?
+	if [[ $folder_to_merge == *"control"* ]]; then
+		outputname=${folder_to_merge}/merged_${folder_to_merge}_${motif}.mfEmptyTmp
+	else
+		outputname=${folder_to_merge}/merged_${folder_to_merge}_${motif}.mf
+	fi
 
 	if [ -f $outputname ]; then
 		echo "File $FILE exists and will be removed before concatenating the rest of files."
@@ -24,4 +30,3 @@ for motif in "${array[@]}"; do
 	echo "====================="
 	echo ""
 done; 
-#while read line; do echo $line; cat *features10000.${line}.txt >merged/merged_${line}; done <listFeatures
