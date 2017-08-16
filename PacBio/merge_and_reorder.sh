@@ -1,5 +1,5 @@
 #!/bin/bash
-array=(APhasedRepeats DirectRepeats InvertedRepeats MirrorRepeats ZDNAMotifs GQuadPlus GQuadMinus GQuadruplex);
+array=(APhasedRepeats DirectRepeats InvertedRepeats MirrorRepeats ZDNAMotifs GQuadPlus GQuadMinus GQuadruplex Empty);
 folder_to_merge=$1
 original_mf_folder=$2
 
