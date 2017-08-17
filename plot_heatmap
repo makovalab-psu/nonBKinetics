@@ -9,8 +9,9 @@ library(data.table)
 #PLOT HEATMAP
 par(bg = "white", las = 1, pty = "s")
 
-errorType<-"INSERTION" #CHANGE THE ERROR TYPE HERE
+errorType<-"MISMATCHES" #CHANGE THE ERROR TYPE HERE
 shape<-"rectangles" #triangles|rectangles
+alpha<-0.1
 
 #rectangles: 
 #           color is based on difference of total means of motifs versus features
@@ -24,9 +25,15 @@ getVectorOfResults <- function(type,root_folder,extension) {
   list <- rbindlist(lapply(filenames,fread))
   dftmp <- as.data.frame(list[seq(2,nrow(list),2),2:ncol(list)])
   pvalues<-data.matrix(dftmp[,seq(6,ncol(dftmp),8)])
+
+  #take mean across all control files
+  dftmpVector<-c(type,as.vector(colMeans(data.matrix(dftmp))))
+  #we want to use max p-value across all controls
+  dftmpVector[seq(7,length(dftmpVector),8)]<-apply(dftmp[,seq(6,ncol(dftmp),8)],2,max,na.rm=TRUE)
+  #signs are not set
+  dftmpVector[seq(6,length(dftmpVector),8)]<-NA
   
-  dftmp<-c(type,as.vector(colMeans(data.matrix(dftmp))))
-  return(list(dataMatrix=dftmp,pvalues=pvalues))
+  return(list(dataMatrix=dftmpVector,pvalues=pvalues))
 }
 
 root_folder<-"/Users/alice/Desktop/projects/kinetics/errors_will/52xAugust14/"
@@ -40,13 +47,13 @@ file_list <-
   )
 
 extension<-paste0(errorType,".txt")
-Pacbio <- c("pacbio",rep(NA,56))
+Pacbio <- getVectorOfResults("pacbio",root_folder,extension)
 Illumina <- getVectorOfResults("illumina",root_folder,extension)
 Diversity <- getVectorOfResults("diversity",root_folder,extension)
 Divergence <- getVectorOfResults("divergence",root_folder,extension)
 TCGA <- getVectorOfResults("TCGA",root_folder,extension)
 
-dataPacBio<-Pacbio
+dataPacBio<-Pacbio$dataMatrix
 dataIllumina<-Illumina$dataMatrix
 dataDiversity<-Diversity$dataMatrix
 dataDivergence<-Divergence$dataMatrix
@@ -115,7 +122,7 @@ getColor <- function(significance, sign) {
   if (significance < 1e-5) {
     significance <- 1e-5
   }
-  #significance[significance>0.05]=1 # threshold at 5%
+  #significance[significance>alpha]=1 # threshold at 5%
   log_pvalue = -log10(significance)
   log_pvalue = sign * log_pvalue     # sign_difference -1 for negative differences, +1 for   positive differences
   colfunc = colorRampPalette(c("navy", "white", "red"))(n = 100 - 1)
@@ -128,7 +135,7 @@ getColor <- function(significance, sign) {
     which((log >= color_limits[1:99]) &
             (log <= color_limits[2:100])
     )[1]))])
-  if (significance > 0.05) {
+  if (significance > alpha) {
     col <- "white" #non-significant not colored
   }
   return(col)
@@ -217,31 +224,31 @@ for (technology in seq(3, nrow(data), 1)) {
     
       #PLOT LABELS INSIDE THE CELLS
       if (shape == "rectangles") {
-        if(result$significance[i] <= 0.05)
+        if(result$significance[i] <= alpha)
           text(
             x + 50,
             y + 50,
             labels = cell_value,
-            col = ifelse(result$significance[i] > 0.05, "black", "white"),
+            col = ifelse(result$significance[i] > alpha, "black", "white"),
             cex = 1.75
           )
       } else {
         if (shape == "triangles") {
           #upper left
-          if(result$significance[i] <= 0.05)
+          if(result$significance[i] <= alpha)
             text(
               x + 33,
               y + 70,
               labels = round(result$zeros[i],2),
-              col = ifelse(result$significance[i] > 0.05, "black", "white")
+              col = ifelse(result$significance[i] > alpha, "black", "white")
             )
           #bottom right
-          if(result$significance[i] <= 0.05)
+          if(result$significance[i] <= alpha)
             text(
               x + 70,
               y + 33,
               labels = round(result$effect[i],2),
-              col = ifelse(result$significance[i] > 0.05, "black", "white")
+              col = ifelse(result$significance[i] > alpha, "black", "white")
             )
         } else {
           warning("Shape type (rectangles|triangles) was not set. ERROR.")
