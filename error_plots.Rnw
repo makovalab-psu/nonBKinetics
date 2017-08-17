@@ -56,6 +56,7 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired, parametric=FALSE) {
     )
   )
   # fold-change of percentage of non-zero
+  #TODO: RENAME THIS VARIABLE!
   nonZeros_perc <-
     as.numeric(sign(feature_non_zero - control_non_zero) * max(c(feature_non_zero, control_non_zero)) /min(c(feature_non_zero, control_non_zero)))
   
@@ -180,12 +181,10 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired, parametric=FALSE) {
   effectSize_perc = two.part$difference_perc
   if(parametric){
     pvalue=two.part$param_pval
-    pvalue_param=two.part$param_pval
   }else{
     # two-tailed test
     pvalue <-
       (sum(examples >= test.diff) + 1) / (max.iter + 1) #from http://danielnee.com/tag/p-value/
-    pvalue_param=two.part$param_pval
   }
   
   #hist(
@@ -210,7 +209,6 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired, parametric=FALSE) {
   return(
     list(
       pvalue = pvalue,
-      pvalue_param = pvalue_param,
       effectSize = effectSize,
       effectSize_perc = effectSize_perc,
       nonZeros_perc = nonZeros_perc
@@ -265,9 +263,11 @@ run <- function(directory, control_directory, filenames, paired, ITER, parametri
       #)
       
       #load empty windows
-      emptyFile <- gsub("FeatureOnly.mf.collapsed", "EmptyTmp.collapsed", basename(file))
+      emptyFile <- gsub("FeatureOnly.mf.collapsed", ".collapsed", basename(file))
+      emptyFile <- gsub(".collapsed", "EmptyTmp.collapsed", emptyFile)
       emptyFile <- gsub("merged_", "", emptyFile)
       emptyFile <-paste0(control_directory,"/",emptyFile) #the control file is in the control directory
+      print(emptyFile)
       
       if (file.exists(emptyFile)) {
         print(paste("empty file exists, will use matching file", emptyFile))
@@ -333,50 +333,58 @@ run <- function(directory, control_directory, filenames, paired, ITER, parametri
       
       print(paste("paired status: ", paired))
       
-      if (paired == TRUE) {
-        #PAIRED DATA
-        df <- as.data.frame(cbind(valuesEmpty, values))
-        missing <- which(is.na(df$values) |
-                           is.na(df$valuesEmpty))
-        filled <- !(1:(length(values)) %in% missing)
-        result = getPvalue(values[filled], valuesEmpty[filled], file, i, ITER, paired, parametric) #should be TRUE for paired test when using features of variable length
-        print(result)
-        print(
-          paste(
-            "control sample size without NA: ",
-            length(na.omit(valuesEmpty[filled])),
-            "feature sample size without NA:",
-            length(na.omit(values[filled]))
+      if (length(valuesEmpty) > 0) { #NON-EMPTY CONTROLS
+        if (paired == TRUE) {
+          #PAIRED DATA
+          df <- as.data.frame(cbind(valuesEmpty, values))
+          missing <- which(is.na(df$values) |
+                             is.na(df$valuesEmpty))
+          filled <- !(1:(length(values)) %in% missing)
+          result = getPvalue(values[filled], valuesEmpty[filled], file, i, ITER, paired, parametric) #should be TRUE for paired test when using features of variable length
+          print(result)
+          print(
+            paste(
+              "control sample size without NA: ",
+              length(na.omit(valuesEmpty[filled])),
+              "feature sample size without NA:",
+              length(na.omit(values[filled]))
+            )
           )
-        )
-        print("validate that controls and features have matching lengths")
-        #VALIDATE THAT CONTROLS AND FEATURES HAVE MATCHING LENGTHS
-        comparison <-
-          testCoordinates(data[filled,], dataEmpty[filled,])
-        if (comparison == TRUE) {
-          print("Features and controls have equal feature lengths. GOOD.")
+          print("validate that controls and features have matching lengths")
+          #VALIDATE THAT CONTROLS AND FEATURES HAVE MATCHING LENGTHS
+          comparison <-
+            testCoordinates(data[filled, ], dataEmpty[filled, ])
+          if (comparison == TRUE) {
+            print("Features and controls have equal feature lengths. GOOD.")
+          } else {
+            print("Features and controls have unequal feature lengths. ERROR.")
+            warning("Features and controls have unequal feature lengths. ERROR.")
+          }
         } else {
-          print("Features and controls have unequal feature lengths. ERROR.")
-          warning("Features and controls have unequal feature lengths. ERROR.")
+          #SINGLE CONTROL
+          result = getPvalue(na.omit(values),
+                             na.omit(valuesEmpty),
+                             file,
+                             i,
+                             ITER,
+                             paired) #should be FALSE when using single control
+          print(
+            paste(
+              "control sample size without NA: ",
+              length(na.omit(valuesEmpty)),
+              "feature sample size without NA:",
+              length(na.omit(values))
+            )
+          )
         }
       } else {
-        #SINGLE CONTROL
-        result = getPvalue(na.omit(values),
-                           na.omit(valuesEmpty),
-                           file,
-                           i,
-                           ITER,
-                           paired) #should be FALSE when using single control
-        print(
-          paste(
-            "control sample size without NA: ",
-            length(na.omit(valuesEmpty)),
-            "feature sample size without NA:",
-            length(na.omit(values))
-          )
+        result <- list(
+          pvalue = NA,
+          effectSize = NA,
+          effectSize_perc = NA,
+          nonZeros_perc = NA
         )
       }
-      
       pv <- as.numeric(result$pvalue)
       effect_size <-
         result$effectSize_perc #this uses percentages as opposed to using effectSizeonly
@@ -400,7 +408,7 @@ run <- function(directory, control_directory, filenames, paired, ITER, parametri
   save.image(file = basename(getwd()))
   
   search_for_motif_name <-function(m) {
-    grep(m,names(TOTAL), value=TRUE)  
+    grep(m,names(TOTALpvalue), value=TRUE)  
   }
   
   
@@ -542,6 +550,7 @@ directories <-
 
 directories <-
   c(
+    "/Users/alice/Desktop/projects/kinetics/errors_will/52xAugust14/pacbio/joint",
     "/Users/alice/Desktop/projects/kinetics/errors_will/52xAugust14/illumina/joint",
     "/Users/alice/Desktop/projects/kinetics/errors_will/52xAugust14/diversity/RM",
     "/Users/alice/Desktop/projects/kinetics/errors_will/52xAugust14/divergence/RM",
