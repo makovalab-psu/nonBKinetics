@@ -33,6 +33,10 @@ else:
 
 			window_start=int(m_array[1])
 			window_end=int(m_array[2])
+
+			if ((window_end-window_start+1) != 100):
+				raise ValueError('Cannot subset to features if input intervals are not 100bp windows.')
+
 			length=int(m_array[3])
 			tail=m_array[4:len(m_array)]
 
