@@ -60,6 +60,9 @@ else:
 		window_end=int(e_array[2]) #coordinates from empty file
 		length=int(m_array[3]) #length from motif file
 
+		if ((window_end-window_start+1) != 100):
+			raise ValueError('Input intervals are not 100bp windows. Error.')
+
 		tail=e_array[4:len(e_array)]
 
 		if (length>100):
