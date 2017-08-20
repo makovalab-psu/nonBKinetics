@@ -42,9 +42,7 @@ with open(args.file, 'r') as f:
                     total_depth=total_depth+int(depth)
                 else: 
                     if (len(str(char))==len(str(ref))):
-                        if ("d1" in str(char)):
-                            print("reference allele of deletion")
-                        else:
+                        if ("d" not in str(char)): #otherwise it would be reference allele of deletion
                             #print("SNP")
                             variants.append("SNP")
                             total_mismatches=total_mismatches+1
