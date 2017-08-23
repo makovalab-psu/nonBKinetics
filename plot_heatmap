@@ -25,13 +25,18 @@ getVectorOfResults <- function(type,root_folder,extension) {
   list <- rbindlist(lapply(filenames,fread))
   dftmp <- as.data.frame(list[seq(2,nrow(list),2),2:ncol(list)])
   pvalues<-data.matrix(dftmp[,seq(6,ncol(dftmp),8)])
-
+  
   #take mean across all control files
   dftmpVector<-c(type,as.vector(colMeans(data.matrix(dftmp))))
   #we want to use max p-value across all controls
   dftmpVector[seq(7,length(dftmpVector),8)]<-apply(dftmp[,seq(6,ncol(dftmp),8)],2,max,na.rm=TRUE)
-  #signs are not set
-  dftmpVector[seq(6,length(dftmpVector),8)]<-NA
+  #compute signs from means (all data)
+  dftmpVector[seq(6,length(dftmpVector),8)]<-sign(as.numeric(dftmpVector[seq(2,length(dftmpVector),8)])-as.numeric(dftmpVector[seq(3,length(dftmpVector),8)]))
+  #compute fold-diff for nonZero_mean and nonZeros_perc and write it after the pvalue
+  nonZeros_mean_foldchange=sign(as.numeric(dftmpVector[seq(4,length(dftmpVector),8)])-as.numeric(dftmpVector[seq(5,length(dftmpVector),8)]))*pmax(as.numeric(dftmpVector[seq(4,length(dftmpVector),8)]),as.numeric(dftmpVector[seq(5,length(dftmpVector),8)]))/pmin(as.numeric(dftmpVector[seq(4,length(dftmpVector),8)]),as.numeric(dftmpVector[seq(5,length(dftmpVector),8)]))
+  nonZeros_perc_foldchange=sign(as.numeric(dftmpVector[seq(8,length(dftmpVector),8)])-as.numeric(dftmpVector[seq(9,length(dftmpVector),8)]))*pmax(as.numeric(dftmpVector[seq(8,length(dftmpVector),8)]),as.numeric(dftmpVector[seq(9,length(dftmpVector),8)]))/pmin(as.numeric(dftmpVector[seq(8,length(dftmpVector),8)]),as.numeric(dftmpVector[seq(9,length(dftmpVector),8)]))
+  dftmpVector[seq(8,length(dftmpVector),8)]<-nonZeros_mean_foldchange
+  dftmpVector[seq(9,length(dftmpVector),8)]<-nonZeros_perc_foldchange
   
   return(list(dataMatrix=dftmpVector,pvalues=pvalues))
 }
@@ -156,7 +161,7 @@ getParametersForTechnology <- function(technology) {
   mean_controls <- as.numeric(as.matrix(technology[seq(3, (7*columns)+1, columns)]))
   
   real_perc_diff <- round(as.numeric(mean_features-mean_controls)/mean_controls, decimal_points)
-
+  
   print(paste(significance, effect, zeros))
   return(list(
     effect = effect,
@@ -183,14 +188,14 @@ for (technology in seq(3, nrow(data), 1)) {
     backgroundColor2 <- "white"
     
     cell_value<-as.numeric(folddiff[technology-2,i]) #fold differences from additional input
-
+    
     if (!is.na(cell_value)) {
       cell_value<-round(cell_value,2)
-    #  if (cell_value==0) {
-    #    cell_value<-paste0("~",cell_value,"")
-    #  } else {
-    #    cell_value<-paste0(cell_value,"")
-    #  }
+      #  if (cell_value==0) {
+      #    cell_value<-paste0("~",cell_value,"")
+      #  } else {
+      #    cell_value<-paste0(cell_value,"")
+      #  }
     }
     
     if (!is.na(result$significance[i])) {
@@ -221,7 +226,7 @@ for (technology in seq(3, nrow(data), 1)) {
           warning("Shape type (rectangles|triangles) was not set. ERROR.")
         }
       }
-    
+      
       #PLOT LABELS INSIDE THE CELLS
       if (shape == "rectangles") {
         if(result$significance[i] <= alpha)
@@ -255,7 +260,7 @@ for (technology in seq(3, nrow(data), 1)) {
         }
       }
     }
-
+    
     
     i <- i + 1
   }
