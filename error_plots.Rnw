@@ -592,9 +592,9 @@ for (directory in directories) {
   parametric=TRUE # if FALSE, permutational pvalue, otherwise approximate parametric pvalue
   
   #RUN THE CODE FOR ALL CONTROLS TO GENERATE 10 p-values
-  for (i in 1:10) {
-    print(i)
-    control_directory<-gsub("$",paste0("_control",i),directory)
+  for (ii in 1:10) {
+    print(ii)
+    control_directory<-gsub("$",paste0("_control",ii),directory)
     run(directory, control_directory, filenames, paired, ITER, parametric)
   }
   #traceback()
