@@ -216,7 +216,7 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired, parametric=FALSE) {
   )
 }
 
-run <- function(directory, control_directory, filenames, paired, ITER, parametric=FALSE) {
+run <- function(directory, control_directory, filenames, paired=TRUE, ITER=1000, parametric=TRUEE) {
   print(paste(directory, control_directory, filenames, paired, ITER, parametric))
   
   #PLOT
@@ -379,29 +379,29 @@ run <- function(directory, control_directory, filenames, paired, ITER, parametri
         }
       } else {
         result <- list(
-          pvalue = NA,
-          effectSize = NA,
-          effectSize_perc = NA,
-          nonZeros_perc = NA
+          pvalue = NA#,
+          #effectSize = NA,
+          #effectSize_perc = NA,
+          #nonZeros_perc = NA
         )
       }
       pv <- as.numeric(result$pvalue)
-      effect_size <-
-        result$effectSize_perc #this uses percentages as opposed to using effectSizeonly
-      nonZeros_perc <- result$nonZeros_perc
+      #effect_size <-
+      #  result$effectSize_perc #this uses percentages as opposed to using effectSizeonly
+      #nonZeros_perc <- result$nonZeros_perc
       
       tmp_data <- get(paste0(i, "pvalue"))
-      tmp_data[gsub("ERRORS", "", gsub(".mf.txt", "", file))] = round(pv, 4) #save pvalue and plot
+      tmp_data[gsub("ERRORS", "", gsub(".mf.txt", "", file))] = round(pv, 5) #save pvalue and plot
       assign(paste0(i, "pvalue"), tmp_data)
       
-      tmp_data <- get(paste0(i, "effectSize"))
-      tmp_data[gsub("ERRORS", "", gsub(".mf.txt", "", file))] = effect_size #save effect size
-      assign(paste0(i, "effectSize"), tmp_data)
+      #tmp_data <- get(paste0(i, "effectSize"))
+      #tmp_data[gsub("ERRORS", "", gsub(".mf.txt", "", file))] = effect_size #save effect size
+      #assign(paste0(i, "effectSize"), tmp_data)
       
       #populate hash with number of non_zeros
-      tmp_data <- get(paste0(i, "nonzeros"))
-      tmp_data[gsub("ERRORS", "", gsub(".mf.txt", "", file))] = nonZeros_perc #difference in non-zero valus in percentages
-      assign(paste0(i, "nonzeros"), tmp_data)
+      #tmp_data <- get(paste0(i, "nonzeros"))
+      #tmp_data[gsub("ERRORS", "", gsub(".mf.txt", "", file))] = nonZeros_perc #difference in non-zero valus in percentages
+      #assign(paste0(i, "nonzeros"), tmp_data)
     }
   }
   
@@ -432,8 +432,6 @@ run <- function(directory, control_directory, filenames, paired, ITER, parametri
     
     significance <-
       as.numeric(values(get(paste0(i, "pvalue")))[names])
-    effectSize <-
-      as.numeric(values(get(paste0(i, "effectSize")))[names])
     
     featuresVector <- values(get(paste0(i)))[names]
     meanFeatures <-
@@ -441,6 +439,9 @@ run <- function(directory, control_directory, filenames, paired, ITER, parametri
     meanNon0Features <-
       vapply(featuresVector, function(x)
         mean(x[x != 0]), numeric(1))
+    percNon0Features <- 
+      vapply(featuresVector, function(x)
+        sum(x != 0)/length(x), numeric(1))
     
     controlsVector <- values(get(paste0(i, "controls")))[names]
     meanControls <-
@@ -448,6 +449,10 @@ run <- function(directory, control_directory, filenames, paired, ITER, parametri
     meanNon0Controls <-
       vapply(controlsVector, function(x)
         mean(x[x != 0]), numeric(1))
+    percNon0Controls <- 
+      vapply(controlsVector, function(x)
+        sum(x != 0)/length(x), numeric(1))
+
     
     print(
       paste(
@@ -458,12 +463,15 @@ run <- function(directory, control_directory, filenames, paired, ITER, parametri
         "meanNon0F:",
         meanNon0Features,
         "meanNon0C:",
-        meanNon0Controls
+        meanNon0Controls,
+        "percNon0F",
+        percNon0Features,
+        "percNon0C",
+        percNon0Controls
       )
     )
     
     signs <- sign(as.numeric(meanFeatures) - as.numeric(meanControls))
-    nonzeros <- values(get(paste0(i, "nonzeros")))[names]
     
     results_headers <-
       c(
@@ -473,8 +481,8 @@ run <- function(directory, control_directory, filenames, paired, ITER, parametri
         "nonZeros_mean_controls",
         "sign",
         "p-value",
-        "effect-size",
-        "zero-effect"
+        "nonZeros_perc_features",
+        "nonZeros_perc_controls"
       )
     
     results <-
@@ -485,8 +493,8 @@ run <- function(directory, control_directory, filenames, paired, ITER, parametri
         meanNon0Controls,
         signs,
         significance,
-        effectSize,
-        nonzeros,
+        percNon0Features,
+        percNon0Controls,
         sep = "\t"
       )
     #summary <-
@@ -587,8 +595,8 @@ for (directory in directories) {
   
   filenames <- list.files(pattern = "*.collapsed", full.names = FALSE)
   filenames <- filenames[grep("Empty", filenames, invert = TRUE)]
-  paired <- TRUE
-  ITER <- 1000
+  paired <- TRUE 
+  ITER <- 1000 # only used if parametric=FALSE
   parametric=TRUE # if FALSE, permutational pvalue, otherwise approximate parametric pvalue
   
   #RUN THE CODE FOR ALL CONTROLS TO GENERATE 10 p-values
