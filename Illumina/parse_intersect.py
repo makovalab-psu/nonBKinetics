@@ -8,7 +8,7 @@ error = 0
 
 for line in infile:
 	line = line.strip()
-	print(line)
+	#print(line)
 	array = line.split('\t')
 	VT,DP,ref,alt,chrom, start, end = array[11], array[14], array[15],array[16],array[0], array[3], array[4]
 	key = str(chrom)+'|'+str(start)+'|'+str(end)
@@ -31,14 +31,14 @@ for line in infile:
 		collapsed[key][2] += INS
 		collapsed[key][3] += DEL
 
-		print("SNP at key:" + str(collapsed[key][1]))
+		#print("SNP at key:" + str(collapsed[key][1]))
 
 for key in collapsed:
 	chrom, start, end = key.split('|')
 	DP, SNP, INS, DEL = collapsed[key]
 	if (DP!=None):
 		TOTAL = SNP + INS + DEL
-		print("TOTAL:" + str(TOTAL) +" SNP:" + str(SNP)+" INS:" + str(INS)+" DEL:" + str(DEL)+" DEPTH:" + str(DP))
+		#print("TOTAL:" + str(TOTAL) +" SNP:" + str(SNP)+" INS:" + str(INS)+" DEL:" + str(DEL)+" DEPTH:" + str(DP))
 		if (int(DP) != 0):
 			#some calls in given regions
 			SNP_rate = float(SNP) / float(DP)
