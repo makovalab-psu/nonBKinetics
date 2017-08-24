@@ -216,7 +216,7 @@ getPvalue <- function(grp.1, grp.2, file, i, ITER, paired, parametric=FALSE) {
   )
 }
 
-run <- function(directory, control_directory, filenames, paired=TRUE, ITER=1000, parametric=TRUEE) {
+run <- function(directory, control_directory, filenames, paired=TRUE, ITER=1000, parametric=TRUE) {
   print(paste(directory, control_directory, filenames, paired, ITER, parametric))
   
   #PLOT
