@@ -197,6 +197,16 @@ for (technology in seq(3, nrow(data), 1)) {
       #    cell_value<-paste0(cell_value,"")
       #  }
     }
+    if (!is.na(result$zeros[i])) {
+      result$zeros[i]<-round(result$zeros[i],2)
+      if(result$zeros[i] %in% c(-1,1))
+        result$zeros[i]=0
+    }
+    if (!is.na(result$effect[i])) {
+      result$effect[i]<-round(result$effect[i],2)
+      if(result$effect[i] %in% c(-1,1))
+        result$effect[i]=0
+    }
     
     if (!is.na(result$significance[i])) {
       if (shape == "rectangles") {
@@ -233,7 +243,7 @@ for (technology in seq(3, nrow(data), 1)) {
           text(
             x + 50,
             y + 50,
-            labels = cell_value,
+            labels = formatC(cell_value,2,format='f'),
             col = ifelse(result$significance[i] > alpha, "black", "white"),
             cex = 1.75
           )
@@ -244,7 +254,7 @@ for (technology in seq(3, nrow(data), 1)) {
             text(
               x + 33,
               y + 70,
-              labels = round(result$zeros[i],2),
+              labels = formatC(result$zeros[i],2,format='f'),
               col = ifelse(result$significance[i] > alpha, "black", "white")
             )
           #bottom right
@@ -252,7 +262,7 @@ for (technology in seq(3, nrow(data), 1)) {
             text(
               x + 70,
               y + 33,
-              labels = round(result$effect[i],2),
+              labels = formatC(result$effect[i],2,format='f'),
               col = ifelse(result$significance[i] > alpha, "black", "white")
             )
         } else {
