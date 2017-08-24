@@ -45,7 +45,7 @@ for line in infile:
                                 i = 1
                                 for allele in alleles:
                                         freq = float(DPR[i]) / float(DP)
-                                        if freq <= 0.05 :
+                                        if freq <= 1 :
                                                 VAR = True
                                                 if len(alt) > len(ref):
                                                         #key = key+'INS,'
@@ -59,7 +59,7 @@ for line in infile:
                                 #print(str(alleles) + ' SNP')
                                 for allele in alleles:
                                         freq = float(DPR[i]) / float(DP)
-                                        if freq <= 0.1 :
+                                        if freq <= 1 :
                                                 VAR = True
                                                 #key = key+'SNP,'
                                                 MM += 1
