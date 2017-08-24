@@ -25,3 +25,4 @@ cat WG_SNP.gff WG_polarized.gff > WG.gff
 python format_to_gff.py ${inp}
 bedtools intersect -wa -wb -b WG.gff -a ${inp}.gff -loj > ${inp}.intersect
 python parse_intersect.py ${inp}.intersect > ${inp}.collapsed
+python rates.py ${inp}.intersect
