@@ -13,6 +13,12 @@ errorType<-"MISMATCHES" #CHANGE THE ERROR TYPE HERE
 shape<-"rectangles" #triangles|rectangles
 alpha<-0.1
 
+# if TRUE, inconclusive results (the ones with one blue and one red triangles)
+# will have white rectangles
+inconclusive_white=TRUE
+# threhsold on fold-diff for coloring triangles (in absolute value)
+threshold_triangle=1.06
+
 #rectangles: 
 #           color is based on difference of total means of motifs versus features
 #
@@ -46,22 +52,22 @@ file_list <-
   c(
   paste(root_folder,"pacbio/pacbio_",errorType,".txt",sep=""),
   paste(root_folder,"illumina/illumina_",errorType,".txt",sep=""),
-  paste(root_folder,"diversity/diversity_",errorType,".txt",sep=""),
   paste(root_folder,"divergence/divergence_",errorType,".txt",sep=""),
+  paste(root_folder,"diversity/diversity_",errorType,".txt",sep=""),
   paste(root_folder,"TCGA/TCGA_",errorType,".txt",sep="")
   )
 
 extension<-paste0(errorType,".txt")
 Pacbio <- getVectorOfResults("pacbio",root_folder,extension)
 Illumina <- getVectorOfResults("illumina",root_folder,extension)
-Diversity <- getVectorOfResults("diversity",root_folder,extension)
 Divergence <- getVectorOfResults("divergence",root_folder,extension)
+Diversity <- getVectorOfResults("diversity",root_folder,extension)
 TCGA <- getVectorOfResults("TCGA",root_folder,extension)
 
 dataPacBio<-Pacbio$dataMatrix
 dataIllumina<-Illumina$dataMatrix
-dataDiversity<-Diversity$dataMatrix
 dataDivergence<-Divergence$dataMatrix
+dataDiversity<-Diversity$dataMatrix
 dataTCGA<-TCGA$dataMatrix
 
 #NOTE THAT ORDER OF P-VALUES LISTED HERE IS RANDOM, NOT 1..10
@@ -69,10 +75,10 @@ print("Pacbio pvalues")
 print(as.data.frame(Pacbio$pvalues))
 print("Illumina pvalues")
 print(as.data.frame(Illumina$pvalues))
-print("Diversity pvalues")
-print(as.data.frame(Diversity$pvalues))
 print("Divergence pvalues")
 print(as.data.frame(Divergence$pvalues))
+print("Diversity pvalues")
+print(as.data.frame(Diversity$pvalues))
 print("TCGA pvalues")
 print(as.data.frame(TCGA$pvalues))
 
@@ -120,7 +126,8 @@ folddiff <- read.table(
         header = T,
         fill = TRUE
       )
-
+# switch 1000G and Divergence
+folddiff=folddiff[c(1,2,4,3,5),]
 
 
 getColor <- function(significance, sign) {
@@ -199,21 +206,34 @@ for (technology in seq(3, nrow(data), 1)) {
     }
     if (!is.na(result$zeros[i])) {
       result$zeros[i]<-round(result$zeros[i],2)
-      if(result$zeros[i] %in% c(-1,1))
+      if(abs(result$zeros[i])<threshold_triangle)
         result$zeros[i]=0
     }
     if (!is.na(result$effect[i])) {
       result$effect[i]<-round(result$effect[i],2)
-      if(result$effect[i] %in% c(-1,1))
+      if(abs(result$effect[i])<threshold_triangle)
         result$effect[i]=0
     }
     
     if (!is.na(result$significance[i])) {
       if (shape == "rectangles") {
+        if(inconclusive_white){
+          if(is.na((sign(result$zeros[i])*sign(result$effect[i])))){
+            color=getColor(result$significance[i], sign(cell_value))
+          }else{
+            if(sign(result$zeros[i])*sign(result$effect[i])==-1){
+              color='white'
+            }else{
+              color=getColor(result$significance[i], sign(cell_value))
+            }
+          }
+        }else{
+          color=getColor(result$significance[i], sign(cell_value))
+        }
         polygon(
           c(x, x, x + (sizeToPlot), x + (sizeToPlot)),
           c(y, y + (sizeToPlot), y + (sizeToPlot), y),
-          col = getColor(result$significance[i], sign(cell_value)),
+          col = color,
           lty = 0
         )
       } else {
@@ -240,13 +260,36 @@ for (technology in seq(3, nrow(data), 1)) {
       #PLOT LABELS INSIDE THE CELLS
       if (shape == "rectangles") {
         if(result$significance[i] <= alpha)
-          text(
-            x + 50,
-            y + 50,
-            labels = formatC(cell_value,2,format='f'),
-            col = ifelse(result$significance[i] > alpha, "black", "white"),
-            cex = 1.75
-          )
+          if(inconclusive_white){
+            if(is.na((sign(result$zeros[i])*sign(result$effect[i])))){
+              text(
+                x + 50,
+                y + 50,
+                labels = formatC(cell_value,2,format='f'),
+                col = ifelse(result$significance[i] > alpha, "black", "white"),
+                cex = 1.75
+              )
+            }else{
+              if(sign(result$zeros[i])*sign(result$effect[i])!=-1){
+                text(
+                  x + 50,
+                  y + 50,
+                  labels = formatC(cell_value,2,format='f'),
+                  col = ifelse(result$significance[i] > alpha, "black", "white"),
+                  cex = 1.75
+                )
+              }
+            }
+          }else{
+            text(
+                  x + 50,
+                  y + 50,
+                  labels = formatC(cell_value,2,format='f'),
+                  col = ifelse(result$significance[i] > alpha, "black", "white"),
+                  cex = 1.75
+                )
+          }
+          
       } else {
         if (shape == "triangles") {
           #upper left
