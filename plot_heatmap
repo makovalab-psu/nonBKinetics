@@ -383,7 +383,9 @@ for (technology in seq(3, nrow(data), 1)) {
                 text(
                   x + 50,
                   y + 50,
-                  labels = getStars(result$significance[i]),
+                  #labels = getStars(result$significance[i]),
+                  labels = paste0(formatC(cell_value,2,format='f'),'\n',
+                                  getStars(result$significance[i])),
                   col = ifelse(result$significance[i] > alpha, "black", "white"),
                   cex = 1.75
                 )
@@ -392,7 +394,9 @@ for (technology in seq(3, nrow(data), 1)) {
                   text(
                     x + 50,
                     y + 50,
-                    labels = getStars(result$significance[i]),
+                    #labels = getStars(result$significance[i]),
+                    labels = paste0(formatC(cell_value,2,format='f'),'\n',
+                                    getStars(result$significance[i])),
                     col = ifelse(result$significance[i] > alpha, "black", "white"),
                     cex = 1.75
                   )
@@ -402,7 +406,9 @@ for (technology in seq(3, nrow(data), 1)) {
               text(
                     x + 50,
                     y + 50,
-                    labels = getStars(result$significance[i]),
+                    #labels = getStars(result$significance[i]),
+                    labels = paste0(formatC(cell_value,2,format='f'),'\n',
+                                    getStars(result$significance[i])),
                     col = ifelse(result$significance[i] > alpha, "black", "white"),
                     cex = 1.75
                   )
@@ -415,7 +421,9 @@ for (technology in seq(3, nrow(data), 1)) {
               text(
                 x + 33,
                 y + 70,
-                labels = getStars(result$significance[i]),
+                #labels = getStars(result$significance[i]),
+                labels = paste0(formatC(result$zeros[i],2,format='f'),'\n',
+                                getStars(result$significance[i])),
                 col = ifelse(result$significance[i] > alpha, "black", "white")
               )
             #bottom right
@@ -423,7 +431,9 @@ for (technology in seq(3, nrow(data), 1)) {
               text(
                 x + 70,
                 y + 33,
-                labels = getStars(result$significance[i]),
+                #labels = getStars(result$significance[i]),
+                labels = paste0(formatC(result$effect[i],2,format='f'),'\n',
+                                getStars(result$significance[i])),
                 col = ifelse(result$significance[i] > alpha, "black", "white")
               )
           } else {
