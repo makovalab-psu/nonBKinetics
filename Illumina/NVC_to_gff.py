@@ -41,23 +41,31 @@ with open(args.file, 'r') as f:
                 if (char==ref):
                     total_depth=total_depth+int(depth)
                 else: 
-                    if (len(str(char))==len(str(ref))):
-                        if ("d" not in str(char)): #otherwise it would be reference allele of deletion
-                            #print("SNP")
-                            variants.append("SNP")
-                            total_mismatches=total_mismatches+1
-                            total_depth=total_depth+int(depth)
-                    else: 
-                        if (len(str(char))>len(str(ref))):
-                            #print("INS")
-                            variants.append("INS")
-                            total_insertions=total_insertions+1
-                            total_depth=total_depth+int(depth)
+                    if ("d" in str(char)):
+                        #print "DEL"
+                        for vd in range(0, int(depth)):
+                            variants.append("DEL") #depth of variance is taken into account, error on each read counts
+                        total_deletions=total_deletions+1
+                        total_depth=total_depth+int(depth)
+                    else:
+                        if (len(str(char))==len(str(ref))):
+                            if ("d" not in str(char)): #otherwise it would be reference allele of deletion
+                                #print("SNP")
+                                for vd in range(0, int(depth)):
+                                    variants.append("SNP") #depth of variance is taken into account, error on each read counts
+                                total_mismatches=total_mismatches+1
+                                total_depth=total_depth+int(depth)
                         else: 
-                            #print("DEL")
-                            variants.append("DEL")
-                            total_deletions=total_deletions+1
-                            total_depth=total_depth+int(depth)
+                            if (len(str(char))>len(str(ref))):
+                                #print("INS")
+                                for vd in range(0, int(depth)):
+                                    variants.append("INS") #depth of variance is taken into account, error on each read counts
+                                total_insertions=total_insertions+1
+                                total_depth=total_depth+int(depth)
+                            else: 
+                                #print("reference allele of a deletion")
+                                total_depth=total_depth+int(depth)
+
 
 
         #print("Total depth per site:" + str(total_depth) + " | mism:" + str(total_mismatches) + " | ins:" + str(total_insertions) + " | del:" + str(total_deletions))
