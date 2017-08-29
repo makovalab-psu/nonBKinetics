@@ -19,6 +19,8 @@ inconclusive_white=TRUE
 # threhsold on fold-diff for coloring triangles (in absolute value)
 threshold_triangle=1.06
 
+col_code='folddiff' # 'pvalue' or 'folddiff'
+
 #rectangles: 
 #           color is based on difference of total means of motifs versus features
 #
@@ -153,6 +155,44 @@ getColor <- function(significance, sign) {
   return(col)
 }
 
+getColor_folddiff <- function(significance, folddiff) {
+  col_folddiff=colorRampPalette(c("navy", "white", "red"))(n=7)
+  if(significance>alpha){
+    return('white')
+  }
+  if(folddiff<(-2)){
+    return(col_folddiff[1])
+  }else if(folddiff<(-1.1)){
+    return(col_folddiff[2])
+  }else if(folddiff<=(-1)){
+    return(col_folddiff[3])
+  }else if(folddiff<1){
+    return(col_folddiff[4])
+  }else if(folddiff<=1.1){
+    return(col_folddiff[5])
+  }else if(folddiff<=2){
+    return(col_folddiff[6])
+  }else{
+    return(col_folddiff[7])
+  }
+}
+
+getStars <- function(pvalue){
+  if(pvalue<=0.0001){
+    return('****')
+  }else if(pvalue<=0.001){
+    return('***')
+  }else if(pvalue<=0.01){
+    return('**')
+  }else if(pvalue<=0.05){
+    return('*')
+  }else if(pvalue<=0.1){
+    return('.')
+  }else{
+    return('')
+  }
+}
+
 getParametersForTechnology <- function(technology) {
   print(technology[, 1])
   decimal_points <- 4
@@ -219,16 +259,28 @@ for (technology in seq(3, nrow(data), 1)) {
       if (shape == "rectangles") {
         if(inconclusive_white){
           if(is.na((sign(result$zeros[i])*sign(result$effect[i])))){
-            color=getColor(result$significance[i], sign(cell_value))
+            if(col_code=='pvalue'){
+              color=getColor(result$significance[i], sign(cell_value))
+            }else{
+              color=getColor_folddiff(result$significance[i], cell_value)
+            }
           }else{
             if(sign(result$zeros[i])*sign(result$effect[i])==-1){
               color='white'
             }else{
-              color=getColor(result$significance[i], sign(cell_value))
+              if(col_code=='pvalue'){
+                color=getColor(result$significance[i], sign(cell_value))
+              }else{
+                color=getColor_folddiff(result$significance[i], cell_value)
+              }
             }
           }
         }else{
-          color=getColor(result$significance[i], sign(cell_value))
+          if(col_code=='pvalue'){
+            color=getColor(result$significance[i], sign(cell_value))
+          }else{
+            color=getColor_folddiff(result$significance[i], cell_value)
+          }
         }
         polygon(
           c(x, x, x + (sizeToPlot), x + (sizeToPlot)),
@@ -239,17 +291,27 @@ for (technology in seq(3, nrow(data), 1)) {
       } else {
         if (shape == "triangles") {
           #upper left
+          if(col_code=='pvalue'){
+            color=getColor(result$significance[i], sign(result$zeros[i]))
+          }else{
+            color=getColor_folddiff(result$significance[i], result$zeros[i])
+          }
           polygon(
             c(x, x, x + (sizeToPlot), x),
             c(y, y + (sizeToPlot), y + (sizeToPlot), y),
-            col = getColor(result$significance[i], sign(result$zeros[i])),
+            col = color,
             lty = 0
           )
           #bottom right
+          if(col_code=='pvalue'){
+            color=getColor(result$significance[i], sign(result$effect[i]))
+          }else{
+            color=getColor_folddiff(result$significance[i], result$effect[i])
+          }
           polygon(
             c(x, x + (sizeToPlot), x + (sizeToPlot), x),
             c(y, y, y + (sizeToPlot), y),
-            col = getColor(result$significance[i], sign(result$effect[i])),
+            col = color,
             lty = 0
           )
         } else {
@@ -258,19 +320,11 @@ for (technology in seq(3, nrow(data), 1)) {
       }
       
       #PLOT LABELS INSIDE THE CELLS
-      if (shape == "rectangles") {
-        if(result$significance[i] <= alpha)
-          if(inconclusive_white){
-            if(is.na((sign(result$zeros[i])*sign(result$effect[i])))){
-              text(
-                x + 50,
-                y + 50,
-                labels = formatC(cell_value,2,format='f'),
-                col = ifelse(result$significance[i] > alpha, "black", "white"),
-                cex = 1.75
-              )
-            }else{
-              if(sign(result$zeros[i])*sign(result$effect[i])!=-1){
+      if(col_code=='pvalue'){
+        if (shape == "rectangles") {
+          if(result$significance[i] <= alpha)
+            if(inconclusive_white){
+              if(is.na((sign(result$zeros[i])*sign(result$effect[i])))){
                 text(
                   x + 50,
                   y + 50,
@@ -278,38 +332,103 @@ for (technology in seq(3, nrow(data), 1)) {
                   col = ifelse(result$significance[i] > alpha, "black", "white"),
                   cex = 1.75
                 )
+              }else{
+                if(sign(result$zeros[i])*sign(result$effect[i])!=-1){
+                  text(
+                    x + 50,
+                    y + 50,
+                    labels = formatC(cell_value,2,format='f'),
+                    col = ifelse(result$significance[i] > alpha, "black", "white"),
+                    cex = 1.75
+                  )
+                }
               }
+            }else{
+              text(
+                    x + 50,
+                    y + 50,
+                    labels = formatC(cell_value,2,format='f'),
+                    col = ifelse(result$significance[i] > alpha, "black", "white"),
+                    cex = 1.75
+                  )
             }
-          }else{
-            text(
+            
+        } else {
+          if (shape == "triangles") {
+            #upper left
+            if(result$significance[i] <= alpha)
+              text(
+                x + 33,
+                y + 70,
+                labels = formatC(result$zeros[i],2,format='f'),
+                col = ifelse(result$significance[i] > alpha, "black", "white")
+              )
+            #bottom right
+            if(result$significance[i] <= alpha)
+              text(
+                x + 70,
+                y + 33,
+                labels = formatC(result$effect[i],2,format='f'),
+                col = ifelse(result$significance[i] > alpha, "black", "white")
+              )
+          } else {
+            warning("Shape type (rectangles|triangles) was not set. ERROR.")
+          }
+        }
+      }else{
+        if (shape == "rectangles") {
+          if(result$significance[i] <= alpha)
+            if(inconclusive_white){
+              if(is.na((sign(result$zeros[i])*sign(result$effect[i])))){
+                text(
                   x + 50,
                   y + 50,
-                  labels = formatC(cell_value,2,format='f'),
+                  labels = getStars(result$significance[i]),
                   col = ifelse(result$significance[i] > alpha, "black", "white"),
                   cex = 1.75
                 )
-          }
-          
-      } else {
-        if (shape == "triangles") {
-          #upper left
-          if(result$significance[i] <= alpha)
-            text(
-              x + 33,
-              y + 70,
-              labels = formatC(result$zeros[i],2,format='f'),
-              col = ifelse(result$significance[i] > alpha, "black", "white")
-            )
-          #bottom right
-          if(result$significance[i] <= alpha)
-            text(
-              x + 70,
-              y + 33,
-              labels = formatC(result$effect[i],2,format='f'),
-              col = ifelse(result$significance[i] > alpha, "black", "white")
-            )
+              }else{
+                if(sign(result$zeros[i])*sign(result$effect[i])!=-1){
+                  text(
+                    x + 50,
+                    y + 50,
+                    labels = getStars(result$significance[i]),
+                    col = ifelse(result$significance[i] > alpha, "black", "white"),
+                    cex = 1.75
+                  )
+                }
+              }
+            }else{
+              text(
+                    x + 50,
+                    y + 50,
+                    labels = getStars(result$significance[i]),
+                    col = ifelse(result$significance[i] > alpha, "black", "white"),
+                    cex = 1.75
+                  )
+            }
+            
         } else {
-          warning("Shape type (rectangles|triangles) was not set. ERROR.")
+          if (shape == "triangles") {
+            #upper left
+            if(result$significance[i] <= alpha)
+              text(
+                x + 33,
+                y + 70,
+                labels = getStars(result$significance[i]),
+                col = ifelse(result$significance[i] > alpha, "black", "white")
+              )
+            #bottom right
+            if(result$significance[i] <= alpha)
+              text(
+                x + 70,
+                y + 33,
+                labels = getStars(result$significance[i]),
+                col = ifelse(result$significance[i] > alpha, "black", "white")
+              )
+          } else {
+            warning("Shape type (rectangles|triangles) was not set. ERROR.")
+          }
         }
       }
     }
