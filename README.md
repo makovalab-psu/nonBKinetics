@@ -73,6 +73,7 @@ IWT_IPD.r
 
 feature_length_IPD.r
 
+(MARZIA NEEDS TO UPDATE THESE FILES, WITH DEPTH)
 
 ##Effect of sequence composition on IPD. 
 
@@ -80,9 +81,13 @@ Sequence composition obtained in: *CompoRegress/bash_comporegress.sh*
 
 sequence_composition_IPD.r
 
+(MARZIA NEEDS TO UPDATE THIS FILE)
+
 ##Experimental characterization of G-quadruplexes. 
 
 thermostability.r
+
+(MARZIA NEEDS TO UPDATE THIS FILE)
 
 #Data formatting
 generateEmptyTrack.py script, employing the Linux function shuf
