@@ -83,14 +83,20 @@ thermostability.r
 
 generateFeatures.py
 
+
 This script restricts the intervals to features only.
+
 Input: .mf file
+
 Output: .mf file with FeatureOnly suffix
 
 generateEmptyTrack.py script, employing the Linux function shuf
 
+
 This script generates matching controls for each motif by subsampling from motif-free windows.
+
 Input: .mf file, optionally output directory
+
 Output: .mf file
 
 generateControls.sh
@@ -102,8 +108,7 @@ Output: 10 folders with matching controls for each motif
 ##SMRT sequencing errors
 runErrorStatistics_optimized.R, generateErrorsFullWindow.sh and generateErrors.sh scripts
 
-##
-Illumina sequencing errors.
+##Illumina sequencing errors.
 bash_illumina.sh script and its dependencies
 
 ##Variants from human-orangutan divergence. 
