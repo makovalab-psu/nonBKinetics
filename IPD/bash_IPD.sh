@@ -24,7 +24,7 @@ python cleanDepth.py 52X.pickle > 52XDepth
 
 python ../prepare_windows.py ../GFF/WG_Clean/ > Windows_Ready
 cat Windows_Ready | env LC_ALL=C sort -k 1,1d -k 2,2n > Windows_Sorted
-python ../collect_values_in_windows.py Windows_Sorted ../IPD > Windows_Collected_F   #collect_values_in_windows.py must be set up to strand 0
+python ../collect_values_in_windows.py Windows_Sorted ../52XIPD > Windows_Collected_F   #collect_values_in_windows.py must be set up to strand 0 # Can use 52XDepth instead of 52XIPD
 python ../../split_by_feature.py Windows_Collected_F
-#python ../collect_values_in_windows.py Windows_Sorted ../IPD > Windows_Collected_R   #collect_values_in_windows.py must be set up to strand 1
+#python ../collect_values_in_windows.py Windows_Sorted ../IPD > Windows_Collected_R   #collect_values_in_windows.py must be set up to strand 1 # Can use 52XDepth instead of 52XIPD
 #python ../../split_by_feature.py Windows_Collected_R
