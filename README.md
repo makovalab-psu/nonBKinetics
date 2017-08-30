@@ -124,6 +124,27 @@ bash_somatic.sh script and its dependencies
 error_plots.Rnw
 
 #Filtering
-High quality calls for HG002:
+
+The accuracy analysis for Illumina and PacBio removed both repeatmasked regions and regions with variants in HG002 compared to hg19.
+Following high quality HG002 calls were used:
 HG002_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-22_v.3.3.2_highconf_triophased.vcf.gz
 
+joint_filtering.sh
+
+filter_out_repeatmasked.sh
+
+filter_out_true_variants.sh
+
+#Data plotting
+plot_heatmap
+
+#Data processing
+Simple scripts for converting between formats used in our study:
+
+mf_into_gff_and_bed.sh
+
+mf2gff.sh
+
+convert_gff_to_mf.sh
+
+gff2mf.py
