@@ -1,9 +1,9 @@
 # README #
 
+This repository accompanies the paper *Non-B DNA affects polymerization speed and error rate in sequencers and living cells*
 
 ### What is this repository for? ###
 
-* This repository accompanies the paper *Non-B DNA affects polymerization speed and error rate in sequencers and living cells*
 * 1.0.0
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
 
