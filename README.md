@@ -29,12 +29,10 @@ parse_repeats.py
 ##Interval-Wise Testing for differences in IPDs. 
 
 **bash_IPD.sh**
-
 Input : unaligned cmp.h5 from PacBio sequencing project, reference genome
 Output : IWT-ready files
 
 **IWT**
-
 load_IPD_data.r
 IWT_IPD.r
 feature_length_IPD.r
