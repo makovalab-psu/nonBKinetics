@@ -107,6 +107,9 @@ bash_somatic.sh script and its dependencies
 ##Comparison of errors and variants between motifs and motif-free regions. 
 error_plots.Rnw
 
+#Filtering
+HG002_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-22_v.3.3.2_highconf_triophased.vcf.gz
+
 ### Contribution guidelines ###
 
 * Writing tests
