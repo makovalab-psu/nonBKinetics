@@ -53,7 +53,13 @@ The .collapsed file describes the final error rates in given intervals.
 #MODULES
 ##Non-B DB and STR annotations.
 
-parse_repeats.py
+Non-B DB annotation files downloaded at: https://nonb-abcc.ncifcrf.gov/apps/Query-GFF/feature/
+
+Microsatellites annotation files obtained through STR-FM (see Fungtammasan, A. et al. Accurate typing of short tandem repeats from genome-wide sequencing data and its applications. Genome Res. 25, 736–749 (2015).)
+
+Microsatellites alignment and collapsing done in MicrosatAnnotation/bash_microsat.sh
+
+
 ##Interval-Wise Testing for differences in IPDs. 
 
 ###bash_IPD.sh###
