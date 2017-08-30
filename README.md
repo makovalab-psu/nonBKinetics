@@ -1,11 +1,10 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
 
 ### What is this repository for? ###
 
 * This repository accompanies the paper *Non-B DNA affects polymerization speed and error rate in sequencers and living cells*
-* Version
+* 1.0.0
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
 
 ### How do I get set up? ###
