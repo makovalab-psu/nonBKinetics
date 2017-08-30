@@ -55,7 +55,7 @@ The .collapsed file describes the final error rates in given intervals.
 
 Non-B DB annotation files downloaded at: https://nonb-abcc.ncifcrf.gov/apps/Query-GFF/feature/
 
-Microsatellites annotation files obtained through STR-FM (see Fungtammasan, A. et al. Accurate typing of short tandem repeats from genome-wide sequencing data and its applications. Genome Res. 25, 736–749 (2015).)
+Microsatellites annotation files obtained through STR-FM (see Fungtammasan, A. et al. Accurate typing of short tandem repeats from genome-wide sequencing data and its applications. Genome Res.2015.)
 
 Microsatellites alignment and collapsing done in: *MicrosatAnnotation/bash_microsat.sh*
 
