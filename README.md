@@ -77,6 +77,8 @@ feature_length_IPD.r
 
 ##Effect of sequence composition on IPD. 
 
+Sequence composition obtained in:*CompoRegress/bash_comporegress.sh*
+
 sequence_composition_IPD.r
 
 ##Experimental characterization of G-quadruplexes. 
