@@ -23,14 +23,15 @@ This README would normally document whatever steps are necessary to get your app
 The .mf file describes the interval of interest and thus overlaps with non-B DNA annotations. This file format will either contain feature-restricted intervals or full 100bp windows.
 This tab delimited file contains 4 required columns:
 
-*chromosome*
+**chromosome**
 
-*start* in 1-based format
+**start** in 1-based format
 
-*end* in 1-based format
+**end** in 1-based format
 
-*feature length* number of nucleotides in feature, note that this field is present in both feature-restricted and 100bp windows. Occassionally, feature can be longer than 100bp. In such cases, we trim it down to 100bp and restrict our analysis to trimmed windows.  
-variable number of columns containing *IPD values* IPD values from ipdSummary, each column represents one nucleotide from feature or 100bp window, thus at most 100 IPD values are present
+**feature length** number of nucleotides in feature, note that this field is present in both feature-restricted and 100bp windows. Occassionally, feature can be longer than 100bp. In such cases, we trim it down to 100bp and restrict our analysis to trimmed windows.   
+
+**IPD values** variable number of columns containing IPD values from ipdSummary, each column represents one nucleotide from feature or 100bp window, thus at most 100 IPD values are present
 .collapsed
 
 #MODULES
