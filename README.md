@@ -28,7 +28,9 @@ This README would normally document whatever steps are necessary to get your app
 parse_repeats.py
 ##Interval-Wise Testing for differences in IPDs. 
 
+load_IPD_data.r
 IWT_IPD.r
+feature_length_IPD.r
 
 ##Effect of sequence composition on IPD. 
 
