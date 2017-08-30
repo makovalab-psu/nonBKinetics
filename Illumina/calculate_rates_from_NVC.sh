@@ -13,12 +13,12 @@ for motif in "${array[@]}"; do
 		echo "File $outputname exists and will be removed before concatenating the rest of files."
 		rm ${outputname}
 	fi
-	echo `ls ${folder_to_merge}/*${motif}*.vcf | xargs -n1 basename`
-	echo `ls ${folder_to_merge}/*${motif}*.vcf | wc -l`
+	echo `ls ${folder_to_merge}/joint*${motif}*.vcf | xargs -n1 basename`
+	echo `ls ${folder_to_merge}/joint*${motif}*.vcf | wc -l`
 
 	mkdir -p ${folder_to_merge}/tmp
 	mv ${folder_to_merge}/*${motif}*.vcf ${folder_to_merge}/tmp
-	cat ${folder_to_merge}/tmp/*${motif}*.vcf | grep -v "^#" >${outputname} #exclude headers after merging of .vcf files
+	cat ${folder_to_merge}/tmp/joint*${motif}*.vcf | grep -v "^#" >${outputname} #exclude headers after merging of .vcf files
 	echo "files merged and written to"
 	echo $outputname
 
