@@ -2,8 +2,6 @@
 
 This repository accompanies the paper *Non-B DNA affects polymerization speed and error rate in sequencers and living cells*
 
-### What is this repository for? ###
-
 * 1.0.0
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
 
@@ -82,7 +80,24 @@ thermostability.r
 (MARZIA NEEDS TO UPDATE THIS FILE)
 
 #Data formatting
+
+generateFeatures.py
+
+This script restricts the intervals to features only.
+Input: .mf file
+Output: .mf file with FeatureOnly suffix
+
 generateEmptyTrack.py script, employing the Linux function shuf
+
+This script generates matching controls for each motif by subsampling from motif-free windows.
+Input: .mf file, optionally output directory
+Output: .mf file
+
+generateControls.sh
+
+Script that generates 10 sets of control datasets.
+Input: folder with .mf files; we will generate 10 controls for these files
+Output: 10 folders with matching controls for each motif
 
 ##SMRT sequencing errors
 runErrorStatistics_optimized.R, generateErrorsFullWindow.sh and generateErrors.sh scripts
