@@ -17,6 +17,13 @@ python WG_to_gff.py WG
 awk '$6 >= 0.05 {print $0}' WG.gff > WG_filtered.gff
 
 grep 'SNP' /nfs/brubeck.bx.psu.edu/scratch5/wilfried/kinetics/Clean/1kG/WG_filtered.gff > WG_SNP.gff
+
+python list_indels_for_MAF.py /nfs/brubeck.bx.psu.edu/scratch5/wilfried/kinetics/Clean/1kG/chrN > chrN.for_galaxy
+#Galaxy (https://usegalaxy.org/) : extract MAF blocks
+#Galaxy (https://usegalaxy.org/) : maf to intervals
+python Join.py chrN.from_galaxy chrN.for_galaxy
+python Polaryze.py chrN.joined
+cat chr*.polarized > WG.polarized
 python Polarize_to_gff.py ../Polarizing/WG.polarized > WG_polarized.gff #files in /nfs/brubeck.bx.psu.edu/scratch6/wilfried/kinetics/Polarizing/
 cat WG_SNP.gff WG_polarized.gff > WG.gff 
 
