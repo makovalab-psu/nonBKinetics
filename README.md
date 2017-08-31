@@ -130,7 +130,7 @@ bash_somatic.sh script and its dependencies
 (Bob to fill this in)
 
 ##Impact of different aligners on calling sequencing errors.
-(Bob to fill this in)
+five_aligners.sh and its dependencies
 
 ##Comparison of errors and variants between motifs and motif-free regions. 
 error_plots.Rnw
