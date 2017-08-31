@@ -15,6 +15,8 @@ PacificBiosciences SMRT-Link :  smrtanalysis-2.3.0
 
 Python 2.7.3 (default, Mar 13 2014, 11:03:55)
 
+Naive Variant Caller, from modified version at tools-blankenberg/tools/naive_variant_caller/tools/naive_variant_caller.py
+
 #FILE FORMATS
 ##.mf
 
