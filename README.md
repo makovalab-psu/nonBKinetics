@@ -66,21 +66,19 @@ Input : unaligned cmp.h5 from PacBio sequencing project, reference genome
 Output : IWT-ready files
 
 ###IWT###
-load_IPD_data.r
+Loading data in R in IWTomics format and creating subsamples for test: load_IPD_data.r
 
-IWT_IPD.r
+Perform IWT test and plot results: IWT_IPD.r
 
-feature_length_IPD.r
+IPD analysis and IWT test for motifs with different length: feature_length_IPD.r
 
-(MARZIA NEEDS TO UPDATE THESE FILES, WITH DEPTH)
 
 ##Effect of sequence composition on IPD. 
 
 Sequence composition obtained in: *CompoRegress/bash_comporegress.sh*
 
-sequence_composition_IPD.r
+Perform sequence composition analysis: sequence_composition_IPD.r
 
-(MARZIA NEEDS TO UPDATE THIS FILE)
 
 ##Experimental characterization of G-quadruplexes. 
 
