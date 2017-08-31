@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mockName=$1     # e.g. "pomegranate"
+mockName=$1     # e.g. "plum"
 featuresDir=$2  # e.g. "/nfs/brubeck.bx.psu.edu/scratch6/monika/true_variants/RM"
 readLength=$3   # e.g. 100
 
