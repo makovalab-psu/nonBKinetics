@@ -12,3 +12,4 @@ create_mock_reads.sh ${mockName} ${sequencingDepth} ${readLength} ${subsPerMilli
 align_mock_reads.sh ${mockName}
 mockify_intervals.sh ${mockName}
 call_mock_variants.sh ${mockName}
+compare_mock_variants.sh ${mockName}
