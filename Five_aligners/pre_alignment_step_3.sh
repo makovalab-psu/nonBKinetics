@@ -5,46 +5,40 @@ chrom=$2      # e.g. "chr1"
 
 featureList="APhasedRepeats DirectRepeats GQuadPlus GQuadMinus InvertedRepeats MirrorRepeats ZDNAMotifs"
 
-# Translate the feature and control intervals files to gff and bed format.
-#
-# inputs:
-#   - "samtools" must be in the executable PATH
-#   - "bedtools" must be in the executable PATH
-#   - The current directory must contain, for each feature,
-#   	features/${feature}.${chrom}.features.mf
-#       features/${feature}.for_${chrom}.controls.mf
-#   - The current directory must contain a subdirectory named temp.samtools,
-#     and within that there must be a subdirectory named bwa
-#
-# outputs:
-#   - For each feature, these files are written
-#   	reads/${feature}.${chrom}.features.fastq
-#   	reads/${feature}.for_${chrom}.${chr}.controls.fastq
-
-…………
-echo ${featureList} | tr " " "\n" \
-  | while read feature ; do
-      echo "=== ${feature} ==="
-      time samtools sort -n \
-            -T temp.samtools/farf.${feature}.${chrom}.features \
-               bam/${feature}.${chrom}.features.bam \
-        | bedtools bamtofastq -i /dev/stdin \
-            -fq reads/${feature}.${chrom}.features.fastq
-      done
+# Reduce the big bam to those reads aligning to features and controls; remove
+# irrelevant clutter from the bam header; change from 1, 2, 3, to chr1, chr2,
+# chr3
 
 echo ${featureList} | tr " " "\n" \
   | while read feature ; do
-      time cat ../features/${feature}.for_${chrom}.controls \
-………
-        | sed "s/^hg19\.chr//" \
-        | awk '{ print $1 }' \
-        | sort -nu \
-        | while read chromNum ; do
-            echo "=== ${feature} for_${chrom}.chr${chromNum} controls ==="
-            samtools sort -n \
-                  -T temp.samtools/farf.${feature}.for_${chrom}.chr${chromNum}.controls \
-                     bam/${feature}.for_${chrom}.chr${chromNum}.controls.bam \
-              | bedtools bamtofastq -i /dev/stdin \
-                  -fq reads/${feature}.for_${chrom}.chr${chromNum}.controls.fastq
-            done
-      done
+      cat features/${feature}.${chrom}.features.mf.bed \
+          features/${feature}.for_${chrom}.controls.mf.bed
+      done \
+  | encodachrom | env LC_ALL=C sort -k 1,1n -k 2,2n | decodachrom \
+  | sed "s/^chr//" \
+  > temp.all_features.bed
+
+
+time samtools view -h ${bamFile} \
+      -L temp.all_features.bed \
+  | grep -v "^@PG" \
+  | awk '/^@SQ/  { chrNum = substr($2,4);
+                   if ((int(chrNum)>=1)&&(int(chrNum)<=22)) print $0; }
+         !/^@SQ/ { print $0; }' \
+  | sed "s/SN:/SN:chr/" \
+  | awk '/^@/  { print $0; }
+         !/^@/ { if ($3!="*")              $3 = "chr"$3;
+                 if (($7=="*")||($7=="=")) $7 = $7
+                 else if (int($7)==0)      $7 = "*";
+                 else                      $7 = "chr"$7;
+                 print $0; }' \
+  | sed "s/chrchr/chr/" \
+  | tr " " "\t" \
+  | samtools view -Sb - \
+  | samtools sort \
+      -T temp.samtools/temp.HG002.all_features.bam \
+      -o bam/HG002.all_features.sorted.bam
+
+time samtools index \
+     bam/HG002.all_features.sorted.bam \
+     bam/HG002.all_features.sorted.bai
