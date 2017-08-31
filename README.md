@@ -127,7 +127,7 @@ bash_diversity.sh script and its dependencies
 bash_somatic.sh script and its dependencies
 
 ##Estimation of falsely reported errors due to misalignment.
-(Bob to fill this in)
+misalignment_simulation.sh and its dependencies
 
 ##Impact of different aligners on calling sequencing errors.
 five_aligners.sh and its dependencies
