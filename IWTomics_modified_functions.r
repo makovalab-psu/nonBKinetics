@@ -1,17 +1,19 @@
 plot_no_size_control <- function(x,type='boxplot',method='pearson',
                                  N_regions=pmin(lengthRegions(x),ifelse(type=='curves',10,ifelse(type=='pairs',1000,+Inf))),
                                  probs=c(0.25,0.5,0.75),average=TRUE,size=TRUE,
+                                 depth=NULL, # NEW plot the depth (percentage with respect to control) instead of sample size
                                  size_perc=FALSE, # NEW plot the sample size in each position as percentage of the total sample size
                                  position=FALSE, # NEW plot the feature positions
                                  reproducible_pval=NULL, # NEW matrix of reproducible p-values (TRUE or FALSE). The TRUE are plotted as black squares under the pointwise boxplot
                                  scale_threshold=NULL, # NEW scale_threshold for reproducible_pval
                                  lengths=NULL, # NEW list with features length to be plotted separetely, for analysis of different lengths
-                                 zero_line=TRUE, # NEK plot a horizontal line at y=0
+                                 zero_line=TRUE, # NEW plot a horizontal line at y=0
                                  id_regions_subset=idRegions(x),id_features_subset=idFeatures(x),
                                  log_scale=FALSE,log_shift=0,col=1+seq_along(id_regions_subset),
                                  plot=TRUE,ask=TRUE,xlab='Windows',ylim=NULL,...){
   # MODIFIED FROM BIOCONDUCTOR PACKAGE IWTomics
   # FUNCTION plot.IWTomicsData
+  require(GenomicRanges)
   
   if(sum(!(id_regions_subset %in% idRegions(x))))
     stop('invalid id_regions_subset. The region datasets provided are not listed in x.')
@@ -152,6 +154,11 @@ plot_no_size_control <- function(x,type='boxplot',method='pearson',
       if(size_perc){
         ### NEW ###
         features_position_size=lapply(features_plot,function(feature_plot) do.call(cbind,lapply(rev(feature_plot[!(idRegions(x) %in% c('Control','Control_new'))]),function(feature) rowSums(!is.na(feature))/ncol(feature))))
+      }else if(!is.null(depth)){
+        ### NEW ###
+        features_position_size=features_plot
+        features_position_size[[1]]=as.matrix(depth[,setdiff(idRegions(x),c('Control','Control_new'))])
+        colnames(features_position_size[[1]])=setdiff(idRegions(x),c('Control','Control_new'))
       }else{
         features_position_size=lapply(features_plot,function(feature_plot) do.call(cbind,lapply(rev(feature_plot[!(idRegions(x) %in% c('Control','Control_new'))]),function(feature) rowSums(!is.na(feature)))))
       }
@@ -228,7 +235,7 @@ plot_no_size_control <- function(x,type='boxplot',method='pearson',
           }
           if(type=='boxplot'){
             plot(1,type="n",xlim=range(x_plot[[id_feature]]),ylim=ylim[[id_feature]],
-                 main=paste(nameRegions(x)[id_regions_subset[2]],'vs',nameRegions(x)[id_regions_subset[1]]),xlab=xlab,
+                 main=paste(nameRegions(x)[id_regions_subset[1]],'vs',nameRegions(x)[id_regions_subset[2]]),xlab=xlab,
                  ylab=paste0(ifelse(log_scale,'log ',''),nameFeatures(x)[id_feature]),...)
             for(id_region in id_regions_subset){
               ### CHANGED ###
@@ -257,7 +264,12 @@ plot_no_size_control <- function(x,type='boxplot',method='pearson',
           }else{
             cex=args$cex
           }
-          legend(par('usr')[2],mean(par('usr')[3:4]),legend=nameRegions(x)[rev(id_regions_subset)],xpd=NA,bty='n',lty=1,lwd=2,col=rev(col),yjust=0.5,seg.len=1,cex=cex)
+          legend(par('usr')[2]+2,mean(par('usr')[3:4]),
+                 legend=paste0(c(nameRegions(x)[rev(id_regions_subset)][1],'','','','',nameRegions(x)[rev(id_regions_subset)][2],'','',''),rep(c('','median','25-75%','5-95%',''),2)[-10]),
+                 xpd=NA,bty='n',lty=c(0,1,0,0,0,0,1,0,0),pch=c(NA,NA,15,15,NA,NA,NA,15,15),lwd=2,pt.cex=3,
+                 col=rev(c(col_plot[[id_regions_subset[1]]][c(1,2,4)],NA,NA,col_plot[[id_regions_subset[2]]][c(1,2,4)],NA)),
+                 yjust=0.5,seg.len=1,cex=cex)
+          #legend(par('usr')[2],mean(par('usr')[3:4]),legend=nameRegions(x)[id_regions_subset],xpd=NA,bty='n',lty=1,lwd=2,col=col,yjust=0.5,seg.len=1,cex=cex)
           if(size){
             par(mar=c(1,mar.left,2,6))
             if(size_perc){ 
@@ -289,6 +301,32 @@ plot_no_size_control <- function(x,type='boxplot',method='pearson',
                       col=col_perc,xlim=par('usr')[1:2],ylim=range(seq_along(setdiff(id_regions_subset,c('Control','Control_new'))))+c(-0.5,0.5),
                       zlim=c(0,1),axes=FALSE,xlab='',ylab='',...)
               }
+            }else if(!is.null(depth)){
+              ### NEW ###
+              col_perc=heat.colors(1000000)
+              col_perc=rev(c(col_perc[seq(1,700001,70)],colorRampPalette(c(col_perc[700001],"#8080FFFF"))(60001)[-1],colorRampPalette(c("#8080FFFF","#FFFFFFFF"))(35001)[1:30000][-1]))
+              col_perc=c("white",rep(col_perc,each=10))
+              col_perc=c(col_perc,colorRampPalette(c(col_perc[length(col_perc)],'purple'))(250000))
+              
+              if(position){
+                if(!is.null(lengths)){
+                  image(x_plot[[id_feature]],seq_len(2*(length(id_regions_subset)-1)),
+                        cbind(features_position[,id],features_position_size[[id_feature]][,id]),
+                        col=col_perc,xlim=par('usr')[1:2],ylim=range(seq_len(2*(length(id_regions_subset)-1)))+c(-0.5,0.5),
+                        zlim=c(0,1.25),axes=FALSE,xlab='',ylab='',...)
+                }else{
+                  image(x_plot[[id_feature]],seq_len(2*(length(id_regions_subset)-1)),
+                        cbind(features_position[,!(colnames(features_position) %in% c('Control','Control_new'))],
+                              features_position_size[[id_feature]][,!(colnames(features_position_size[[id_feature]]) %in% c('Control','Control_new'))]),
+                        col=col_perc,xlim=par('usr')[1:2],ylim=range(seq_len(2*(length(id_regions_subset)-1)))+c(-0.5,0.5),
+                        zlim=c(0,1.25),axes=FALSE,xlab='',ylab='',...)
+                }
+              }else{
+                image(x_plot[[id_feature]],seq_along(setdiff(id_regions_subset,c('Control','Control_new'))),
+                      as.matrix(features_position_size[[id_feature]][,!(colnames(features_position_size[[id_feature]]) %in% c('Control','Control_new'))]),
+                      col=col_perc,xlim=par('usr')[1:2],ylim=range(seq_along(setdiff(id_regions_subset,c('Control','Control_new'))))+c(-0.5,0.5),
+                      zlim=c(0,1.25),axes=FALSE,xlab='',ylab='',...)
+              }
             }else{
               image(x_plot[[id_feature]],seq_along(setdiff(id_regions_subset,c('Control','Control_new'))),
                     as.matrix(features_position_size[[id_feature]][,!(colnames(features_position_size[[id_feature]]) %in% c('Control','Control_new'))]),
@@ -296,6 +334,19 @@ plot_no_size_control <- function(x,type='boxplot',method='pearson',
                     axes=FALSE,xlab='',ylab='',...)
             }
             axis(side=3,...)
+            if(id_feature=="IPD_Forward"){
+              if(is.null(depth)){
+                lab='IPD ref'
+              }else{
+                lab='Depth ref'
+              }
+            }else{
+              if(is.null(depth)){
+                lab='IPD rev'
+              }else{
+                lab='Depth rev'
+              }
+            }
             if(position){
               ### NEW ###
               if(!is.null(lengths)){
@@ -306,12 +357,12 @@ plot_no_size_control <- function(x,type='boxplot',method='pearson',
               index_pos=c(min(index_pos),max(index_pos))
               #lines(x_plot[[id_feature]][rep(index_pos[1],each=2)]-0.5,c(0.5,1.5),col='black',lty=2)
               #lines(x_plot[[id_feature]][rep(index_pos[2],each=2)]+0.5,c(0.5,1.5),col='black',lty=2)
-              axis(side=2,at=seq_len(2*(length(id_regions_subset)-1)),labels=c('Feature','IPD values'),tick=FALSE,las=1,line=-2,...)
-              axis(side=4,at=mean(seq_len(2*(length(id_regions_subset)-1))),labels=paste0('Total:\n',lengthRegions(x)[setdiff(id_regions_subset,c('Control','Control_new'))],' windows'),tick=FALSE,las=1,line=-2,...)
+              axis(side=2,at=seq_len(2*(length(id_regions_subset)-1))+c(0,0),labels=c('Motif',lab),tick=FALSE,las=1,line=-2,...)
+              axis(side=4,at=mean(seq_len(2*(length(id_regions_subset)-1))),labels=paste0(lengthRegions(x)[setdiff(id_regions_subset,c('Control','Control_new'))],'\nWindows'),tick=FALSE,las=1,line=-2,...)
               x.rect=range(x_plot[[id_feature]])+c(-1,1)*diff(x_plot[[id_feature]])[1]/2
               rect(x.rect[1],seq_len(2*(length(id_regions_subset)-1))-0.5,x.rect[2],seq_len(2*(length(id_regions_subset)-1))+0.5,border='black',...)
             }else{
-              axis(side=2,at=seq_along(setdiff(id_regions_subset,c('Control','Control_new'))),labels=c('Sample size'),tick=FALSE,las=1,line=-2,...)
+              axis(side=2,at=seq_along(setdiff(id_regions_subset,c('Control','Control_new'))),labels=lab,tick=FALSE,las=1,line=-2,...)
               axis(side=4,at=seq_along(setdiff(id_regions_subset,c('Control','Control_new'))),labels=paste0('Total:\n',lengthRegions(x)[setdiff(id_regions_subset,c('Control','Control_new'))],' windows'),tick=FALSE,las=1,line=-2,...)
               x.rect=range(x_plot[[id_feature]])+c(-1,1)*diff(x_plot[[id_feature]])[1]/2
               rect(x.rect[1],seq_along(setdiff(id_regions_subset,c('Control','Control_new')))-0.5,x.rect[2],seq_along(setdiff(id_regions_subset,c('Control','Control_new')))+0.5,border='black',...)
@@ -321,8 +372,12 @@ plot_no_size_control <- function(x,type='boxplot',method='pearson',
               ### NEW ###
               image(seq(-50,50,length.out=1001),1,as.matrix(seq.int(1001)),xlim=c(-100,100),axes=FALSE,xlab='Percentage',ylab='',col=col_perc,...)
               labels=seq(0,1,length.out=5)
+            }else if(!is.null(depth)){
+              ### NEW ###
+              image(seq(-50,75,length.out=1251),1,as.matrix(seq.int(1251)),xlim=c(-100,125),axes=FALSE,xlab='Percentage',ylab='',col=col_perc,...)
+              labels=c(seq(0,1,length.out=5),1.25)
             }else{
-              image(-50:50,1,as.matrix(seq.int(101)),xlim=c(-100,100),axes=FALSE,xlab='Sample size',ylab='',col=cm.colors(101),...)
+              image(-50:50,1,as.matrix(seq.int(101)),xlim=c(-100,100),axes=FALSE,xlab='IPD values',ylab='',col=cm.colors(101),...)
               labels=seq(min(features_position_size[[id_feature]][,!(colnames(features_position_size[[id_feature]]) %in% c('Control','Control_new'))]),max(features_position_size[[id_feature]][,!(colnames(features_position_size[[id_feature]]) %in% c('Control','Control_new'))]),length.out=5)
             }
             if(length(unique(labels))==1)
@@ -331,6 +386,10 @@ plot_no_size_control <- function(x,type='boxplot',method='pearson',
               ### NEW ###
               axis(side=1,at=c(-50,-25,0,25,50),labels=paste0(labels*100,'%'),...)
               rect(-50.1,par('usr')[3],50.1,par('usr')[4],border='black',...)
+            }else if(!is.null(depth)){
+              ### NEW ###
+              axis(side=1,at=c(-50,-25,0,25,50,75),labels=paste0(labels*100,'%'),...)
+              rect(-50.1,par('usr')[3],75.1,par('usr')[4],border='black',...)
             }else{
               axis(side=1,at=c(-50,-25,0,25,50),labels=labels,...)
               rect(-50.5,par('usr')[3],50.5,par('usr')[4],border='black',...)
@@ -359,6 +418,7 @@ plot_no_size_control <- function(x,type='boxplot',method='pearson',
 plotTest_same_sample_size <- function(regionsFeatures,alpha=0.05,scale_threshold=NULL,nlevel=100,type='boxplot',
                                       N_regions=pmin(lengthRegions(regionsFeatures),10),
                                       probs=c(0.25,0.5,0.75),average=TRUE,size=TRUE,
+                                      depth=NULL, # NEW plot the depth (percentage with respect to control) instead of sample size
                                       size_perc=FALSE, # NEW plot the sample size in each position as percentage of the total sample size
                                       position=FALSE, # NEW plot the feature positions
                                       id_features_subset=idFeatures(regionsFeatures),
@@ -366,6 +426,7 @@ plotTest_same_sample_size <- function(regionsFeatures,alpha=0.05,scale_threshold
                                       ask=TRUE,xlab='Windows',ylim=NULL,...){
   # MODIFIED FROM BIOCONDUCTOR PACKAGE IWTomics
   # FUNCTION plotTest
+  require(GenomicRanges)
   
   if(class(regionsFeatures)!='IWTomicsData')
     stop('invalid regionsFeatures. IWTomicsData object expected.')
@@ -402,7 +463,7 @@ plotTest_same_sample_size <- function(regionsFeatures,alpha=0.05,scale_threshold
     for(id_feature in id_features_subset){
       if(.testResults(regionsFeatures)[[i]][[id_feature]]$test=='1pop'){
         plot_data=plot_no_size_control(regionsFeatures,type=type,
-                                       N_regions=N_regions[id_region1_i],probs=probs,average=average,size=size,
+                                       N_regions=N_regions[id_region1_i],probs=probs,average=average,size=size,depth=depth,
                                        size_perc=size_perc,position=position, ### MODIFIED ###
                                        id_regions_subset=id_region1_i,id_features_subset=id_feature,
                                        col=col[id_region1_i],plot=FALSE)
@@ -424,7 +485,7 @@ plotTest_same_sample_size <- function(regionsFeatures,alpha=0.05,scale_threshold
         ### end NEW ###
         plot_data=plot_no_size_control(regionsFeatures_sub,type=type,
                                        N_regions=N_regions[c(id_region1_i,id_region2_i)],probs=probs,average=average,
-                                       size=size,size_perc=size_perc,position=position, ### MODIFIED ###
+                                       size=size,size_perc=size_perc,position=position,depth=depth, ### MODIFIED ###
                                        id_regions_subset=c(id_region1_i,id_region2_i),id_features_subset=id_feature,
                                        col=col[c(id_region1_i,id_region2_i)],plot=FALSE)
       }
@@ -495,7 +556,7 @@ plotTest_same_sample_size <- function(regionsFeatures,alpha=0.05,scale_threshold
       if(type=='boxplot'){
         plot(1,type="n",xlim=par('usr')[1:2],ylim=ylim,xaxs="i",xlab=xlab,
              ylab=nameFeatures(regionsFeatures)[id_feature],mgp=c(3,0.8,0),...) ### MODIFIED ###
-        for(id_region in c(id_region2_i,id_region1_i)){
+        for(id_region in c(id_region1_i,id_region2_i)){
           ### MODIFIED ###
           polygon(c(x_plot,rev(x_plot)),c(plot_data$features_plot[[id_feature]][[id_region]][,1],rev(plot_data$features_plot[[id_feature]][[id_region]][,length(probs)])),
                   col=plot_data$col_plot[[id_region]][1],border=plot_data$col_plot[[id_region]][3])
@@ -541,20 +602,50 @@ plotTest_same_sample_size <- function(regionsFeatures,alpha=0.05,scale_threshold
                   col=col_perc,xlim=par('usr')[1:2],ylim=range(seq_len(ncol(plot_data$features_position_size[[id_feature]])))+c(-0.5,0.5),
                   zlim=c(0,1),axes=FALSE,xlab='',ylab='',mgp=c(3,0.8,0),...)
           }
+        }else if(!is.null(depth)){
+          ### NEW ###
+          col_perc=heat.colors(1000000)
+          col_perc=rev(c(col_perc[seq(1,700001,70)],colorRampPalette(c(col_perc[700001],"#8080FFFF"))(60001)[-1],colorRampPalette(c("#8080FFFF","#FFFFFFFF"))(35001)[1:30000][-1]))
+          col_perc=c("white",rep(col_perc,each=10))
+          col_perc=c(col_perc,colorRampPalette(c(col_perc[length(col_perc)],'purple'))(250000))
+          if(position){
+            image(x_plot,seq_len(2*length(id_region1_i)),
+                  cbind(plot_data$features_position,
+                        plot_data$features_position_size[[id_feature]]),
+                  col=col_perc,xlim=par('usr')[1:2],ylim=range(seq_len(2*length(id_region1_i)))+c(-0.5,0.5),
+                  zlim=c(0,1.25),axes=FALSE,xlab='',ylab='',mgp=c(3,0.8,0),...)
+          }else{
+            image(x_plot,seq_len(ncol(plot_data$features_position_size[[id_feature]])),plot_data$features_position_size[[id_feature]],
+                  col=col_perc,xlim=par('usr')[1:2],ylim=range(seq_len(ncol(plot_data$features_position_size[[id_feature]])))+c(-0.5,0.5),
+                  zlim=c(0,1.25),axes=FALSE,xlab='',ylab='',mgp=c(3,0.8,0),...)
+          }
         }else{
           image(x_plot,seq_along(id_region1_i),plot_data$features_position_size[[id_feature]],
                 col=cm.colors(101),xlim=par('usr')[1:2],ylim=range(seq_along(id_region1_i))+c(-0.5,0.5),
                 axes=FALSE,xlab='',ylab='',...)
         }
         axis(side=3,...)
+        if(id_feature=="IPD_Forward"){
+          if(is.null(depth)){
+            lab='IPD ref'
+          }else{
+            lab='Depth ref'
+          }
+        }else{
+          if(is.null(depth)){
+            lab='IPD rev'
+          }else{
+            lab='Depth rev'
+          }
+        }
         if(position){
           ### NEW ###
-          axis(side=2,at=seq_len(2*length(id_region1_i)),labels=c('Feature','Sample size'),mgp=c(3,1.5,0),tick=FALSE,las=1,line=-1,...)
-          axis(side=4,at=mean(seq_len(2*length(id_region1_i))),labels=paste0('Total:\n',lengthRegions(regionsFeatures)[id_region1_i],' windows'),mgp=c(3,1.5,0),tick=FALSE,las=1,line=-1,...)
+          axis(side=2,at=seq_len(2*length(id_region1_i)),labels=c('Motif',lab),mgp=c(3,1.5,0),tick=FALSE,las=1,line=-1,...)
+          axis(side=4,at=mean(seq_len(2*length(id_region1_i))),labels=paste0(lengthRegions(regionsFeatures)[id_region1_i],'\nWindows'),mgp=c(3,1.5,0),tick=FALSE,las=1,line=-1,...)
           x.rect=range(x_plot)+c(-1,1)*diff(x_plot)[1]/2
           rect(x.rect[1],seq_len(2*length(id_region1_i))-0.5,x.rect[2],seq_len(2*length(id_region1_i))+0.5,border='black')
         }else{
-          axis(side=2,at=seq_len(ncol(plot_data$features_position_size[[id_feature]])),labels=rep('Sample size',ncol(plot_data$features_position_size[[id_feature]])),mgp=c(3,1.5,0),tick=FALSE,las=1,line=-1,...)
+          axis(side=2,at=seq_len(ncol(plot_data$features_position_size[[id_feature]])),labels=rep(lab,ncol(plot_data$features_position_size[[id_feature]])),mgp=c(3,1.5,0),tick=FALSE,las=1,line=-1,...)
           axis(side=4,at=seq_along(id_region1_i),labels=paste0('Total:\n',lengthRegions(regionsFeatures)[id_region1_i],' windows'),mgp=c(3,1.5,0),tick=FALSE,las=1,line=-1,...)
           x.rect=range(x_plot)+c(-1,1)*diff(x_plot)[1]/2
           rect(x.rect[1],seq_len(ncol(plot_data$features_position_size[[id_feature]]))-0.5,x.rect[2],seq_len(ncol(plot_data$features_position_size[[id_feature]]))+0.5,border='black')
@@ -564,8 +655,12 @@ plotTest_same_sample_size <- function(regionsFeatures,alpha=0.05,scale_threshold
           ### NEW ###
           image(seq(-50,50,length.out=1001),1,as.matrix(seq.int(1001)),xlim=c(-100,100),axes=FALSE,xlab='Percentage',ylab='',mgp=c(3,1.5,0),col=col_perc,...)
           labels=seq(0,1,length.out=5)
+        }else if(!is.null(depth)){
+          ### NEW ###
+          image(seq(-50,75,length.out=1251),1,as.matrix(seq.int(1251)),xlim=c(-100,125),axes=FALSE,xlab='Percentage',ylab='',col=col_perc,...)
+          labels=c(seq(0,1,length.out=5),1.25)
         }else{
-          image(-50:50,1,as.matrix(seq.int(101)),xlim=c(-100,100),axes=FALSE,xlab='Sample size',ylab='',col=cm.colors(101),...)
+          image(-50:50,1,as.matrix(seq.int(101)),xlim=c(-100,100),axes=FALSE,xlab='IPD values',ylab='',col=cm.colors(101),...)
           labels=seq(min(plot_data$features_position_size[[id_feature]]),max(plot_data$features_position_size[[id_feature]]),length.out=5)
         }
         ### start NEW ###
@@ -576,6 +671,10 @@ plotTest_same_sample_size <- function(regionsFeatures,alpha=0.05,scale_threshold
           ### NEW ###
           axis(side=1,at=c(-50,-25,0,25,50),labels=paste0(labels*100,'%'),...)
           rect(-50.1,par('usr')[3],50.1,par('usr')[4],border='black')
+        }else if(!is.null(depth)){
+          ### NEW ###
+          axis(side=1,at=c(-50,-25,0,25,50,75),labels=paste0(labels*100,'%'),...)
+          rect(-50.1,par('usr')[3],75.1,par('usr')[4],border='black',...)
         }else{
           axis(side=1,at=c(-50,-25,0,25,50),labels=labels,...)
           rect(-50.5,par('usr')[3],50.5,par('usr')[4],border='black')
@@ -589,9 +688,6 @@ IWTomicsTest_same_sample_size <- function(regionsFeatures,
                                           id_region1=idRegions(regionsFeatures)[1],id_region2=NULL, 
                                           id_features_subset=idFeatures(regionsFeatures),
                                           mu=0,statistics="mean",probs=0.5,max_scale=NULL,paired=FALSE,B=1000){
-  # MODIFIED FROM BIOCONDUCTOR PACKAGE IWTomics
-  # FUNCTION IWTomicsTest
-  
   if(class(regionsFeatures)!='IWTomicsData')
     stop('invalid regionsFeatures. IWTomicsData object expected.')
   if(!validObject(regionsFeatures))
@@ -667,7 +763,6 @@ IWTomicsTest_same_sample_size <- function(regionsFeatures,
         if(regionsFeatures@test$result[[i]][[id_feature]]$exact)
           warning('number of iteration B greater than number of possible permutations. Exact p-values computed.',call.=FALSE,immediate.=TRUE)
       }else{
-        ### MODIFIED ###
         tmp=.IWTomics.2pop_same_sample_size(features_test_i[[id_feature]][[id_region1_i]],features_test_i[[id_feature]][[id_region2_i]],
                                             mu=mu_i[[id_feature]],statistics=statistics,probs=probs,max_scale=max_scale_i[[id_feature]],paired=paired,B=B)
         if(TRUE %in% tmp$no.pval)
@@ -684,9 +779,6 @@ IWTomicsTest_same_sample_size <- function(regionsFeatures,
 }
 
 .IWTomics.2pop_same_sample_size <- function(data1,data2,mu=0,statistics='mean',probs=0.5,max_scale=nrow(data1),paired=FALSE,B=1000,recycle=FALSE){
-  # MODIFIED FROM BIOCONDUCTOR PACKAGE IWTomics
-  # FUNCTION .IWTomics.2pop
-  
   # recycle     if TRUE, edges are recycled.
   # max_scale   max interval length for the adjustment.
   
@@ -696,14 +788,12 @@ IWTomicsTest_same_sample_size <- function(regionsFeatures,
   }
   n1=ncol(data1)
   n2=ncol(data2)
-  ### start NEW ###
   if(n1<n2){
     index.data2=sample(n2,n1)
     data2=data2[,index.data2]
   }else{
     index.data2=seq_len(n2)
   }
-  ### end NEW ###
   n2=ncol(data2)
   n=n1+n2
   data1=data1-mu
@@ -1099,7 +1189,7 @@ plotSummary_reproducible <- function(regionsFeatures,alpha=0.05,only_significant
       #  row.names(log_significant)=round(seq(0,1,length.out=nrow(log_significant)),2)
       
       main=paste0(nameFeatures(regionsFeatures)[id_features_subset_i])
-      .pheatmap(t(log_significant),gaps_row=gaps_tests_i,border_color="grey60",filename=filename_i,
+      .pheatmap(t(log_significant),gaps_row=gaps_tests_i,border_color="grey80",filename=filename_i,
                 breaks=seq(-5,5,length.out=nlevel),color=colorRampPalette(c("navy","white","red"))(n=nlevel-1),
                 legend.main='-log10(p-value)',main=main,cex.main=2,xlab=xlab,ylab=ylab,
                 zero_lab=align_lab,zero_lab_pos=alignment(regionsFeatures),cellwidth=cellwidth,cellheight=cellheight,...)
