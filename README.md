@@ -5,6 +5,15 @@ This repository accompanies the paper *Non-B DNA affects polymerization speed an
 * 1.0.0
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
 
+#Sofware versions
+
+Samtools : Version: 1.3.1 (using htslib 1.3.1)
+Bedtools : Version:   v2.26.0
+Bedops   : Version:  2.4.20
+
+PacificBiosciences SMRT-Link :  smrtanalysis-2.3.0
+
+Python 2.7.3 (default, Mar 13 2014, 11:03:55)
 
 #FILE FORMATS
 ##.mf
