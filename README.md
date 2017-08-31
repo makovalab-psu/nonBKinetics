@@ -126,10 +126,10 @@ bash_diversity.sh script and its dependencies
 ##Somatic mutations from The Cancer Genome Atlas.
 bash_somatic.sh script and its dependencies
 
-##Estimation of falsely reported errors due to misalignment
+##Estimation of falsely reported errors due to misalignment.
 (Bob to fill this in)
 
-##Impact of different aligners on calling sequencing errors
+##Impact of different aligners on calling sequencing errors.
 (Bob to fill this in)
 
 ##Comparison of errors and variants between motifs and motif-free regions. 
