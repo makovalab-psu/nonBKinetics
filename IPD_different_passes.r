@@ -1,3 +1,4 @@
+# Scalar version of the test used in IWTomics package
 test_scalar <- function(data1,data2,mu=0,statistics='mean',probs=0.5,paired=FALSE,B=1000){
   # data1 and data2 matrices with 1 row
   
@@ -120,300 +121,187 @@ test_scalar <- function(data1,data2,mu=0,statistics='mean',probs=0.5,paired=FALS
 }
 
 
-setwd("C:/Users/MarziaAngela/Documents/Marzia/Progetti/PacBio times/Monika")
+################################
+# G-quadruplex vs Control plus #
+################################
 
 
+# Load G-quadruplex data
+load('IPDlist_passes.GQuadPlusFeatureOnly.mf.gff.intersect.IPDs.txt.rda')
 
-# G-quadruplex (chr7 missing)
-load('IPDlist_passes_Gquad.rda')
-
+# Molecules that start from strand 0
 IPD_start_0=list(pass1=IPDlistPASS1_0,
                  pass2=IPDlistPASS2_1,
                  pass3=IPDlistPASS3_0,
-                 pass4=IPDlistPASS4_1,
-                 pass5=IPDlistPASS5_0)
+                 pass4=IPDlistPASS4_1)
 
+# Molecules that start from strand 1
 IPD_start_1=list(pass1=IPDlistPASS1_1,
                  pass2=IPDlistPASS2_0,
                  pass3=IPDlistPASS3_1,
-                 pass4=IPDlistPASS4_0,
-                 pass5=IPDlistPASS5_1)
+                 pass4=IPDlistPASS4_0)
+
+# Compute log meanIPD
+IPD_start_0_mean_Gquad=lapply(IPD_start_0,
+                              function(IPD) unlist(lapply(IPD,function(IPD) log(mean(IPD,na.rm=TRUE)+0.01))))
+IPD_start_1_mean_Gquad=lapply(IPD_start_1,
+                              function(IPD) unlist(lapply(IPD,function(IPD) log(mean(IPD,na.rm=TRUE)+0.01))))
 
 
 
+# Load matching motif-free regions
+load('IPDlist_passes.GQuadPlusFeatureOnly.mfEmptyTmp.mf.gff.intersect.IPDs.txt.rda')
 
-IPD_start_0_mean=lapply(IPD_start_0,
-                        function(IPD) unlist(lapply(IPD,function(IPD) mean(log(IPD+0.01),na.rm=TRUE))))
-IPD_start_1_mean=lapply(IPD_start_1,
-                        function(IPD) unlist(lapply(IPD,function(IPD) mean(log(IPD+0.01),na.rm=TRUE))))
-
-box=boxplot(IPD_start_0_mean,plot=FALSE)
-box$stats[c(1,5),]=Reduce(cbind,lapply(IPD_start_0_mean,quantile,probs=c(0.05,0.95)))
-bxp(box,outline=FALSE,main=paste0('Start from 0 strand (',length(IPD_start_0_mean$pass1),' molecules)'),ylab='Log mean IPD')
-
-box=boxplot(IPD_start_0_mean[c(1,3,5)],plot=FALSE)
-box$stats[c(1,5),]=Reduce(cbind,lapply(IPD_start_0_mean[c(1,3,5)],quantile,probs=c(0.05,0.95)))
-bxp(box,outline=FALSE,main='Strand without G-quadruplex',ylab='Log mean IPD')
-#matplot(Reduce(rbind,IPD_start_0_mean[c(1,3,5)])[,1:20],type='l',lty=1,add=TRUE)
-box=boxplot(cbind(IPD_start_0_mean[[3]]-IPD_start_0_mean[[1]],
-                  IPD_start_0_mean[[5]]-IPD_start_0_mean[[1]]),plot=FALSE)
-box$stats[c(1,5),]=apply(cbind(IPD_start_0_mean[[3]]-IPD_start_0_mean[[1]],
-                               IPD_start_0_mean[[5]]-IPD_start_0_mean[[1]]),2,quantile,probs=c(0.05,0.95))
-bxp(box,outline=FALSE,ylim=c(-1.2,1.2),main='Strand without G-quadruplex',ylab='Log mean IPD',show.names=FALSE)
-axis(1,1:2,c('pass 3-1','pass 5-1'))
-abline(h=0,col='red')
-#pval_3_1=signif(t.test(IPD_start_0_mean[[3]],IPD_start_0_mean[[1]],paired=TRUE)$p.val,2)
-#pval_5_1=signif(t.test(IPD_start_0_mean[[5]],IPD_start_0_mean[[1]],paired=TRUE)$p.val,2)
-pval_3_1=test_scalar(IPD_start_0_mean[[3]],IPD_start_0_mean[[1]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-pval_5_1=test_scalar(IPD_start_0_mean[[5]],IPD_start_0_mean[[1]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-text(1:2,-1.1,labels=c(pval_3_1,pval_5_1))
-
-box=boxplot(IPD_start_0_mean[c(2,4)],plot=FALSE)
-box$stats[c(1,5),]=Reduce(cbind,lapply(IPD_start_0_mean[c(2,4)],quantile,probs=c(0.05,0.95)))
-bxp(box,outline=FALSE,main='Strand with G-quadruplex',ylab='Log mean IPD')
-#matplot(Reduce(rbind,IPD_start_0_mean[c(2,4)])[,1:20],type='l',lty=1,add=TRUE)
-box=boxplot(IPD_start_0_mean[[4]]-IPD_start_0_mean[[2]],plot=FALSE)
-box$stats[c(1,5),]=quantile(IPD_start_0_mean[[4]]-IPD_start_0_mean[[2]],probs=c(0.05,0.95))
-bxp(box,outline=FALSE,ylim=c(-1.2,1.2),main='Strand with G-quadruplex',ylab='Log mean IPD',show.names=FALSE)
-axis(1,1,'pass 4-2')
-abline(h=0,col='red')
-#pval_4_2=signif(t.test(IPD_start_0_mean[[4]],IPD_start_0_mean[[2]],paired=TRUE)$p.val,2)
-pval_4_2=test_scalar(IPD_start_0_mean[[4]],IPD_start_0_mean[[2]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-text(1,-1.1,labels=pval_4_2)
-
-box=boxplot(IPD_start_0_mean[c(3,5)],plot=FALSE)
-box$stats[c(1,5),]=Reduce(cbind,lapply(IPD_start_0_mean[c(3,5)],quantile,probs=c(0.05,0.95)))
-bxp(box,outline=FALSE,main='Strand without G-quadruplex',ylab='Log mean IPD')
-#matplot(Reduce(rbind,IPD_start_0_mean[c(3,5)])[,1:20],type='l',lty=1,add=TRUE)
-box=boxplot(IPD_start_0_mean[[5]]-IPD_start_0_mean[[3]],plot=FALSE)
-box$stats[c(1,5),]=quantile(IPD_start_0_mean[[5]]-IPD_start_0_mean[[3]],probs=c(0.05,0.95))
-bxp(box,outline=FALSE,ylim=c(-1.2,1.2),main='Strand without G-quadruplex',ylab='Log mean IPD',show.names=FALSE)
-axis(1,1,'pass 5-3')
-abline(h=0,col='red')
-#pval_5_3=signif(t.test(IPD_start_0_mean[[5]],IPD_start_0_mean[[3]],paired=TRUE)$p.val,2)
-pval_5_3=test_scalar(IPD_start_0_mean[[5]],IPD_start_0_mean[[3]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-text(1,-1.1,labels=pval_5_3)
-
-
-
-box=boxplot(IPD_start_1_mean,plot=FALSE)
-box$stats[c(1,5),]=Reduce(cbind,lapply(IPD_start_1_mean,quantile,probs=c(0.05,0.95)))
-bxp(box,outline=FALSE,main=paste0('Start from 1 strand (',length(IPD_start_1_mean$pass1),' molecules)'),ylab='Log mean IPD')
-
-box=boxplot(IPD_start_1_mean[c(1,3,5)],plot=FALSE)
-box$stats[c(1,5),]=Reduce(cbind,lapply(IPD_start_1_mean[c(1,3,5)],quantile,probs=c(0.05,0.95)))
-bxp(box,outline=FALSE,main='Strand with G-quadruplex',ylab='Log mean IPD')
-#matplot(Reduce(rbind,IPD_start_1_mean[c(1,3,5)])[,1:20],type='l',lty=1,add=TRUE)
-box=boxplot(cbind(IPD_start_1_mean[[3]]-IPD_start_1_mean[[1]],
-                  IPD_start_1_mean[[5]]-IPD_start_1_mean[[1]]),plot=FALSE)
-box$stats[c(1,5),]=apply(cbind(IPD_start_1_mean[[3]]-IPD_start_1_mean[[1]],
-                               IPD_start_1_mean[[5]]-IPD_start_1_mean[[1]]),2,quantile,probs=c(0.05,0.95))
-bxp(box,outline=FALSE,ylim=c(-1.2,1.2),main='Strand with G-quadruplex',ylab='Log mean IPD',show.names=FALSE)
-axis(1,1:2,c('pass 3-1','pass 5-1'))
-abline(h=0,col='red')
-#pval_3_1=signif(t.test(IPD_start_1_mean[[3]],IPD_start_1_mean[[1]],paired=TRUE)$p.val,2)
-#pval_5_1=signif(t.test(IPD_start_1_mean[[5]],IPD_start_1_mean[[1]],paired=TRUE)$p.val,2)
-pval_3_1=test_scalar(IPD_start_1_mean[[3]],IPD_start_1_mean[[1]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-pval_5_1=test_scalar(IPD_start_1_mean[[5]],IPD_start_1_mean[[1]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-text(1:2,-1.1,labels=c(pval_3_1,pval_5_1))
-
-box=boxplot(IPD_start_1_mean[c(2,4)],plot=FALSE)
-box$stats[c(1,5),]=Reduce(cbind,lapply(IPD_start_1_mean[c(2,4)],quantile,probs=c(0.05,0.95)))
-bxp(box,outline=FALSE,main='Strand without G-quadruplex',ylab='Log mean IPD')
-#matplot(Reduce(rbind,IPD_start_1_mean[c(2,4)])[,1:20],type='l',lty=1,add=TRUE)
-box=boxplot(IPD_start_1_mean[[4]]-IPD_start_1_mean[[2]],plot=FALSE)
-box$stats[c(1,5),]=quantile(IPD_start_1_mean[[4]]-IPD_start_1_mean[[2]],probs=c(0.05,0.95))
-bxp(box,outline=FALSE,ylim=c(-1.2,1.2),main='Strand without G-quadruplex',ylab='Log mean IPD',show.names=FALSE)
-axis(1,1,'pass 4-2')
-abline(h=0,col='red')
-#pval_4_2=signif(t.test(IPD_start_1_mean[[4]],IPD_start_1_mean[[2]],paired=TRUE)$p.val,2)
-pval_4_2=test_scalar(IPD_start_1_mean[[4]],IPD_start_1_mean[[2]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-text(1,-1.1,labels=pval_4_2)
-
-box=boxplot(IPD_start_1_mean[c(3,5)],plot=FALSE)
-box$stats[c(1,5),]=Reduce(cbind,lapply(IPD_start_1_mean[c(3,5)],quantile,probs=c(0.05,0.95)))
-bxp(box,outline=FALSE,main='Strand with G-quadruplex',ylab='Log mean IPD')
-#matplot(Reduce(rbind,IPD_start_1_mean[c(3,5)])[,1:20],type='l',lty=1,add=TRUE)
-box=boxplot(IPD_start_1_mean[[5]]-IPD_start_1_mean[[3]],plot=FALSE)
-box$stats[c(1,5),]=quantile(IPD_start_1_mean[[5]]-IPD_start_1_mean[[3]],probs=c(0.05,0.95))
-bxp(box,outline=FALSE,ylim=c(-1.2,1.2),main='Strand with G-quadruplex',ylab='Log mean IPD',show.names=FALSE)
-axis(1,1,'pass 5-3')
-abline(h=0,col='red')
-#pval_5_3=signif(t.test(IPD_start_1_mean[[5]],IPD_start_1_mean[[3]],paired=TRUE)$p.val,2)
-pval_5_3=test_scalar(IPD_start_1_mean[[5]],IPD_start_1_mean[[3]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-text(1,-1.1,labels=pval_5_3)
-
-
-
-
-
-
-
-
-
-
-# Control
-load('IPDlist_passes_control.rda')
-
+# Molecules that start from strand 0
 IPD_start_0=list(pass1=IPDlistPASS1_0,
                  pass2=IPDlistPASS2_1,
                  pass3=IPDlistPASS3_0,
-                 pass4=IPDlistPASS4_1,
-                 pass5=IPDlistPASS5_0)
+                 pass4=IPDlistPASS4_1)
 
+# Molecules that start from strand 1
 IPD_start_1=list(pass1=IPDlistPASS1_1,
                  pass2=IPDlistPASS2_0,
                  pass3=IPDlistPASS3_1,
-                 pass4=IPDlistPASS4_0,
-                 pass5=IPDlistPASS5_1)
+                 pass4=IPDlistPASS4_0)
+
+# Compute log meanIPD
+IPD_start_0_mean_Control=lapply(IPD_start_0,
+                                function(IPD) unlist(lapply(IPD,function(IPD) log(mean(IPD,na.rm=TRUE)+0.01))))
+IPD_start_1_mean_Control=lapply(IPD_start_1,
+                                function(IPD) unlist(lapply(IPD,function(IPD) log(mean(IPD,na.rm=TRUE)+0.01))))
+
+
+IPD_start_0_mean=unlist(mapply(function(Gquad,Control) list(Gquad=Gquad,Control=Control),IPD_start_0_mean_Gquad,IPD_start_0_mean_Control,SIMPLIFY=FALSE),recursive=FALSE)
+IPD_start_1_mean=unlist(mapply(function(Gquad,Control) list(Gquad=Gquad,Control=Control),IPD_start_1_mean_Gquad,IPD_start_1_mean_Control,SIMPLIFY=FALSE),recursive=FALSE)
 
 
 
-
-IPD_start_0_mean=lapply(IPD_start_0,
-                        function(IPD) unlist(lapply(IPD,function(IPD) mean(log(IPD+0.01),na.rm=TRUE))))
-IPD_start_1_mean=lapply(IPD_start_1,
-                        function(IPD) unlist(lapply(IPD,function(IPD) mean(log(IPD+0.01),na.rm=TRUE))))
-
+# Test motifs vs motif-free regions
+pval_1=test_scalar(IPD_start_0_mean[[1]],IPD_start_0_mean[[2]],
+                   statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=FALSE,B=10000)$result$unadjusted_pval
+pval_2=test_scalar(IPD_start_0_mean[[3]],IPD_start_0_mean[[4]],
+                   statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=FALSE,B=10000)$result$unadjusted_pval
+pval_3=test_scalar(IPD_start_0_mean[[5]],IPD_start_0_mean[[6]],
+                   statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=FALSE,B=10000)$result$unadjusted_pval
+pval_4=test_scalar(IPD_start_0_mean[[7]],IPD_start_0_mean[[8]],
+                   statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=FALSE,B=10000)$result$unadjusted_pval
 box=boxplot(IPD_start_0_mean,plot=FALSE)
-box$stats[c(1,5),]=Reduce(cbind,lapply(IPD_start_0_mean,quantile,probs=c(0.05,0.95)))
-bxp(box,outline=FALSE,main=paste0('Start from 0 strand (',length(IPD_start_0_mean$pass1),' molecules)'),ylab='Log mean IPD')
-#matplot(Reduce(rbind,IPD_start_0_mean)[,1:20],type='l',lty=1,add=TRUE)
-matplot(Reduce(rbind,IPD_start_0_mean)[,1:20],type='l',lty=1,
-        main=paste0('Start from 0 strand (',length(IPD_start_0_mean$pass1),' molecules)'),ylab='Log mean IPD')
-box=boxplot(cbind(IPD_start_0_mean[[2]]-IPD_start_0_mean[[1]],IPD_start_0_mean[[3]]-IPD_start_0_mean[[1]],
-                  IPD_start_0_mean[[4]]-IPD_start_0_mean[[1]],IPD_start_0_mean[[5]]-IPD_start_0_mean[[1]]),plot=FALSE)
-box$stats[c(1,5),]=apply(cbind(IPD_start_0_mean[[2]]-IPD_start_0_mean[[1]],IPD_start_0_mean[[3]]-IPD_start_0_mean[[1]],
-                               IPD_start_0_mean[[4]]-IPD_start_0_mean[[1]],IPD_start_0_mean[[5]]-IPD_start_0_mean[[1]]),2,quantile,probs=c(0.05,0.95))
-bxp(box,outline=FALSE,ylim=c(-1.2,1.2),main=paste0('Start from 0 strand (',length(IPD_start_0_mean$pass1),' molecules)'),ylab='Log mean IPD',show.names=FALSE)
-axis(1,1:4,c('pass 2-1','pass 3-1','pass 4-1','pass 5-1'))
-abline(h=0,col='red')
-#pval_2_1=signif(t.test(IPD_start_0_mean[[2]],IPD_start_0_mean[[1]],paired=TRUE)$p.val,2)
-#pval_3_1=signif(t.test(IPD_start_0_mean[[3]],IPD_start_0_mean[[1]],paired=TRUE)$p.val,2)
-#pval_4_1=signif(t.test(IPD_start_0_mean[[4]],IPD_start_0_mean[[1]],paired=TRUE)$p.val,2)
-#pval_5_1=signif(t.test(IPD_start_0_mean[[5]],IPD_start_0_mean[[1]],paired=TRUE)$p.val,2)
-pval_2_1=test_scalar(IPD_start_0_mean[[2]],IPD_start_0_mean[[1]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-pval_3_1=test_scalar(IPD_start_0_mean[[3]],IPD_start_0_mean[[1]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-pval_4_1=test_scalar(IPD_start_0_mean[[4]],IPD_start_0_mean[[1]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-pval_5_1=test_scalar(IPD_start_0_mean[[5]],IPD_start_0_mean[[1]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-text(1:4,-1.1,labels=c(pval_2_1,pval_3_1,pval_4_1,pval_5_1))
+box$stats[c(1,5),]=Reduce(cbind,lapply(IPD_start_0_mean,quantile,probs=c(0.05,0.95),na.rm=TRUE))
+par(mar=c(7.5,4,4,2)+0.1)
+bxp(box,at=c(1:2,4:5,7:8,10:11),outline=FALSE,ylim=c(-3,1),show.names=FALSE,
+    main='Start from G4- as template',ylab='Log mean IPD',las=3)
+text(c(1.5,4.5,7.5,10.5),-2.5,labels=c(pval_1,pval_2,pval_3,pval_4),col=c('black','red','black','red'))
+axis(1,at=c(1:2,4:5,7:8,10:11),labels=paste0(c('G4+','Motif-free'),' pass',rep(1:4,each=2)),las=2)
 
-
-
-
+# Test motifs vs motif-free regions
+pval_1=test_scalar(IPD_start_1_mean[[1]],IPD_start_1_mean[[2]],
+                   statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=FALSE,B=10000)$result$unadjusted_pval
+pval_2=test_scalar(IPD_start_1_mean[[3]],IPD_start_1_mean[[4]],
+                   statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=FALSE,B=10000)$result$unadjusted_pval
+pval_3=test_scalar(IPD_start_1_mean[[5]],IPD_start_1_mean[[6]],
+                   statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=FALSE,B=10000)$result$unadjusted_pval
+pval_4=test_scalar(IPD_start_1_mean[[7]],IPD_start_1_mean[[8]],
+                   statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=FALSE,B=10000)$result$unadjusted_pval
 box=boxplot(IPD_start_1_mean,plot=FALSE)
-box$stats[c(1,5),]=Reduce(cbind,lapply(IPD_start_1_mean,quantile,probs=c(0.05,0.95)))
-bxp(box,outline=FALSE,main=paste0('Start from 1 strand (',length(IPD_start_1_mean$pass1),' molecules)'),ylab='Log mean IPD')
-#matplot(Reduce(rbind,IPD_start_1_mean)[,1:20],type='l',lty=1,add=TRUE)
-matplot(Reduce(rbind,IPD_start_1_mean)[,1:20],type='l',lty=1,
-        main=paste0('Start from 1 strand (',length(IPD_start_1_mean$pass1),' molecules)'),ylab='Log mean IPD')
-
-box=boxplot(cbind(IPD_start_1_mean[[2]]-IPD_start_1_mean[[1]],IPD_start_1_mean[[3]]-IPD_start_1_mean[[1]],
-                  IPD_start_1_mean[[4]]-IPD_start_1_mean[[1]],IPD_start_1_mean[[5]]-IPD_start_1_mean[[1]]),plot=FALSE)
-box$stats[c(1,5),]=apply(cbind(IPD_start_1_mean[[2]]-IPD_start_1_mean[[1]],IPD_start_1_mean[[3]]-IPD_start_1_mean[[1]],
-                               IPD_start_1_mean[[4]]-IPD_start_1_mean[[1]],IPD_start_1_mean[[5]]-IPD_start_1_mean[[1]]),2,quantile,probs=c(0.05,0.95))
-bxp(box,outline=FALSE,ylim=c(-1.2,1.2),main=paste0('Start from 1 strand (',length(IPD_start_1_mean$pass1),' molecules)'),ylab='Log mean IPD',show.names=FALSE)
-axis(1,1:4,c('pass 2-1','pass 3-1','pass 4-1','pass 5-1'))
-abline(h=0,col='red')
-#pval_2_1=signif(t.test(IPD_start_1_mean[[2]],IPD_start_1_mean[[1]],paired=TRUE)$p.val,2)
-#pval_3_1=signif(t.test(IPD_start_1_mean[[3]],IPD_start_1_mean[[1]],paired=TRUE)$p.val,2)
-#pval_4_1=signif(t.test(IPD_start_1_mean[[4]],IPD_start_1_mean[[1]],paired=TRUE)$p.val,2)
-#pval_5_1=signif(t.test(IPD_start_1_mean[[5]],IPD_start_1_mean[[1]],paired=TRUE)$p.val,2)
-pval_2_1=test_scalar(IPD_start_1_mean[[2]],IPD_start_1_mean[[1]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-pval_3_1=test_scalar(IPD_start_1_mean[[3]],IPD_start_1_mean[[1]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-pval_4_1=test_scalar(IPD_start_1_mean[[4]],IPD_start_1_mean[[1]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-pval_5_1=test_scalar(IPD_start_1_mean[[5]],IPD_start_1_mean[[1]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-text(1:4,-1.1,labels=c(pval_2_1,pval_3_1,pval_4_1,pval_5_1))
+box$stats[c(1,5),]=Reduce(cbind,lapply(IPD_start_1_mean,quantile,probs=c(0.05,0.95),na.rm=TRUE))
+par(mar=c(7.5,4,4,2)+0.1)
+bxp(box,at=c(1:2,4:5,7:8,10:11),outline=FALSE,ylim=c(-3,1),show.names=FALSE,
+    main='Start from G4+ as template',ylab='Log mean IPD',las=3)
+text(c(1.5,4.5,7.5,10.5),-2.5,labels=c(pval_1,pval_2,pval_3,pval_4),col=c('red','black','red','black'))
+axis(1,at=c(1:2,4:5,7:8,10:11),labels=paste0(c('G4+','Motif-free'),' pass',rep(1:4,each=2)),las=2)
 
 
 
 
-IPD_start_01_mean=mapply(function(IPD_0,IPD_1) unlist(c(lapply(IPD_0,function(IPD) mean(log(IPD+0.01),na.rm=TRUE)),
-                                                        lapply(IPD_1,function(IPD) mean(log(IPD+0.01),na.rm=TRUE)))),
-                         IPD_start_0,IPD_start_1,SIMPLIFY=FALSE)
-
-box=boxplot(IPD_start_01_mean,plot=FALSE)
-box$stats[c(1,5),]=Reduce(cbind,lapply(IPD_start_01_mean,quantile,probs=c(0.05,0.95)))
-bxp(box,outline=FALSE,main=paste0('Start from both strands (',length(IPD_start_01_mean$pass1),' molecules)'),ylab='Log mean IPD')
-#matplot(Reduce(rbind,IPD_start_01_mean)[,1:20],type='l',lty=1,add=TRUE)
-matplot(Reduce(rbind,IPD_start_01_mean)[,sample(length(IPD_start_01_mean$pass1),20)],type='l',lty=1,
-        main=paste0('Start from both strands (',length(IPD_start_01_mean$pass1),' molecules)'),ylab='Log mean IPD')
-
-box=boxplot(cbind(IPD_start_01_mean[[2]]-IPD_start_01_mean[[1]],IPD_start_01_mean[[3]]-IPD_start_01_mean[[1]],
-                  IPD_start_01_mean[[4]]-IPD_start_01_mean[[1]],IPD_start_01_mean[[5]]-IPD_start_01_mean[[1]]),plot=FALSE)
-box$stats[c(1,5),]=apply(cbind(IPD_start_01_mean[[2]]-IPD_start_01_mean[[1]],IPD_start_01_mean[[3]]-IPD_start_01_mean[[1]],
-                               IPD_start_01_mean[[4]]-IPD_start_01_mean[[1]],IPD_start_01_mean[[5]]-IPD_start_01_mean[[1]]),2,quantile,probs=c(0.05,0.95))
-bxp(box,outline=FALSE,ylim=c(-1.2,1.2),main=paste0('Start from both strands (',length(IPD_start_01_mean$pass1),' molecules)'),ylab='Log mean IPD',show.names=FALSE)
-axis(1,1:4,c('pass 2-1','pass 3-1','pass 4-1','pass 5-1'))
-abline(h=0,col='red')
-#pval_2_1=signif(t.test(IPD_start_01_mean[[2]],IPD_start_01_mean[[1]],paired=TRUE)$p.val,2)
-#pval_3_1=signif(t.test(IPD_start_01_mean[[3]],IPD_start_01_mean[[1]],paired=TRUE)$p.val,2)
-#pval_4_1=signif(t.test(IPD_start_01_mean[[4]],IPD_start_01_mean[[1]],paired=TRUE)$p.val,2)
-#pval_5_1=signif(t.test(IPD_start_01_mean[[5]],IPD_start_01_mean[[1]],paired=TRUE)$p.val,2)
-pval_2_1=test_scalar(IPD_start_01_mean[[2]],IPD_start_01_mean[[1]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-pval_3_1=test_scalar(IPD_start_01_mean[[3]],IPD_start_01_mean[[1]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-pval_4_1=test_scalar(IPD_start_01_mean[[4]],IPD_start_01_mean[[1]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-pval_5_1=test_scalar(IPD_start_01_mean[[5]],IPD_start_01_mean[[1]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-text(1:4,-1.1,labels=c(pval_2_1,pval_3_1,pval_4_1,pval_5_1))
 
 
 
 
-box=boxplot(cbind(IPD_start_01_mean[[3]]-IPD_start_01_mean[[2]],
-                  IPD_start_01_mean[[4]]-IPD_start_01_mean[[2]],IPD_start_01_mean[[5]]-IPD_start_01_mean[[2]]),plot=FALSE)
-box$stats[c(1,5),]=apply(cbind(IPD_start_01_mean[[3]]-IPD_start_01_mean[[2]],
-                               IPD_start_01_mean[[4]]-IPD_start_01_mean[[2]],IPD_start_01_mean[[5]]-IPD_start_01_mean[[2]]),2,quantile,probs=c(0.05,0.95))
-bxp(box,outline=FALSE,ylim=c(-1.2,1.2),main=paste0('Start from both strands (',length(IPD_start_01_mean$pass1),' molecules)'),ylab='Log mean IPD',show.names=FALSE)
-axis(1,1:3,c('pass 3-2','pass 4-2','pass 5-2'))
-abline(h=0,col='red')
-#pval_3_2=signif(t.test(IPD_start_01_mean[[3]],IPD_start_01_mean[[2]],paired=TRUE)$p.val,2)
-#pval_4_2=signif(t.test(IPD_start_01_mean[[4]],IPD_start_01_mean[[2]],paired=TRUE)$p.val,2)
-#pval_5_2=signif(t.test(IPD_start_01_mean[[5]],IPD_start_01_mean[[2]],paired=TRUE)$p.val,2)
-pval_3_2=test_scalar(IPD_start_01_mean[[3]],IPD_start_01_mean[[2]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-pval_4_2=test_scalar(IPD_start_01_mean[[4]],IPD_start_01_mean[[2]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-pval_5_2=test_scalar(IPD_start_01_mean[[5]],IPD_start_01_mean[[2]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-text(1:3,-1.1,labels=c(pval_3_2,pval_4_2,pval_5_2))
+
+
+################################
+# G-quadruplex vs Control plus #
+################################
+
+
+# Load G-quadruplex data
+load('IPDlist_passes.GQuadMinusFeatureOnly.mf.gff.intersect.IPDs.txt.rda')
+
+# Molecules that start from strand 0
+IPD_start_0=list(pass1=IPDlistPASS1_0,
+                 pass2=IPDlistPASS2_1,
+                 pass3=IPDlistPASS3_0,
+                 pass4=IPDlistPASS4_1)
+
+# Molecules that start from strand 1
+IPD_start_1=list(pass1=IPDlistPASS1_1,
+                 pass2=IPDlistPASS2_0,
+                 pass3=IPDlistPASS3_1,
+                 pass4=IPDlistPASS4_0)
+
+# Compute log meanIPD
+IPD_start_0_mean_Gquad=lapply(IPD_start_0,
+                              function(IPD) unlist(lapply(IPD,function(IPD) log(mean(IPD,na.rm=TRUE)+0.01))))
+IPD_start_1_mean_Gquad=lapply(IPD_start_1,
+                              function(IPD) unlist(lapply(IPD,function(IPD) log(mean(IPD,na.rm=TRUE)+0.01))))
 
 
 
+# Load matching motif-free regions
+load('IPDlist_passes.GQuadMinusFeatureOnly.mfEmptyTmp.mf.gff.intersect.IPDs.txt.rda')
 
-box=boxplot(cbind(IPD_start_01_mean[[4]]-IPD_start_01_mean[[3]],IPD_start_01_mean[[5]]-IPD_start_01_mean[[3]],
-                  IPD_start_01_mean[[5]]-IPD_start_01_mean[[4]]),plot=FALSE)
-box$stats[c(1,5),]=apply(cbind(IPD_start_01_mean[[4]]-IPD_start_01_mean[[3]],IPD_start_01_mean[[5]]-IPD_start_01_mean[[3]],
-                               IPD_start_01_mean[[5]]-IPD_start_01_mean[[4]]),2,quantile,probs=c(0.05,0.95))
-bxp(box,outline=FALSE,ylim=c(-1.2,1.2),main=paste0('Start from both strands (',length(IPD_start_01_mean$pass1),' molecules)'),ylab='Log mean IPD',show.names=FALSE)
-axis(1,1:3,c('pass 4-3','pass 5-3','pass 5-4'))
-abline(h=0,col='red')
-#pval_4_3=signif(t.test(IPD_start_01_mean[[4]],IPD_start_01_mean[[3]],paired=TRUE)$p.val,2)
-#pval_5_3=signif(t.test(IPD_start_01_mean[[5]],IPD_start_01_mean[[3]],paired=TRUE)$p.val,2)
-#pval_5_4=signif(t.test(IPD_start_01_mean[[5]],IPD_start_01_mean[[4]],paired=TRUE)$p.val,2)
-pval_4_3=test_scalar(IPD_start_01_mean[[4]],IPD_start_01_mean[[3]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-pval_5_3=test_scalar(IPD_start_01_mean[[5]],IPD_start_01_mean[[3]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-pval_5_4=test_scalar(IPD_start_01_mean[[5]],IPD_start_01_mean[[4]],
-                     statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=TRUE,B=10000)$result$unadjusted_pval
-text(1:3,-1.1,labels=c(pval_4_3,pval_5_3,pval_5_4))
+# Molecules that start from strand 0
+IPD_start_0=list(pass1=IPDlistPASS1_0,
+                 pass2=IPDlistPASS2_1,
+                 pass3=IPDlistPASS3_0,
+                 pass4=IPDlistPASS4_1)
+
+# Molecules that start from strand 1
+IPD_start_1=list(pass1=IPDlistPASS1_1,
+                 pass2=IPDlistPASS2_0,
+                 pass3=IPDlistPASS3_1,
+                 pass4=IPDlistPASS4_0)
+
+# Compute log meanIPD
+IPD_start_0_mean_Control=lapply(IPD_start_0,
+                                function(IPD) unlist(lapply(IPD,function(IPD) log(mean(IPD,na.rm=TRUE)+0.01))))
+IPD_start_1_mean_Control=lapply(IPD_start_1,
+                                function(IPD) unlist(lapply(IPD,function(IPD) log(mean(IPD,na.rm=TRUE)+0.01))))
+
+IPD_start_0_mean=unlist(mapply(function(Gquad,Control) list(Gquad=Gquad,Control=Control),IPD_start_0_mean_Gquad,IPD_start_0_mean_Control,SIMPLIFY=FALSE),recursive=FALSE)
+IPD_start_1_mean=unlist(mapply(function(Gquad,Control) list(Gquad=Gquad,Control=Control),IPD_start_1_mean_Gquad,IPD_start_1_mean_Control,SIMPLIFY=FALSE),recursive=FALSE)
+
+
+
+# Test motifs vs motif-free regions
+pval_1=test_scalar(IPD_start_0_mean[[1]],IPD_start_0_mean[[2]],
+                   statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=FALSE,B=10000)$result$unadjusted_pval
+pval_2=test_scalar(IPD_start_0_mean[[3]],IPD_start_0_mean[[4]],
+                   statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=FALSE,B=10000)$result$unadjusted_pval
+pval_3=test_scalar(IPD_start_0_mean[[5]],IPD_start_0_mean[[6]],
+                   statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=FALSE,B=10000)$result$unadjusted_pval
+pval_4=test_scalar(IPD_start_0_mean[[7]],IPD_start_0_mean[[8]],
+                   statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=FALSE,B=10000)$result$unadjusted_pval
+box=boxplot(IPD_start_0_mean,plot=FALSE)
+box$stats[c(1,5),]=Reduce(cbind,lapply(IPD_start_0_mean,quantile,probs=c(0.05,0.95),na.rm=TRUE))
+par(mar=c(7,4,4,2)+0.1)
+bxp(box,at=c(1:2,4:5,7:8,10:11),outline=FALSE,ylim=c(-3,1.8),
+    main='G-quadruplex rev vs Control - Start from 0 strand',ylab='Log mean IPD',las=3)
+text(c(1.5,4.5,7.5,10.5),-2.5,labels=c(pval_1,pval_2,pval_3,pval_4),col=c('red','black','red','black'))
+
+# Test motifs vs motif-free regions
+pval_1=test_scalar(IPD_start_1_mean[[1]],IPD_start_1_mean[[2]],
+                   statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=FALSE,B=10000)$result$unadjusted_pval
+pval_2=test_scalar(IPD_start_1_mean[[3]],IPD_start_1_mean[[4]],
+                   statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=FALSE,B=10000)$result$unadjusted_pval
+pval_3=test_scalar(IPD_start_1_mean[[5]],IPD_start_1_mean[[6]],
+                   statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=FALSE,B=10000)$result$unadjusted_pval
+pval_4=test_scalar(IPD_start_1_mean[[7]],IPD_start_1_mean[[8]],
+                   statistics='quantile',probs=c(0.05,0.25,0.50,0.75,0.95),paired=FALSE,B=10000)$result$unadjusted_pval
+box=boxplot(IPD_start_1_mean,plot=FALSE)
+box$stats[c(1,5),]=Reduce(cbind,lapply(IPD_start_1_mean,quantile,probs=c(0.05,0.95),na.rm=TRUE))
+par(mar=c(7,4,4,2)+0.1)
+bxp(box,at=c(1:2,4:5,7:8,10:11),outline=FALSE,ylim=c(-3,1.8),
+    main='G-quadruplex rev vs Control - Start from 1 strand',ylab='Log mean IPD',las=3)
+text(c(1.5,4.5,7.5,10.5),-2.5,labels=c(pval_1,pval_2,pval_3,pval_4),col=c('black','red','black','red'))
+
