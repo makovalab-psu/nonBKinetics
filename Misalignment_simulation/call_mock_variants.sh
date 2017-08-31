@@ -21,7 +21,7 @@ ls temp.*.zzz \
         | awk '{ print $1,($2)-1,$3 }' \
         > temp.${feature}_RMfiltered.dat
       #
-      naive_variant_caller_for_region_file \
+      naive_variant_caller \
         --bam=alignments/${mockName}.${chrom}.reads.truth.bam \
         --index=alignments/${mockName}.${chrom}.reads.truth.bai \
         --reference_genome_filename=targets/${mockName}.fa \
@@ -49,7 +49,7 @@ ls temp.*.zzz \
                  | select_lines_by_name --name=${chrom} \
                  | awk '{ print $2 }'`
       echo "=== ${chrom} ${feature} ==="
-      naive_variant_caller_for_region_file \
+      naive_variant_caller \
         --bam=alignments/${mockName}.${chrom}.reads.sorted.bam \
         --index=alignments/${mockName}.${chrom}.reads.sorted.bai \
         --reference_genome_filename=targets/${mockName}.fa \
