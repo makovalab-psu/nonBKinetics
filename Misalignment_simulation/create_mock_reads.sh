@@ -1,12 +1,10 @@
 #!/bin/bash
 
-mockName=$1         # e.g. "pomegranate"
+mockName=$1         # e.g. "plum"
 sequencingDepth=$2  # e.g. 60
 readLength=$3       # e.g. 100
 subsPerMillion=$4   # e.g. 2000
 indelsPerMillion=$5 # e.g. 10
-
-featureList="APhasedRepeats DirectRepeats GQuadPlus GQuadMinus InvertedRepeats MirrorRepeats ZDNAMotifs"
 
 # Sample reads from the mock genome
 
@@ -56,7 +54,7 @@ ls temp.*.zzz \
       numReads=$((genomeLenth*sequencingDepth/readLength))
       echo "${chrom} ${numReads} reads" | commatize_column 2 --sep=space
       #      
-      rootName=${mockName}.${chrom}.reads_s${subsPerMillion}_i${indelsPerMillion}
+      rootName=${mockName}.${chrom}.reads
       cat targets/${mockName}.${chrom}.fa \
         | awk '{ print $1 }' \
         | simulate_reads ${numReads}x${readLength} \
@@ -78,12 +76,12 @@ ls temp.*.zzz \
   | sed "s/\.zzz//" \
   | while read chrom ; do
       echo "=== ${chrom} ==="
-      gzip -dc temp/${mockName}.${chrom}.reads_s2000_i10.truth.sam.gz \
+      gzip -dc temp/${mockName}.${chrom}.reads.truth.sam.gz \
         | samtools sort \
-            -T temp.samtools/${mockName}.${chrom}.reads_s2000_i10.truth \
-            -o alignments/${mockName}.${chrom}.reads_s2000_i10.truth.bam
+            -T temp.samtools/${mockName}.${chrom}.reads.truth \
+            -o alignments/${mockName}.${chrom}.reads.truth.bam
       samtools index \
-        alignments/${mockName}.${chrom}.reads_s2000_i10.truth.bam \
-        alignments/${mockName}.${chrom}.reads_s2000_i10.truth.bai
+        alignments/${mockName}.${chrom}.reads.truth.bam \
+        alignments/${mockName}.${chrom}.reads.truth.bai
     done
 
