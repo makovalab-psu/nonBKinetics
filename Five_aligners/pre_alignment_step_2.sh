@@ -22,10 +22,10 @@ featureList="APhasedRepeats DirectRepeats GQuadPlus GQuadMinus InvertedRepeats M
 #   - For each feature, these files are written
 #       features/${feature}.${chrom}.features.mf.gff
 #       features/${feature}.for_${chrom}.controls.mf.gff
-#       features/${feature}.${chrom}.features.mf.bed \
-#       features/${feature}.for_${chrom}.controls.mf.bed \
+#       features/${feature}.${chrom}.features.mf.bed
+#       features/${feature}.for_${chrom}.controls.mf.bed
 
-time echo ${featureList} | tr " " "\n" \
+echo ${featureList} | tr " " "\n" \
   | while read feature ; do
       echo "=== ${feature} ==="
       cp features/${feature}.${chrom}.features.mf \

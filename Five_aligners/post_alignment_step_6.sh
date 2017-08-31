@@ -24,9 +24,15 @@ time echo ${featureList} | tr " " "\n" \
       echo "=== ${feature} ==="
       parse_intersect_aligners \
           alignments/${aligner}/${feature}.${chrom}.features.plus.intersect.gz \
+        | sed "s/^chr//" \
+        | sort -k1,1n -k2,2n \
+        | awk '{ print "chr"$0 }' \
         > alignments/${aligner}/${feature}.${chrom}.features.plus.collapsed
       #
       parse_intersect_aligners \
           alignments/${aligner}/${feature}.for_${chrom}.controls.plus.intersect.gz \
+        | sed "s/^chr//" \
+        | sort -k1,1n -k2,2n \
+        | awk '{ print "chr"$0 }' \
         > alignments/${aligner}/${feature}.for_${chrom}.controls.plus.collapsed
       done
