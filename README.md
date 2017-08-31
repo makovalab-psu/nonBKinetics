@@ -82,9 +82,8 @@ Perform sequence composition analysis: sequence_composition_IPD.r
 
 ##Experimental characterization of G-quadruplexes. 
 
-thermostability.r
+Analyze Tm and delta-epsilon experimental results: thermostability.r
 
-(MARZIA NEEDS TO UPDATE THIS FILE)
 
 #Data formatting
 
