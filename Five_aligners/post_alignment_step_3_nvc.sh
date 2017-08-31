@@ -8,7 +8,7 @@ featureList="APhasedRepeats DirectRepeats GQuadPlus GQuadMinus InvertedRepeats M
 # Compute pileup on the forward-strand alignments.
 #
 # inputs:
-#   - "naive_variant_caller_for_region_file" must be in the executable PATH
+#   - "naive_variant_caller" must be in the executable PATH
 #   - The current directory must contain, for each feature,
 #   	alignments/${aligner}/${feature}.${chrom}.features.plus.bam
 #   	alignments/${aligner}/${feature}.${chrom}.features.plus.bai
@@ -24,7 +24,7 @@ featureList="APhasedRepeats DirectRepeats GQuadPlus GQuadMinus InvertedRepeats M
 time echo ${featureList} | tr " " "\n" \
   | while read feature ; do
       echo "=== ${feature} ==="
-      naive_variant_caller_for_region_file \
+      naive_variant_caller \
         --bam=alignments/${aligner}/${feature}.${chrom}.features.plus.bam \
         --index=alignments/${aligner}/${feature}.${chrom}.features.plus.bai \
         --reference_genome_filename=${bwa_index_dir}/hg19.unmasked.fa \
@@ -33,7 +33,7 @@ time echo ${featureList} | tr " " "\n" \
         | gzip \
         > alignments/${aligner}/${feature}.${chrom}.features.plus.pileup.gz
       #
-      naive_variant_caller_for_region_file \
+      naive_variant_caller \
         --bam=alignments/${aligner}/${feature}.for_${chrom}.controls.plus.bam \
         --index=alignments/${aligner}/${feature}.for_${chrom}.controls.plus.bai \
         --reference_genome_filename=${bwa_index_dir}/hg19.unmasked.fa \
