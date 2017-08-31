@@ -11,3 +11,4 @@ create_mock_genome.sh ${mockName} ${featuresDir} ${readLength}
 create_mock_reads.sh ${mockName} ${sequencingDepth} ${readLength} ${subsPerMillion} ${indelsPerMillion}
 align_mock_reads.sh ${mockName}
 mockify_intervals.sh ${mockName}
+call_mock_variants.sh ${mockName}
