@@ -21,13 +21,13 @@ echo ${featureList} | tr " " "\n" \
         | awk '{ if ($3 == chrom) print $0 }' chrom=${chrom} \
         > temp.${feature}.reverse_map.txt
       #
-      featureFile=features/${feature}_fonly_RMfiltered.dat
+      featureFile=features/${feature}_RMfiltered.dat
       cat ${featureFile} \
         | translate_positions --sep=whitespace --origin=1 \
             temp.${feature}.reverse_map.txt \
         | awk '{ print $1,$2,$3 }' \
         | line_up_columns \
-        > targets/${feature}_fonly_RMfiltered.dat
+        > targets/${feature}_RMfiltered.dat
       #
       rm temp.${feature}.reverse_map.txt
       done
