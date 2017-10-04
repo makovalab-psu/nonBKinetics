@@ -149,6 +149,8 @@ filter_out_repeatmasked.sh
 
 filter_out_true_variants.sh
 
+filter_out_repeatmasked.sh and filter_out_true_variants.sh can be run separately or together in the joint_filtering.sh. 
+
 #Data plotting
 plot_heatmap
 
@@ -162,3 +164,14 @@ mf2gff.sh
 convert_gff_to_mf.sh
 
 gff2mf.py
+
+#Preparing the motif and motif-free windows
+
+inputs : .mf files, RepeatMasked file, True Variants file
+
+1. mf2gff.sh
+2. filter_out_repeatmasked.sh (Diversity, Divergence, TCGA) & joint_filtering.sh (Genome in a Bottle - Pacbio + Illumina)
+	Create sepearte folders for RepeatMasked and Joint
+3. convert_gff_to_mf.sh (use on filtered files. Don't forget to remove the orginal GFFs. Only the output of step 2 will work with that script - needs gff2mf.py)
+4. generateFeatures.py (remove the flanking regions of motifs in their 100bp windows. When original motifs were bigger than 100bp, only kept the 100bp at the center of the motifs)
+5. generateControls.sh (generates 10 random controls for each motif. Needs generateEmptyTrack.py)
