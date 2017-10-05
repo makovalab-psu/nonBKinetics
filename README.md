@@ -117,7 +117,11 @@ Output: 10 folders with matching controls for each motif
 runErrorStatistics_optimized.R, generateErrorsFullWindow.sh and generateErrors.sh scripts
 
 ##Illumina sequencing errors.
-bash_illumina.sh script and its dependencies
+#bash_illumina.sh script and its dependencies
+
+Now with Naive Variant Caller:
+
+bash runIlluminaErrorDiscoveryTest.sh Joint/ bam/0 var_output collapsed_output
 
 ##Variants from human-orangutan divergence. 
 bash_divergence.sh script and its dependencies
