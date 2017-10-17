@@ -11,7 +11,7 @@ intervalmap = {}
 for line in infile2:
         line = line.strip()
         chrom, start, stop, AF, ref, alt = line.split('\t')
-        if AF > 0.05:
+        if AF >= 0.05:
                 key = chrom+'|'+start+'|'+stop
                 intervalmap[key] = [ref,alt]
 
