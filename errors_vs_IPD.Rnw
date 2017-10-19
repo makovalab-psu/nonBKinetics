@@ -5,29 +5,55 @@
 
 
 <<>>=
-
+par(mfrow = c(2, 4))
+require(grDevices)
 log_mean <- function(data) {
-return(log(mean(data,na.rm=TRUE)+0.01))
+  return(log(mean(data, na.rm = TRUE) + 0.01))
 }
 
-runRegression <- function(vectorErrors, vectorIPDs) {
-  mylm <- lm(vectorIPDs ~ vectorErrors)
-  summary(mylm)
-  pvalue <-
-    as.numeric(round(coef(summary(mylm))[, "Pr(>|t|)"][2], 3))
-  slope <-
-    as.numeric(round(coef(summary(mylm))[, "Estimate"][2], 3))
-  rsquare <- as.numeric(round(summary(mylm)$r.squared, 3))
-  
-  return(list(
-    res_lm = mylm,
-    pvalue = pvalue,
-    slope = slope,
-    rsquare = rsquare
-  ))
-}
+runRegression <-
+  function(vectorErrors,
+           vectorIPDs,
+           type,
+           metric,
+           file) {
+    mylm <- lm(vectorIPDs ~ vectorErrors)
+    summary(mylm)
+    pvalue <-
+      as.numeric(round(coef(summary(mylm))[, "Pr(>|t|)"][2], 3))
+    slope <-
+      as.numeric(round(coef(summary(mylm))[, "Estimate"][2], 3))
+    rsquare <- as.numeric(round(summary(mylm)$r.squared, 3))
+    
+    plot(
+      vectorErrors,
+      vectorIPDs,
+      pch = ".",
+      col = adjustcolor("darkgray", alpha.f = 0.2),
+      main = gsub("FeatureOnly.mf", "", file),
+      sub = type,
+      xlim = c(0, 0.20),
+      xlab = "% ERROR RATE",
+      ylab = paste("transformed IPD", metric)
+    )
+    mtext(
+      paste("p-value:", pvalue, "slope:", slope, "r-square", rsquare),
+      col = ifelse(pvalue < 0.05, 'red', 'blue'),
+      side = 4,
+      line = 0.5,
+      cex = 0.75
+    )
+    abline(mylm, col = "red")
+    
+    return(list(
+      res_lm = mylm,
+      pvalue = pvalue,
+      slope = slope,
+      rsquare = rsquare
+    ))
+  }
 
-loadData <- function(fileErrors, fileIPDs) {
+loadData <- function(fileErrors, fileIPDs, file) {
   dataE <-
     read.table(fileErrors,
                header = F,
@@ -62,72 +88,87 @@ loadData <- function(fileErrors, fileIPDs) {
           as.data.frame(dataI),
           by = c("chr", "start", "end"))
   
-  means <- as.numeric(apply(mergedData[,9:no_col],1,log_mean))
-  #medians <- as.numeric(apply(mergedData[,9:no_col],1,median,na.rm=TRUE))
+  means <- as.numeric(apply(mergedData[, 9:no_col], 1, log_mean))
+  medians <-
+    as.numeric(apply(mergedData[, 9:no_col], 1, median, na.rm = TRUE))
   
-    for (type in c("TOTAL", "MISMATCHES", "INSERTION", "DELETION")) {
-      regression_on_means<-runRegression(mergedData[[type]],means)
-      #regression_on_medians<-runRegression(mergedData[[type]],medians)
-      
-      print(paste(type,"pvalue (means):",regression_on_means$pvalue,"pvalue (medians):",regression_on_medians$pvalue))
-    }
+  for (type in c("TOTAL", "MISMATCHES", "INSERTION", "DELETION")) {
+    regression_on_means <-
+      runRegression(mergedData[[type]], means, type, "mean", file)
+    regression_on_medians <-
+      runRegression(mergedData[[type]], medians, type, "median", file)
+    
+    print(
+      paste(
+        type,
+        "pvalue (means):",
+        regression_on_means$pvalue,
+        "pvalue (medians):",
+        regression_on_medians$pvalue
+      )
+    )
+  }
   
-  return(list(
-    ipd_median = median(means,na.rm=TRUE),
-    ipd_quantiles = quantile(means,na.rm=TRUE),
-    totalERRORS = mean(mergedData[["TOTAL"]],na.rm=TRUE),
-    totalERRORSquantile = quantile(mergedData[["TOTAL"]],na.rm=TRUE),
-    mismatchesERRORS = mean(mergedData[["MISMATCHES"]],na.rm=TRUE),
-    mismatchesERRORSquantile = quantile(mergedData[["MISMATCHES"]],na.rm=TRUE),
-    insertionERRORS = mean(mergedData[["INSERTION"]],na.rm=TRUE),
-    insertionERRORSquantile = quantile(mergedData[["INSERTION"]],na.rm=TRUE),
-    deletionERRORS = mean(mergedData[["DELETION"]],na.rm=TRUE),
-    deletionERRORSquantile = quantile(mergedData[["DELETION"]],na.rm=TRUE)
-  ))
+  return(
+    list(
+      ipd_median = median(means, na.rm = TRUE),
+      ipd_quantiles = quantile(means, na.rm = TRUE),
+      totalERRORS = mean(mergedData[["TOTAL"]], na.rm = TRUE),
+      totalERRORSquantile = quantile(mergedData[["TOTAL"]], na.rm = TRUE),
+      mismatchesERRORS = mean(mergedData[["MISMATCHES"]], na.rm = TRUE),
+      mismatchesERRORSquantile = quantile(mergedData[["MISMATCHES"]], na.rm =
+                                            TRUE),
+      insertionERRORS = mean(mergedData[["INSERTION"]], na.rm = TRUE),
+      insertionERRORSquantile = quantile(mergedData[["INSERTION"]], na.rm =
+                                           TRUE),
+      deletionERRORS = mean(mergedData[["DELETION"]], na.rm = TRUE),
+      deletionERRORSquantile = quantile(mergedData[["DELETION"]], na.rm =
+                                          TRUE)
+    )
+  )
 }
 
 getResults <- function(file) {
-  file_with_IPDs <-file
-  file_with_errors <- gsub(".mf",".collapsed",file)
-  print(paste(file_with_errors,file_with_IPDs))
-  result<-loadData(file_with_errors,file_with_IPDs)
+  file_with_IPDs <- file
+  file_with_errors <- gsub(".mf", ".collapsed", file)
+  print(paste(file_with_errors, file_with_IPDs))
+  result <- loadData(file_with_errors, file_with_IPDs, file)
   return(result)
 }
 
 setwd("/Users/alice/Desktop/projects/kinetics/errors_vs_IPD")
 filenames <- list.files(pattern = "*.mf", full.names = FALSE)
 
-results<-as.data.frame(sapply(filenames, getResults,simplify=TRUE))
+results <- as.data.frame(sapply(filenames, getResults, simplify = TRUE))
 
-for (type in c("totalERRORS", "mismatchesERRORS", "insertionERRORS", "deletionERRORS")) { 
-  e<-unlist(results[type,])
-  i<-unlist(results["ipd_median",])
-  quantIPD<-as.data.frame(unlist(results["ipd_quantiles",]))
-  plot(
-  e,
-  i,
-  xaxs = "i",
-  yaxs = "i",
-  ylim = c(round(min(quantIPD),2)-0.1,round(max(quantIPD),2)+0.1),
-  xlim = c(round(min(e),2)-0.01,round(max(e),2)+0.01),
-  xlab="ERRORS",
-  ylab="log(meanIPD)",
-  main=type,
-  sub="errors vs IPDs",
-  col="black",
-  pch=16
-  )
-  text(e,i+abs(mean(i)/10),labels=gsub("FeatureOnly.mf","",gsub("Repeats","",colnames(results))),cex=0.75)
-  
-  q25thIPD<-quantIPD[seq(2,nrow(quantIPD),5),]
-  q75thIPD<-quantIPD[seq(4,nrow(quantIPD),5),]
-  
-  quantERROR<-as.data.frame(unlist(results[paste(type,"quantile",sep=""),]))
-  q25thERROR<-quantERROR[seq(2,nrow(quantERROR),5),]
-  q75thERROR<-quantERROR[seq(4,nrow(quantERROR),5),]
-  rect(q25thERROR,q25thIPD,q75thERROR,q75thIPD,col=adjustcolor( "red", alpha.f = 0.2))
-}
+#for (type in c("totalERRORS", "mismatchesERRORS", "insertionERRORS", "deletionERRORS")) {
+#  e<-unlist(results[type,])
+#  i<-unlist(results["ipd_median",])
+#  quantIPD<-as.data.frame(unlist(results["ipd_quantiles",]))
+#  plot(
+#  e,
+#  i,
+#  xaxs = "i",
+#  yaxs = "i",
+#  ylim = c(round(min(quantIPD),2)-0.1,round(max(quantIPD),2)+0.1),
+#  xlim = c(round(min(e),2)-0.01,round(max(e),2)+0.01),
+#  xlab="ERRORS",
+#  ylab="log(meanIPD)",
+#  main=type,
+#  sub="errors vs IPDs",
+#  col="black",
+#  pch=16
+#  )
+#  text(e,i+abs(mean(i)/10),labels=gsub("FeatureOnly.mf","",gsub("Repeats","",colnames(results))),cex=0.75)
 
+#  q25thIPD<-quantIPD[seq(2,nrow(quantIPD),5),]
+#  q75thIPD<-quantIPD[seq(4,nrow(quantIPD),5),]
+
+#  quantERROR<-as.data.frame(unlist(results[paste(type,"quantile",sep=""),]))
+#  q25thERROR<-quantERROR[seq(2,nrow(quantERROR),5),]
+#  q75thERROR<-quantERROR[seq(4,nrow(quantERROR),5),]
+#  rect(q25thERROR,q25thIPD,q75thERROR,q75thIPD,col=adjustcolor( "red", alpha.f = 0.2))
+#}
 
 @
 
