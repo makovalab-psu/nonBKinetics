@@ -37,9 +37,18 @@ runRegression <-
       ylab = paste("transformed IPD", metric)
     )
     mtext(
-      paste("p-value:", pvalue, "slope:", slope, "r-square", rsquare),
+      paste("p-val:", pvalue, "slope:", slope, "r-sq", rsquare),
       col = ifelse(pvalue < 0.05, 'red', 'blue'),
       side = 4,
+      line = 0.5,
+      cex = 0.75
+    )
+    
+    myCor<-cor.test(vectorErrors,vectorIPDs,method="spearman")
+    mtext(
+      paste("p-value:", round(myCor$p.value,3), "cor:", round(myCor$estimate,3)),
+      col = ifelse(myCor$p.value < 0.05, 'red', 'blue'),
+      side = 3,
       line = 0.5,
       cex = 0.75
     )
