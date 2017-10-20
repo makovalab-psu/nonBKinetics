@@ -136,7 +136,8 @@ getResults <- function(file) {
   return(result)
 }
 
-setwd("/Users/alice/Desktop/projects/kinetics/errors_vs_IPD")
+#CHANGE PATH TO THE APPROPRIATE FOLDER HERE
+setwd("/Users/alice/Desktop/projects/kinetics/errors_vs_IPD/october19")
 filenames <- list.files(pattern = "*.mf", full.names = FALSE)
 
 results <- as.data.frame(sapply(filenames, getResults, simplify = TRUE))
