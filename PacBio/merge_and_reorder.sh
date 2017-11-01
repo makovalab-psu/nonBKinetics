@@ -13,7 +13,7 @@ for motif in "${array[@]}"; do
 		outputname=${folder_to_merge}/merged_${folder_to_merge}_${motif}.mf
 	fi
 
-	if [ -f $outputname ]; then
+	if [[ -f "$outputname" ]]; then
 		echo "File $FILE exists and will be removed before concatenating the rest of files."
 		rm ${outputname}
 	fi
@@ -22,10 +22,10 @@ for motif in "${array[@]}"; do
 	echo "files merged and written to"
 	echo $outputname
 
-	mf_file=${original_mf_folder}/*${motif}*.mf*
-	echo $mf_file
+	mf_file=`eval echo ${original_mf_folder}/${motif}*.mf*`
+	echo ".mf file to be used:  "$mf_file
 
-	if [ -f $mf_file ]; then
+	if [[ -f "$mf_file" ]]; then
 		echo "This output file will be reordered based on following matching file with IPD values:"
 		python reorder_pacbio.py ${mf_file} ${outputname}
 		echo ".collapsed file have been produced"
