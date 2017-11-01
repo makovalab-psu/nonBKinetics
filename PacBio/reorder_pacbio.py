@@ -68,8 +68,12 @@ def walk_ordered(motifFileWithIPds, errorDict):
             key=str(left)
             if errorDict.has_key(key):
                 values=errorDict[key]
-            if values:
-                left.append(values[0])
+            try:
+                if values:
+                    left.append(values[0])
+            except UnboundLocalError:
+                print("Looks like the coordinate lookup was unsuccessfull. Are you sure you are using correct input files? Aborting.")
+                sys.exit()
             flattenned = '\t'.join( left )
             ordered_errorDict.append( flattenned )
     f.close()
