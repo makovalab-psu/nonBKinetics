@@ -100,8 +100,11 @@ def walk_ordered(motifFileWithIPds, errorDict, windowCount):
                     else: 
                         adjusted_rates=[] #the error rates need to be adjusted because control window is present multiple times
                         for rate in values[0].split('\t'):
-                            numerical_rate=float(rate)
-                            adjusted_rate=numerical_rate/float(number_of_window_occurencies) #adjustment
+                            if (rate=="NA"):
+                                adjusted_rate="NA" #if value is NA, then no adjustment is necessary
+                            else:
+                                numerical_rate=float(rate)
+                                adjusted_rate=numerical_rate/float(number_of_window_occurencies) #adjustment
                             adjusted_rates.append(str(adjusted_rate))
                         adjusted_rates='\t'.join(adjusted_rates)
                         left.append(adjusted_rates)
