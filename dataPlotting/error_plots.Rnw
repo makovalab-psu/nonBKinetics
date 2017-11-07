@@ -358,7 +358,7 @@ run <- function(directory, control_directory, filenames, paired=TRUE, ITER=1000,
             print("Features and controls have equal feature lengths. GOOD.")
           } else {
             print("Features and controls have unequal feature lengths. ERROR.")
-            warning("Features and controls have unequal feature lengths. ERROR.")
+            stop("Features and controls have unequal feature lengths. ERROR.")
           }
         } else {
           #SINGLE CONTROL
@@ -420,7 +420,7 @@ run <- function(directory, control_directory, filenames, paired=TRUE, ITER=1000,
   
   if (length(names)<2) {
     print("The number of motifs to be analyzed is too low. Please add more motifs. ERROR.")
-    warning("The number of motifs to be analyzed is too low. Please add more motifs. ERROR.")
+    stop("The number of motifs to be analyzed is too low. Please add more motifs. ERROR.")
   }
   
   par(mfrow = c(1, 1), cex = 1.4)
@@ -558,12 +558,13 @@ directories <-
 
 directories <-
   c(
-    "/Users/alice/Desktop/projects/kinetics/errors_will/52xAugust14/pacbio/joint",
-    "/Users/alice/Desktop/projects/kinetics/errors_will/52xAugust14/illumina/joint",
-    "/Users/alice/Desktop/projects/kinetics/errors_will/52xAugust14/diversity/RM",
-    "/Users/alice/Desktop/projects/kinetics/errors_will/52xAugust14/divergence/RM",
-    "/Users/alice/Desktop/projects/kinetics/errors_will/52xAugust14/TCGA/RM"
+    "/Users/Willou/Documents/Doctoral_Thesis/UntitleProject2017/ReplotFig4/PacBio/Joint",
+    "/Users/Willou/Documents/Doctoral_Thesis/UntitleProject2017/ReplotFig4/Illumina/Joint",
+    "/Users/Willou/Documents/Doctoral_Thesis/UntitleProject2017/ReplotFig4/Diversity_high/RM",
+    "/Users/Willou/Documents/Doctoral_Thesis/UntitleProject2017/ReplotFig4/Divergence/RM",
+    "/Users/Willou/Documents/Doctoral_Thesis/UntitleProject2017/ReplotFig4/TCGA/RM"
   )
+
 
 for (directory in directories) {
   setwd(directory)
