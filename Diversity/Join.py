@@ -11,9 +11,11 @@ intervalmap = {}
 for line in infile2:
         line = line.strip()
         chrom, start, stop, AF, ref, alt = line.split('\t')
-        if AF >= 0.05:
-                key = chrom+'|'+start+'|'+stop
-                intervalmap[key] = [ref,alt]
+#       AF = AF.split(',')
+#       #if float(AF[-1]) < 0.05:       #CHANGED FOR LOW FREQ
+#        if float(AF[0]) >= 0.05:        #CHANGED FOR HIGH FREQ
+        key = chrom+'|'+start+'|'+stop
+        intervalmap[key] = [ref,alt]
 
 
 oldstart = 0
@@ -23,6 +25,8 @@ pan = ''
 gor = ''
 pon = ''
 nom = ''
+
+
 
 infile.readline() #remove header
 
@@ -37,6 +41,7 @@ for line in infile:
                 missing =  11 - linelen
                 for i in range(0,missing):
                         line = line + '\t'
+
 
 
         if newstart != oldstop:
