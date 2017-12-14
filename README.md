@@ -164,7 +164,7 @@ The .collapsed file describes the final error rates in given intervals.
 	
 	`for a in *n; do cut -f1,2,3,4,5 $a > ../GFF/$a; done;`
 	
-	#Repeat for Di, Tri and Tetra
+	Repeat for Di, Tri and Tetra
 	
 5. Prepare windows for study:	#we still have an issue of features bigger than windows overlapping with surronding windows
 	
