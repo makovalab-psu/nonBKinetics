@@ -53,7 +53,7 @@ Features Types to Retrieve: choose all but Short Tandem Repeats
 
 ##Microsat annotation:
 
-Gottern from Chai. Need to be shared
+Microsatellites annotation files obtained through STR-FM (see Fungtammasan, A. et al. Accurate typing of short tandem repeats from genome-wide sequencing data and its applications. Genome Res.2015.)
 
 
 ##1000Genomes Project VCF files :
@@ -113,13 +113,59 @@ The .collapsed file describes the final error rates in given intervals.
 **deletion rate** as fraction <0,1>
 
 #MODULES
-##Non-B DB and STR annotations.
 
-Non-B DB annotation files downloaded at: https://nonb-abcc.ncifcrf.gov/apps/Query-GFF/feature/
+##Steps to prepare IPD and Depth data in PacBio:
 
-Microsatellites annotation files obtained through STR-FM (see Fungtammasan, A. et al. Accurate typing of short tandem repeats from genome-wide sequencing data and its applications. Genome Res.2015.)
+1. Download and extract the data
+2. Recover *.bax.h5
+3. Aligning:
+	pbalign --nproc 8 $inp ./hg19.fa ${inp}.cmp.h5 --forQuiver --metrics IPD
+	nproc: number of processor used - depends on your machine
+4. Merge alignment into one file:
+	find ./ -name "*cmp.h5" -type f -exec cmph5tools.py merge --outFile out_all.cmp.h5 {} +
+5. Sanity checks: 
+	use coverage.py (see explaination inside script) ?
+	cmph5tools.py summarize out_all.cmp.h5
+6. Deep sort alignment (optional?):
+	cmph5tools.py sort --deep out_all.cmp.h5
+7. Separate alignment in chromosomes:
+	cmph5tools.py select --where "(Reference == 'chr${inp}')" --outFile chr${inp}.cmp.h5 out_all.cmp.h5
+8. Compute IPDs:
+	ipdSummary.py $inp --reference ../hg19.fa --outfile ${inp}.idp
+	cat *pickle > 52X.pickle
+	python cleanIPD.py 52X.pickle > 52XIPD
+9. Compute Depth:
+	python cleanDepth.py 52X.pickle > 52XDepth
 
-Microsatellites alignment and collapsing done in: *MicrosatAnnotation/bash_microsat.sh*
+
+##Steps to prepare IWT input:
+
+1. Download non-B DNA annotation
+2. Filter G4 into G4Plus and G4Minus and format:
+	grep '+' G_Quadruplex_Motifs | cut -f 1-6 > G4Plus
+3. Format unstranded motifs:
+	cut -f 1-6 Direct_Repeats > DirectRepeats
+4. Format Microsat Annotation:
+	python format.py all.per1.TRs.bed.10 Mono
+	python line_up_microsats.py Mono > Mono.aligned
+	python parse_repeats.py Mono.aligned
+	for a in *n; do cut -f1,2,3,4,5 $a > ../GFF/$a; done;
+	#Repeat for Di, Tri and Tetra
+5. Prepare windows for study:	#we still have an issue of features bigger than windows overlapping with surronding windows
+	python ../prepare_windows.py ../GFF/ > Windows_Ready
+6. Sort windows:	#/!\ This step is critical /!\ Make sure sorting was properly performed /!\
+	cat Windows_Ready | env LC_ALL=C sort -k 1,1d -k 2,2n > Windows_Sorted
+7. Collect values in windows:	#adjust collect_values_in_windows.py for F or R
+	python ../collect_values_in_windows.py Windows_Sorted 52XIPD > Windows_Collected_F
+	python ../collect_values_in_windows.py Windows_Sorted 52XIPD > Windows_Collected_R
+8. Split by feature:
+	python ../../split_by_feature.py Windows_Collected_F
+	python ../../split_by_feature.py Windows_Collected_R
+9. IPD data now ready for IWT. ReDo step 7 and 8 with 52XDepth for IWT on Depth.
+
+
+
+
 
 
 ##Interval-Wise Testing for differences in IPDs. 
