@@ -147,25 +147,45 @@ The .collapsed file describes the final error rates in given intervals.
 
 1. Download non-B DNA annotation
 2. Filter G4 into G4Plus and G4Minus and format:
-	grep '+' G_Quadruplex_Motifs | cut -f 1-6 > G4Plus
+
+	`grep '+' G_Quadruplex_Motifs | cut -f 1-6 > G4Plus`
+	
 3. Format unstranded motifs:
-	cut -f 1-6 Direct_Repeats > DirectRepeats
+
+	`cut -f 1-6 Direct_Repeats > DirectRepeats`
+	
 4. Format Microsat Annotation:
-	python format.py all.per1.TRs.bed.10 Mono
-	python line_up_microsats.py Mono > Mono.aligned
-	python parse_repeats.py Mono.aligned
-	for a in *n; do cut -f1,2,3,4,5 $a > ../GFF/$a; done;
+
+	`python format.py all.per1.TRs.bed.10 Mono`
+	
+	`python line_up_microsats.py Mono > Mono.aligned`
+	
+	`python parse_repeats.py Mono.aligned`
+	
+	`for a in *n; do cut -f1,2,3,4,5 $a > ../GFF/$a; done;`
+	
 	#Repeat for Di, Tri and Tetra
+	
 5. Prepare windows for study:	#we still have an issue of features bigger than windows overlapping with surronding windows
-	python ../prepare_windows.py ../GFF/ > Windows_Ready
-6. Sort windows:	#/!\ This step is critical /!\ Make sure sorting was properly performed /!\
-	cat Windows_Ready | env LC_ALL=C sort -k 1,1d -k 2,2n > Windows_Sorted
+	
+	`python ../prepare_windows.py ../GFF/ > Windows_Ready`
+	
+6. Sort windows:	#/!\ This step is error prone /!\ Make sure sorting was properly performed /!\
+	
+	`cat Windows_Ready | env LC_ALL=C sort -k 1,1d -k 2,2n > Windows_Sorted`
+	
 7. Collect values in windows:	#adjust collect_values_in_windows.py for F or R
-	python ../collect_values_in_windows.py Windows_Sorted 52XIPD > Windows_Collected_F
-	python ../collect_values_in_windows.py Windows_Sorted 52XIPD > Windows_Collected_R
+	
+	`python ../collect_values_in_windows.py Windows_Sorted 52XIPD > Windows_Collected_F`
+	
+	`python ../collect_values_in_windows.py Windows_Sorted 52XIPD > Windows_Collected_R`
+	
 8. Split by feature:
-	python ../../split_by_feature.py Windows_Collected_F
-	python ../../split_by_feature.py Windows_Collected_R
+
+	`python ../../split_by_feature.py Windows_Collected_F`
+	
+	`python ../../split_by_feature.py Windows_Collected_R`
+	
 9. IPD data now ready for IWT. ReDo step 7 and 8 with 52XDepth for IWT on Depth.
 
 
