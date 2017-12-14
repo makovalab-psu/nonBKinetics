@@ -51,6 +51,34 @@ Query Type: all features for the region
 Features Types to Retrieve: choose all but Short Tandem Repeats
 
 
+##Microsat annotation:
+
+Gottern from Chai. Need to be shared
+
+
+##1000Genomes Project VCF files :
+
+Download files from url:
+
+ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/
+
+
+##Multi-Z Alignment:
+
+Download files from url (chromosomes 1 to 22):
+
+http://hgdownload-test.cse.ucsc.edu/goldenPath/hg19/multiz100way/maf/
+
+
+##TCGA:
+
+Url for portal:
+
+https://portal.gdc.cancer.gov/
+
+Proper authentification required, data is not public access. 
+
+
 #FILE FORMATS
 ##.mf
 
