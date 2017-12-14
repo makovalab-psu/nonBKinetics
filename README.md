@@ -27,6 +27,7 @@ This tab delimited file contains 4 required columns:
 ##Genome in a Bottle Son - PacBio
 
 Download files from url:
+
 https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/HG002_NA24385_son/PacBio_MtSinai_NIST/hdf5/
 
 ##Genome in a Bottle Son - Illumina
@@ -37,15 +38,23 @@ Monika please complete
 ##non-B DNA annotation
 
 Url for portal:
+
 https://nonb-abcc.ncifcrf.gov/apps/Query-GFF/feature/
 
 Enter following options:
+
 Species: Human
+
 Classes: NonBDAS
+
 Search by Type: Chromosome
+
 Chromosome: 1 to 22 (one chromosome at a time only)
+
 Query Type: all features for the region
+
 Features Types to Retrieve: choose all but Short Tandem Repeats
+
 
 
 
