@@ -122,7 +122,9 @@ The .collapsed file describes the final error rates in given intervals.
 	`cmph5tools.py select --where "(Reference == 'chr${inp}')" --outFile chr${inp}.cmp.h5 out_all.cmp.h5`
 8. Compute IPDs:
 	`ipdSummary.py $inp --reference ../hg19.fa --outfile ${inp}.idp`
+	
 	`cat *pickle > 52X.pickle`
+	
 	`python cleanIPD.py 52X.pickle > 52XIPD`
 9. Compute Depth:
 	`python cleanDepth.py 52X.pickle > 52XDepth`
