@@ -17,11 +17,6 @@ Python 2.7.3 (default, Mar 13 2014, 11:03:55)
 
 Naive Variant Caller, from modified version at tools-blankenberg/tools/naive_variant_caller/tools/naive_variant_caller.py
 
-#FILE FORMATS
-##.mf
-
-The .mf file describes the interval of interest and thus overlaps with non-B DNA annotations. This file format will either contain feature-restricted intervals or full 100bp windows.
-This tab delimited file contains 4 required columns:
 
 #DATA SOURCE
 ##Genome in a Bottle Son - PacBio
@@ -56,7 +51,11 @@ Query Type: all features for the region
 Features Types to Retrieve: choose all but Short Tandem Repeats
 
 
+#FILE FORMATS
+##.mf
 
+The .mf file describes the interval of interest and thus overlaps with non-B DNA annotations. This file format will either contain feature-restricted intervals or full 100bp windows.
+This tab delimited file contains 4 required columns:
 
 **chromosome**
 
