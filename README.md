@@ -23,6 +23,32 @@ Naive Variant Caller, from modified version at tools-blankenberg/tools/naive_var
 The .mf file describes the interval of interest and thus overlaps with non-B DNA annotations. This file format will either contain feature-restricted intervals or full 100bp windows.
 This tab delimited file contains 4 required columns:
 
+#DATA SOURCE
+##Genome in a Bottle Son - PacBio
+
+Download files from url:
+https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/HG002_NA24385_son/PacBio_MtSinai_NIST/hdf5/
+
+##Genome in a Bottle Son - Illumina
+
+Monika please complete
+
+
+##non-B DNA annotation
+
+Url for portal:
+https://nonb-abcc.ncifcrf.gov/apps/Query-GFF/feature/
+
+Enter following options:
+Species: Human
+Classes: NonBDAS
+Search by Type: Chromosome
+Chromosome: 1 to 22 (one chromosome at a time only)
+Query Type: all features for the region
+Features Types to Retrieve: choose all but Short Tandem Repeats
+
+
+
 **chromosome**
 
 **start** in 1-based format
