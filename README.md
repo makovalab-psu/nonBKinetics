@@ -109,18 +109,31 @@ The .collapsed file describes the final error rates in given intervals.
 1. Download and extract the data
 2. Recover *.bax.h5
 3. Aligning:
+
 	`pbalign --nproc 8 $inp ./hg19.fa ${inp}.cmp.h5 --forQuiver --metrics IPD`
+	
 	nproc: number of processor used - depends on your machine
+	
 4. Merge alignment into one file:
+
 	`find ./ -name "*cmp.h5" -type f -exec cmph5tools.py merge --outFile out_all.cmp.h5 {} +`
+	
 5. Sanity checks: 
+
 	use coverage.py (see explaination inside script) ?
+	
 	`cmph5tools.py summarize out_all.cmp.h5`
+	
 6. Deep sort alignment (optional?):
+
 	`cmph5tools.py sort --deep out_all.cmp.h5`
+	
 7. Separate alignment in chromosomes:
+
 	`cmph5tools.py select --where "(Reference == 'chr${inp}')" --outFile chr${inp}.cmp.h5 out_all.cmp.h5`
+	
 8. Compute IPDs:
+
 	`ipdSummary.py $inp --reference ../hg19.fa --outfile ${inp}.idp`
 	
 	`cat *pickle > 52X.pickle`
