@@ -19,6 +19,7 @@ Naive Variant Caller, from modified version at tools-blankenberg/tools/naive_var
 
 
 #DATA SOURCE
+
 ##Genome in a Bottle Son - PacBio
 
 Download files from url:
@@ -80,6 +81,7 @@ Proper authentification required, data is not public access.
 
 
 #FILE FORMATS
+
 ##.mf
 
 The .mf file describes the interval of interest and thus overlaps with non-B DNA annotations. This file format will either contain feature-restricted intervals or full 100bp windows.
@@ -190,6 +192,7 @@ The .collapsed file describes the final error rates in given intervals.
 
 
 ###IWT###
+
 Loading data in R in IWTomics format and creating subsamples for test: load_IPD_data.r
 
 Perform IWT test and plot results: IWT_IPD.r
@@ -275,79 +278,130 @@ inputs : .mf files, RepeatMasked file, True Variants file
 
 
 ##SMRT sequencing errors
+
 runErrorStatistics_optimized.R, generateErrorsFullWindow.sh and generateErrors.sh scripts
 
 ##Illumina sequencing errors.
+
 #bash_illumina.sh script and its dependencies
 
 Now with Naive Variant Caller:
 
 bash runIlluminaErrorDiscoveryTest.sh Joint/ bam/0 var_output collapsed_output
 
-##Variants from human-orangutan divergence. 
-1. Concatenate all chomosomes multiple alignment
-	cat chr*.maf > WG.maf
+##Variants from human-orangutan divergence.
+
+1. Concatenate all chomosomes multiple alignment:
+
+	`cat chr*.maf > WG.maf`
+	
 2. Filter by species of interest (homo - pongo - rhesus outgroup):
-	python filter_out_maf.py > WG.filtered.maf
+
+	`python filter_out_maf.py > WG.filtered.maf`
+	
 3. Parse for SNPs:
-	mafparser.py WG.filtered.maf > WGSNP.gff
+
+	`mafparser.py WG.filtered.maf > WGSNP.gff`
+	
 4. With use.galaxy.org, parse for INDELs:
-	use .mf files for features and controls
-	use Extract MAF Blocks on .mf files
-	use Fetch Indels on extracted MAF blocks
+	1. use .mf files for features and controls
+	2. use Extract MAF Blocks on .mf files
+	3. use Fetch Indels on extracted MAF blocks
+	
 5. Format Indels in GFF and concatenate:
-	python parse_indels.py indels.fetched > WGINDELS.gff
-	cat WGSNP.gff WGINDELS.gff > Divergence.gff
+
+	`python parse_indels.py indels.fetched > WGINDELS.gff`
+	
+	`cat WGSNP.gff WGINDELS.gff > Divergence.gff`
+	
 6. Intersect variants with features coordinates:
-	bedtools intersect -wa -wb -b Divergence.gff -a ${inp}.gff -loj > ${inp}.
-	python parse_intersect.py ${inp}.intersect > ${inp}.collapsed
-	python reorder.py ${inp}  ${inp}.collapsed
+
+	`bedtools intersect -wa -wb -b Divergence.gff -a ${inp}.gff -loj > ${inp}.intersect`
+	
+	`python parse_intersect.py ${inp}.intersect > ${inp}.collapsed`
+	
+	`python reorder.py ${inp}  ${inp}.collapsed`
+	
 7. Compute number of variants inside features:
-	python rates.py ${inp}.intersect
+
+	`python rates.py ${inp}.intersect`
 
 ##Variants from the 1000 Genomes project.
+
 1. Extract polymorphisms from 1000G VCF files, split by type and frequency range:
-	python filterVCFforMAF.py ALL.chr${X}.* chr${X}
+
+	`python filterVCFforMAF.py ALL.chr${X}.* chr${X}`
+	
 2. Concatenate chromosomes:
-	cat highfreqsnpchr* > highfreqsnp.intervals
-	cat highfreqindelchr* > highfreqindel.intervals
-	cat lowfreqsnpchr* > lowfreqsnp.intervals
-	cat lowfreqindelchr* > lowfreqindel.intervals
+
+	`cat highfreqsnpchr* > highfreqsnp.intervals`
+	
+	`cat highfreqindelchr* > highfreqindel.intervals`
+	
+	`cat lowfreqsnpchr* > lowfreqsnp.intervals`
+	
+	`cat lowfreqindelchr* > lowfreqindel.intervals`
+	
 3. With use.galaxy.org, get multiple alignments (pan, gorilla, pongo, nomascus around indels:
-	extract MAF blocks
-	maf to intervals
+
+	1. extract MAF blocks
+	
+	2. maf to intervals
+	
 4. Polarize indels:
-	python Join.py highfreqindel.maf.intervals highfreqindel.intervals
-	python Polaryze.py highfreqindel.maf.intervals.joined
+
+	`python Join.py highfreqindel.maf.intervals highfreqindel.intervals`
+	
+	`python Polaryze.py highfreqindel.maf.intervals.joined`
+	
 5. Format output in GFF:
-	python Intervals_to_gff.py highfreqsnp.intervals > highfreqsnp.gff
-	python Polarize_to_gff.py highfreqindel.polarized > highfreqindel.gff
-	cat highfreqsnp.gff highfreqindel.gff > highfreq1kG.gff
+
+	`python Intervals_to_gff.py highfreqsnp.intervals > highfreqsnp.gff`
+	
+	`python Polarize_to_gff.py highfreqindel.polarized > highfreqindel.gff`
+	
+	`cat highfreqsnp.gff highfreqindel.gff > highfreq1kG.gff`
+	
 6. Intersect polymorphisms with features coordinates:
-	bedtools intersect -wa -wb -b highfreq.gff -a ${inp}.gff -loj > ${inp}.
-	python parse_intersect.py ${inp}.intersect > ${inp}.collapsed
-	python reorder.py ${inp}  ${inp}.collapsed
+
+	`bedtools intersect -wa -wb -b highfreq.gff -a ${inp}.gff -loj > ${inp}.intersect`
+	
+	`python parse_intersect.py ${inp}.intersect > ${inp}.collapsed`
+	
+	`python reorder.py ${inp}  ${inp}.collapsed`
+
 7. Compute number of polymorphisms inside features:
-	python rates.py ${inp}.intersect
+
+	`python rates.py ${inp}.intersect`
+	
 6. Redo steps 3 to 7 for lowfreq
 
 ##Somatic mutations from The Cancer Genome Atlas.
+
 1. Obtain somatic mutations as described in Material and Methods and format into GFF
 2. Count each segregation site once (a coordinate can happen only once)
 3. Intersect variants with features coordinates:
-	bedtools intersect -wa -wb -b Divergence.gff -a ${inp}.gff -loj > ${inp}.
-	python parse_intersect.py ${inp}.intersect > ${inp}.collapsed
-	python reorder.py ${inp}  ${inp}.collapsed
+
+	`bedtools intersect -wa -wb -b Divergence.gff -a ${inp}.gff -loj > ${inp}.intersect`
+	
+	`python parse_intersect.py ${inp}.intersect > ${inp}.collapsed`
+	
+	`python reorder.py ${inp}  ${inp}.collapsed`
+	
 4. Compute number of variants inside features:
-	python rates.py ${inp}.intersect
+
+	`python rates.py ${inp}.intersect`
 
 ##Estimation of falsely reported errors due to misalignment.
+
 misalignment_simulation.sh and its dependencies
 
 ##Impact of different aligners on calling sequencing errors.
+
 five_aligners.sh and its dependencies
 
-##Comparison of errors and variants between motifs and motif-free regions. 
+##Comparison of errors and variants between motifs and motif-free regions.
+
 error_plots.Rnw
 
 
