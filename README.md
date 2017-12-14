@@ -86,31 +86,21 @@ The .mf file describes the interval of interest and thus overlaps with non-B DNA
 This tab delimited file contains 4 required columns:
 
 1. **chromosome**
-
 2. **start** in 1-based format
-
 3. **end** in 1-based format
-
-4. **feature length** number of nucleotides in feature, note that this field is present in both feature-restricted and 100bp windows. Occassionally, feature can be longer than 100bp. In such cases, we trim it down to 100bp and restrict our analysis to trimmed windows.   
-
+4. **feature length** number of nucleotides in feature, note that this field is present in both feature-restricted and 100bp windows. Occassionally, feature can be longer than 100bp. In such cases, we trim it down to 100bp and restrict our analysis to trimmed windows.
 5. **IPD values** variable number of columns containing IPD values from ipdSummary, each column represents one nucleotide from feature or 100bp window, thus at most 100 IPD values are present
-.collapsed
 
 ##.collapsed
 The .collapsed file describes the final error rates in given intervals.
-**chromosome**
 
-**start** in 1-based format
-
-**end** in 1-based format
-
-**total rate** as fraction <0,1>
-
-**mismatch rate** as fraction <0,1>
-
-**insertion rate** as fraction <0,1>
-
-**deletion rate** as fraction <0,1>
+1. **chromosome**
+2. **start** in 1-based format
+3. **end** in 1-based format
+4. **total rate** as fraction <0,1>
+5. **mismatch rate** as fraction <0,1>
+6. **insertion rate** as fraction <0,1>
+7. **deletion rate** as fraction <0,1>
 
 #MODULES
 
