@@ -79,6 +79,12 @@ https://portal.gdc.cancer.gov/
 
 Proper authentification required, data is not public access. 
 
+##DeCode Trios:
+
+Url for portal:
+
+https://www.ebi.ac.uk/ena/data/view/PRJEB21300
+
 
 #FILE FORMATS
 
@@ -421,6 +427,27 @@ bash runIlluminaErrorDiscoveryTest.sh Joint/ bam/0 var_output collapsed_output
 3. Intersect variants with features coordinates:
 
 	`bedtools intersect -wa -wb -b Divergence.gff -a ${inp}.gff -loj > ${inp}.intersect`
+	
+	`python parse_intersect.py ${inp}.intersect > ${inp}.collapsed`
+	
+	`python reorder.py ${inp}  ${inp}.collapsed`
+	
+4. Compute number of variants inside features:
+
+	`python rates.py ${inp}.intersect`
+	
+	
+##DeCode Trios:
+
+1. Extract De Novo Mutations from DeCode VCF files and format to GFF:
+
+	'python DeCode2GFF.py'
+	
+2. With use.galaxy.org, use liftOver to change coordinates from hg38 to hg19
+	
+3. Intersect variants with features coordinates:
+
+	`bedtools intersect -wa -wb -b DecodeDNMhg19.gff -a ${inp}.gff -loj > ${inp}.intersect`
 	
 	`python parse_intersect.py ${inp}.intersect > ${inp}.collapsed`
 	
