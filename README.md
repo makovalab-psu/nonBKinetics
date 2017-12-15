@@ -441,7 +441,7 @@ bash runIlluminaErrorDiscoveryTest.sh Joint/ bam/0 var_output collapsed_output
 
 1. Extract De Novo Mutations from DeCode VCF files and format to GFF:
 
-	'python DeCode2GFF.py'
+	`python DeCode2GFF.py`
 	
 2. With use.galaxy.org, use liftOver to change coordinates from hg38 to hg19
 	
