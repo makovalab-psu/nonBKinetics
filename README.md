@@ -182,7 +182,7 @@ The .collapsed file describes the final error rates in given intervals.
 	
 	`python ../collect_values_in_windows.py Windows_Sorted 52XIPD > Windows_Collected_R`
 	
-8. Split by feature:
+8. Split by Featurs:
 
 	`python ../../split_by_feature.py Windows_Collected_F`
 	
@@ -203,6 +203,25 @@ IPD analysis and IWT test for motifs with different length: feature_length_IPD.r
 
 
 ##Effect of sequence composition on IPD.
+
+1. Obtain coordinates of windows: 
+
+	`python bedformatting.py Windows_Collected_F`
+
+2. Get sequence inside each window:
+
+	`bedtools getfasta -s -fi hg19.fa -bed Windows_Collected_F.bed > getFastaF`
+	
+3. Get sequence composition of each window:
+
+	`python compo.py Windows_Collected_F.bed getFastaF > Windows_Collected_F.compo`
+	
+4. Split by Features:
+
+	`python split_by_feature.py Windows_Collected_F.compo`
+	
+5. ReDo steps 1 to 4 with Windows_Collected_R
+
 
 Marzia: is it enough details to be reproduced?
 
