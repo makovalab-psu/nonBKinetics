@@ -193,6 +193,8 @@ The .collapsed file describes the final error rates in given intervals.
 
 ###IWT###
 
+Marzia: is it enough details to be reproduced?
+
 Loading data in R in IWTomics format and creating subsamples for test: load_IPD_data.r
 
 Perform IWT test and plot results: IWT_IPD.r
@@ -200,7 +202,9 @@ Perform IWT test and plot results: IWT_IPD.r
 IPD analysis and IWT test for motifs with different length: feature_length_IPD.r
 
 
-##Effect of sequence composition on IPD. 
+##Effect of sequence composition on IPD.
+
+Marzia: is it enough details to be reproduced?
 
 Sequence composition obtained in: *CompoRegress/bash_comporegress.sh*
 
@@ -209,10 +213,14 @@ Perform sequence composition analysis: sequence_composition_IPD.r
 
 ##Experimental characterization of G-quadruplexes. 
 
+Marzia: is it enough details to be reproduced?
+
 Analyze Tm and delta-epsilon experimental results: thermostability.r
 
 
 #Data formatting
+
+Monika: please complete
 
 generateFeatures.py
 
@@ -241,6 +249,8 @@ Output: 10 folders with matching controls for each motif
 
 #Filtering
 
+Monika: please complete
+
 The accuracy analysis for Illumina and PacBio removed both repeatmasked regions and regions with variants in HG002 compared to hg19.
 Following high quality HG002 calls were used:
 HG002_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-22_v.3.3.2_highconf_triophased.vcf.gz
@@ -254,6 +264,9 @@ filter_out_true_variants.sh
 filter_out_repeatmasked.sh and filter_out_true_variants.sh can be run separately or together in the joint_filtering.sh. 
 
 #Data processing
+
+Monika: please complete
+
 Simple scripts for converting between formats used in our study:
 
 mf_into_gff_and_bed.sh
@@ -265,6 +278,8 @@ convert_gff_to_mf.sh
 gff2mf.py
 
 #Preparing the motif and motif-free windows
+
+Monika: please complete
 
 inputs : .mf files, RepeatMasked file, True Variants file
 
@@ -279,9 +294,13 @@ inputs : .mf files, RepeatMasked file, True Variants file
 
 ##SMRT sequencing errors
 
+Monika: please complete
+
 runErrorStatistics_optimized.R, generateErrorsFullWindow.sh and generateErrors.sh scripts
 
 ##Illumina sequencing errors.
+
+Monika: please complete
 
 #bash_illumina.sh script and its dependencies
 
