@@ -44,7 +44,7 @@ def get_coordinates(gff): # Use the GFF format
         array = line.split('\t')
         if len(array) > 5:                      # Will recognize the GFFs from nonB-DB
             strand = array[6]
-            if strand == '+' or '-':
+            if (strand == '+') or (strand == '-'):
                 chrom = array[0][3:]
                 start = array[3]
                 end = array[4]
@@ -79,7 +79,7 @@ def clean_windows(data):        # Returns non-overlapping windows containing onl
                 chr_dic[chrom] = [[window_start, window_stop, feature, length]]
 
     clean_windows = []
-    for chrom in chr_dic:
+    for chrom in chr_dic: # Here should take into account original start and stop if length > 100
         chr_dic[chrom].sort(key=lambda x:x[0])
         previous_stop = -1
         for i,(start, stop, feature, length) in enumerate(chr_dic[chrom]):
@@ -107,14 +107,14 @@ def empty_windows(clean_windows):       # Find all the ranks containing no featu
     for chrom in uniq_positions:
         empty_positions[chrom] = set(xrange(uniq_positions[chrom][0], uniq_positions[chrom][-1])) - set(positions[chrom])
     chromosomes = []
-    for chrom in empty_positions:
+    for chrom in empty_positions: # This and...
         chromosomes.append(chrom)
     all_empty_positions = []
-    for chrom in empty_positions:
+    for chrom in empty_positions: # ... this and ...
         for position in empty_positions[chrom]:
             all_empty_positions.append([position, chrom])
     windows = []
-    for position in all_empty_positions:
+    for position in all_empty_positions: # ... this should be merged in one chunk
         windows.append([position[1],position[0]*100,position[0]*100+99,100,'Empty'])
 
     return windows
