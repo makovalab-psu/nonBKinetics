@@ -66,29 +66,49 @@ def clean_windows(data):        # Returns non-overlapping windows containing onl
         for start, stop, chrom, length in data[feature]:
             center = (int(start) + int(stop)) / 2.0
             edge = (window_size - 1) / 2.0
-            #length = int(stop) - int(start) + 1
             window_start = int(center - edge)
             window_stop = int(center + edge)
-            rank_start = int(int(window_start)/100)
-            rank_stop = int(int(window_stop)/100)
-            ranks.append(str(rank_start) + '|' + str(chrom))
-            ranks.append(str(rank_stop) + '|' + str(chrom))
+            if int(length) <= window_size:
+                rank_start = int(int(window_start)/window_size)
+                rank_stop = int(int(window_stop)/window_size)
+                ranks.append(str(rank_start) + '|' + str(chrom))
+                ranks.append(str(rank_stop) + '|' + str(chrom))
+            if int(length) > window_size:
+                rank_start = int(int(start)/window_size)
+                rank_stop = int(int(stop)/window_size)
+                for i in range(rank_start,rank_stop+1):
+                    ranks.append(str(i)+'|'+str(chrom))
+
             if chrom in chr_dic:
-                chr_dic[chrom].append([window_start, window_stop, feature, length])
+                chr_dic[chrom].append([window_start, window_stop, start, stop, feature, length])
             else:
-                chr_dic[chrom] = [[window_start, window_stop, feature, length]]
+                chr_dic[chrom] = [[window_start, window_stop, start, stop, feature, length]]
 
     clean_windows = []
-    for chrom in chr_dic: # Here should take into account original start and stop if length > 100
-        chr_dic[chrom].sort(key=lambda x:x[0])
+    for chrom in chr_dic:
+        chr_dic[chrom].sort(key=lambda x:min(x[0],x[2]))
         previous_stop = -1
-        for i,(start, stop, feature, length) in enumerate(chr_dic[chrom]):
-            if i == len(chr_dic[chrom])-1:
-                if start > previous_stop:
-                    clean_windows.append([chrom,start,stop,length,feature])
-            elif start > previous_stop and stop < chr_dic[chrom][i+1][0]:
-                clean_windows.append([chrom,start,stop,length,feature])
-            previous_stop = stop
+        for i,(window_start, window_stop, start, stop, feature, length) in enumerate(chr_dic[chrom]):
+            window_start = int(window_start)
+            window_stop = int(window_stop)
+            start = int(start)
+            stop = int(stop)
+            length = int(length)
+            if int(length) <= window_size:
+                if i == len(chr_dic[chrom])-1:
+                    if window_start > previous_stop:
+                        clean_windows.append([chrom,window_start,window_stop,length,feature])
+                elif window_start > previous_stop and window_stop < chr_dic[chrom][i+1][0] and window_stop < chr_dic[chrom][i+1][2]:
+                    clean_windows.append([chrom,window_start,window_stop,length,feature])
+                previous_stop = window_stop
+            elif int(length) > window_size:
+                if i == len(chr_dic[chrom])-1:
+                    if start > previous_stop:
+                        clean_windows.append([chrom,window_start,window_stop,length,feature])
+                elif start > previous_stop and stop < chr_dic[chrom][i+1][0] and stop < chr_dic[chrom][i+1][2]:
+                    clean_windows.append([chrom,window_start,window_stop,length,feature])
+                previous_stop = stop
+
     return [clean_windows,ranks]
     
 def empty_windows(clean_windows):       # Find all the ranks containing no feature
