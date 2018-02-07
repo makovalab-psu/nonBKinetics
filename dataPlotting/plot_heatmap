@@ -9,17 +9,19 @@ library(data.table)
 #PLOT HEATMAP
 par(bg = "white", las = 1, pty = "s")
 
-errorType<-"MISMATCHES" #CHANGE THE ERROR TYPE HERE
+errorType<-"MISMATCHES"#CHANGE THE ERROR TYPE HERE
 shape<-"rectangles" #triangles|rectangles
 alpha<-0.1
 
 # if TRUE, inconclusive results (the ones with one blue and one red triangles)
 # will have white rectangles
 inconclusive_white=TRUE
+#inconclusive_white=FALSE
 # threhsold on fold-diff for coloring triangles (in absolute value)
-threshold_triangle=1.06
+threshold_triangle=1.11
+#threshold_triangle=0.99
 
-col_code='pvalue' # 'pvalue' or 'folddiff'
+col_code='folddiff' # 'pvalue' or 'folddiff'
 
 #rectangles: 
 #           color is based on difference of total means of motifs versus features
@@ -49,22 +51,34 @@ getVectorOfResults <- function(type,root_folder,extension) {
   return(list(dataMatrix=dftmpVector,pvalues=pvalues))
 }
 
-root_folder<-"/Users/alice/Desktop/projects/kinetics/errors_will/52xAugust14/"
-file_list <-
-  c(
-  paste(root_folder,"pacbio/pacbio_",errorType,".txt",sep=""),
-  paste(root_folder,"illumina/illumina_",errorType,".txt",sep=""),
-  paste(root_folder,"divergence/divergence_",errorType,".txt",sep=""),
-  paste(root_folder,"diversity/diversity_",errorType,".txt",sep=""),
-  paste(root_folder,"TCGA/TCGA_",errorType,".txt",sep="")
-  )
+root_folder<-"/Users/Willou/Documents/Doctoral_Thesis/UntitleProject2017/ReplotFig4/"
+#file_list <-
+#  c(
+#  paste(root_folder,"Pacbio/Pacbio_",errorType,".txt",sep=""),
+#  paste(root_folder,"Illumina/Illumina_",errorType,".txt",sep=""),
+#  paste(root_folder,"Divergence/Divergence_",errorType,".txt",sep=""),
+#  paste(root_folder,"Diversity/Diversity_high_",errorType,".txt",sep=""),
+#  paste(root_folder,"TCGA/TCGA_",errorType,".txt",sep="")
+#  )
 
 extension<-paste0(errorType,".txt")
-Pacbio <- getVectorOfResults("pacbio",root_folder,extension)
-Illumina <- getVectorOfResults("illumina",root_folder,extension)
-Divergence <- getVectorOfResults("divergence",root_folder,extension)
-Diversity <- getVectorOfResults("diversity",root_folder,extension)
+Pacbio <- getVectorOfResults("Pacbio",root_folder,extension)
+Illumina <- getVectorOfResults("Illumina_fwd2",root_folder,extension)
+Divergence <- getVectorOfResults("Divergence",root_folder,extension)
+Diversity <- getVectorOfResults("Diversity_high",root_folder,extension)
 TCGA <- getVectorOfResults("TCGA",root_folder,extension)
+
+#Pacbio <- getVectorOfResults("Illumina_rev2",root_folder,extension)
+#Illumina <- getVectorOfResults("Illumina_fwd1",root_folder,extension)
+#Divergence <- getVectorOfResults("Illumina_fwd2",root_folder,extension)
+#Diversity <- getVectorOfResults("Illumina_rev1",root_folder,extension)
+#TCGA <- getVectorOfResults("Illumina_1",root_folder,extension)
+
+#Pacbio <- getVectorOfResults("Illumina_rev2",root_folder,extension)
+#Illumina <- getVectorOfResults("Illumina_fwd1",root_folder,extension)
+#Divergence <- getVectorOfResults("Diversity_low",root_folder,extension)
+#Diversity <- getVectorOfResults("Diversity_high",root_folder,extension)
+#TCGA <- getVectorOfResults("TCGA",root_folder,extension)
 
 dataPacBio<-Pacbio$dataMatrix
 dataIllumina<-Illumina$dataMatrix
@@ -87,7 +101,7 @@ print(as.data.frame(TCGA$pvalues))
 header<-as.data.frame(read.table(paste0(root_folder,"header.txt"),header=FALSE,sep="\t"))
 
 require(reshape2)
-df<-t(melt(data.frame(dataPacBio,dataIllumina,dataDiversity,dataDivergence,dataTCGA)))
+df<-t(melt(data.frame(dataPacBio,dataIllumina,dataDivergence,dataDiversity,dataTCGA)))
 df<-rbind(header,df)
 
 #dataset <- do.call("rbind",lapply(file_list,
@@ -158,6 +172,9 @@ getColor <- function(significance, sign) {
 getColor_folddiff <- function(significance, folddiff) {
   col_folddiff=colorRampPalette(c("navy", "white", "red"))(n=7)
   if(significance>alpha){
+    return('white')
+  }
+  if(is.na(folddiff)){
     return('white')
   }
   if(folddiff<(-2)){
@@ -291,10 +308,14 @@ for (technology in seq(3, nrow(data), 1)) {
       } else {
         if (shape == "triangles") {
           #upper left
-          if(col_code=='pvalue'){
-            color=getColor(result$significance[i], sign(result$zeros[i]))
+          if(is.na(cell_value)){
+            color='white'
           }else{
-            color=getColor_folddiff(result$significance[i], result$zeros[i])
+            if(col_code=='pvalue'){
+              color=getColor(result$significance[i], sign(result$zeros[i]))
+            }else{
+              color=getColor_folddiff(result$significance[i], result$zeros[i])
+            }
           }
           polygon(
             c(x, x, x + (sizeToPlot), x),
@@ -303,10 +324,14 @@ for (technology in seq(3, nrow(data), 1)) {
             lty = 0
           )
           #bottom right
-          if(col_code=='pvalue'){
-            color=getColor(result$significance[i], sign(result$effect[i]))
+          if(is.na(cell_value)){
+            color='white'
           }else{
-            color=getColor_folddiff(result$significance[i], result$effect[i])
+            if(col_code=='pvalue'){
+              color=getColor(result$significance[i], sign(result$effect[i]))
+            }else{
+              color=getColor_folddiff(result$significance[i], result$effect[i])
+            }
           }
           polygon(
             c(x, x + (sizeToPlot), x + (sizeToPlot), x),
