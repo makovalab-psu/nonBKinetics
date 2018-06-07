@@ -199,11 +199,17 @@ The .collapsed file describes the final error rates in given intervals.
 
 ###IWT###
 
-Loading data in R in IWTomics format and creating subsamples for test: load_IPD_data.r
+1. Loading data in R in IWTomics format and creating subsamples for test: 
 
-Perform IWT test and plot results: IWT_IPD.r
+	`load_IPD_data.r`
 
-IPD analysis and IWT test for motifs with different length: feature_length_IPD.r
+2. Perform IWT test and plot results: 
+
+	`IWT_IPD.r`
+
+3. IPD analysis and IWT test for motifs with different length: 
+
+	`feature_length_IPD.r`
 
 
 ##Effect of sequence composition on IPD.
@@ -227,18 +233,20 @@ IPD analysis and IWT test for motifs with different length: feature_length_IPD.r
 5. ReDo steps 1 to 4 with Windows_Collected_R
 
 
-Marzia: is it enough details to be reproduced?
+
 
 Sequence composition obtained in: *CompoRegress/bash_comporegress.sh*
 
-Perform sequence composition analysis: sequence_composition_IPD.r
+6. Perform sequence composition analysis: 
+
+	`sequence_composition_IPD.r`
 
 
 ##Experimental characterization of G-quadruplexes. 
 
-Marzia: is it enough details to be reproduced?
-
-Analyze Tm and delta-epsilon experimental results: thermostability.r
+1. Analyze Tm and delta-epsilon experimental results: 
+	
+	`thermostability.r`
 
 
 #Data formatting
