@@ -199,8 +199,6 @@ The .collapsed file describes the final error rates in given intervals.
 
 ###IWT###
 
-Marzia: is it enough details to be reproduced?
-
 Loading data in R in IWTomics format and creating subsamples for test: load_IPD_data.r
 
 Perform IWT test and plot results: IWT_IPD.r
