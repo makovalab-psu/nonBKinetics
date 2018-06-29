@@ -28,7 +28,7 @@ https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/HG002_NA24385_so
 
 ##Genome in a Bottle Son - Illumina
 
-Monika please complete
+---
 
 
 ##non-B DNA annotation
@@ -251,7 +251,7 @@ Sequence composition obtained in: *CompoRegress/bash_comporegress.sh*
 
 #Data formatting
 
-Monika: please complete
+---
 
 generateFeatures.py
 
@@ -280,7 +280,7 @@ Output: 10 folders with matching controls for each motif
 
 #Filtering
 
-Monika: please complete
+---
 
 The accuracy analysis for Illumina and PacBio removed both repeatmasked regions and regions with variants in HG002 compared to hg19.
 Following high quality HG002 calls were used:
@@ -296,7 +296,7 @@ filter_out_repeatmasked.sh and filter_out_true_variants.sh can be run separately
 
 #Data processing
 
-Monika: please complete
+---
 
 Simple scripts for converting between formats used in our study:
 
@@ -310,7 +310,7 @@ gff2mf.py
 
 #Preparing the motif and motif-free windows
 
-Monika: please complete
+---
 
 inputs : .mf files, RepeatMasked file, True Variants file
 
@@ -325,13 +325,13 @@ inputs : .mf files, RepeatMasked file, True Variants file
 
 ##SMRT sequencing errors
 
-Monika: please complete
+---
 
 runErrorStatistics_optimized.R, generateErrorsFullWindow.sh and generateErrors.sh scripts
 
 ##Illumina sequencing errors.
 
-Monika: please complete
+---
 
 #bash_illumina.sh script and its dependencies
 
