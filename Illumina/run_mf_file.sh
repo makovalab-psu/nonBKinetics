@@ -50,8 +50,12 @@ out=$( basename "$motif_file" )
 for chromosome in "${array[@]}"; do 
 	echo $chromosome; 
 	grep "^${chromosome}\b" ${var_folder}/${motif}.bed >${var_folder}/${chromosome}_${motif}.bed
+	#restrict bam file to regions of interest only
+	samtools view -h -b -L ${var_folder}/${chromosome}_${motif}.bed ${bam_folder}/${chromosome}.bam >${var_folder}/${chromosome}_${motif}.bam
+	samtools index ${var_folder}/${chromosome}_${motif}.bam
+
 	#samtools mpileup ${bam_folder}/chr${chromosome}.cmp.h5.bam -f $reference -l ${motif_file} -uv --min-MQ 0 --no-BAQ --adjust-MQ 0 --open-prob 0 --excl-flags UNMAP,DUP -Q 0 -D -t INFO/DPR >${var_folder}/${chromosome}_${out}.mp & 
-	time srun -C new --nodes=1 --ntasks=1 --time=INFINITE python /galaxy/home/biomonika/NVC/naive_variant_caller_for_region_file.py --bam=${bam_folder}/${chromosome}.bam --index=${bam_folder}/${chromosome}.bam.bai --reference_genome_filename=${reference} --regions_filename=${var_folder}/${chromosome}_${motif}.bed --output_vcf_filename=${var_folder}/${chromosome}_${out}.vcf &
+	time srun -C new --nodes=1 --ntasks=1 --time=INFINITE python /galaxy/home/biomonika/NVC/naive_variant_caller_for_region_file.py --bam=${var_folder}/${chromosome}_${motif}.bam --index=${var_folder}/${chromosome}_${motif}.bam.bai --reference_genome_filename=${reference} --regions_filename=${var_folder}/${chromosome}_${motif}.bed --output_vcf_filename=${var_folder}/${chromosome}_${out}.vcf &
 done; 
 wait #all chromosomes call variants/errors in parallel
 
@@ -73,8 +77,8 @@ then
 	cat ${var_folder}/*_${motif}.vcf | grep -v "^#" | sort -T ${var_folder} >${var_folder}/${motif}.vcf; 
 	echo "Convert .vcf files with vcf output into .gff"
 	python NVC_to_gff.py --file ${var_folder}/${motif}.vcf | sort -k1,1 -k4,4n -T ${var_folder} > ${var_folder}/${motif}.split.gff
-	echo "Remove concatenated .vcf file"
-	rm ${var_folder}/${motif}.vcf
+	#echo "Remove concatenated .vcf file"
+	#rm ${var_folder}/${motif}.vcf
 
 	if [ -s ${var_folder}/${motif}.split.gff ]
 	then
