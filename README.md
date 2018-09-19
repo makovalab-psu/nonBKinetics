@@ -475,7 +475,10 @@ five_aligners.sh and its dependencies
 
 error_plots.Rnw
 
+This needs to be updated (3 clouds figure)
 
 
 #Data plotting
 plot_heatmap
+
+This needs to be updated (now a table)
