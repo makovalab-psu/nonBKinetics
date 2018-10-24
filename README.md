@@ -1,6 +1,10 @@
 # README #
 
-This repository accompanies the paper *Non-B DNA affects polymerization speed and error rate in sequencers and living cells*
+This repository accompanies the paper *Long-read sequencing technology indicates genome-wide effects of non-B DNA on polymerization speed and error rate *
+
+All figures and tables were created with scripts present in that directory. Supplementary Figures/Tables deriving from main Figures/Tables are not described in details in this README as they were generated with the same scripts, usually by filtering the inputs.
+
+Please check that your version of this repository is up to date (https://bitbucket.org/makova-lab/kinetics_wmm)
 
 * 1.0.0
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
@@ -20,14 +24,13 @@ Naive Variant Caller, from modified version at tools-blankenberg/tools/naive_var
 
 #DATA SOURCE
 
+---
+
 ##Genome in a Bottle Son - PacBio
 
 Download files from url:
 
 https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/HG002_NA24385_son/PacBio_MtSinai_NIST/hdf5/
-
-
----
 
 
 ##non-B DNA annotation
@@ -70,9 +73,9 @@ Download files from url (chromosomes 1 to 22):
 http://hgdownload-test.cse.ucsc.edu/goldenPath/hg19/multiz100way/maf/
 
 
+#CUSTOM FILE FORMATS
 
-
-#FILE FORMATS
+---
 
 ##.mf
 
@@ -96,7 +99,10 @@ The .collapsed file describes the final error rates in given intervals.
 6. **insertion rate** as fraction <0,1>
 7. **deletion rate** as fraction <0,1>
 
-#MODULES
+
+#FIGURE 2
+
+---
 
 ##Steps to prepare IPD and Depth data in PacBio:
 
@@ -184,7 +190,7 @@ The .collapsed file describes the final error rates in given intervals.
 9. IPD data now ready for IWT. ReDo step 7 and 8 with 52XDepth for IWT on Depth.
 
 
-###IWT###
+##Run IWT
 
 1. Loading data in R in IWTomics format and creating subsamples for test: 
 
@@ -220,8 +226,6 @@ The .collapsed file describes the final error rates in given intervals.
 5. ReDo steps 1 to 4 with Windows_Collected_R
 
 
-
-
 Sequence composition obtained in: *CompoRegress/bash_comporegress.sh*
 
 6. Perform sequence composition analysis: 
@@ -229,11 +233,22 @@ Sequence composition obtained in: *CompoRegress/bash_comporegress.sh*
 	`sequence_composition_IPD.r`
 
 
+
+#FIGURE 3
+
+---
+
 ##Experimental characterization of G-quadruplexes. 
 
 1. Analyze Tm and delta-epsilon experimental results: 
 	
 	`IPD/thermostability.r`
+
+
+#FIGURE 4
+
+---
+
 
 
 #Data formatting
