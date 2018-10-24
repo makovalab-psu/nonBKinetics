@@ -348,7 +348,7 @@ Input needed: GQuadPlus (from FIGURE 2) , Genome in a Bottle bam file (only chr2
 
 4. Build the histograms:
 
-	`Rscript plothistograms.r'
+	`Rscript plothistograms.r`
 
 
 
@@ -357,6 +357,12 @@ Input needed: GQuadPlus (from FIGURE 2) , Genome in a Bottle bam file (only chr2
 #SUPPLEMENTARY NOTE 2
 
 ---
+
+
+TODO
+
+
+
 
 #SUPPLEMENTARY NOTE 4 & TABLE S9
 
@@ -453,7 +459,7 @@ Input needed: GQuadPlus (from FIGURE 2) , Genome in a Bottle bam file (only chr2
 
 
 
-
+TO FINISH
 
 
 
@@ -464,28 +470,7 @@ Input needed: GQuadPlus (from FIGURE 2) , Genome in a Bottle bam file (only chr2
 ---
 
 
+TODO
 
 
 
-
-
-
-##Estimation of falsely reported errors due to misalignment.
-
-misalignment_simulation.sh and its dependencies
-
-##Impact of different aligners on calling sequencing errors.
-
-five_aligners.sh and its dependencies
-
-##Comparison of errors and variants between motifs and motif-free regions.
-
-error_plots.Rnw
-
-This needs to be updated (3 clouds figure)
-
-
-#Data plotting
-plot_heatmap
-
-This needs to be updated (now a table)
