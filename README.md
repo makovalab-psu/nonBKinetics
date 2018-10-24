@@ -334,7 +334,7 @@ Input needed: GQuadPlus (from FIGURE 2) , Genome in a Bottle bam file (only chr2
 
 1. Create the flanks:
 
-	`python flanking.py'
+	`python flanking.py`
 	
 2. Find the position of read ends:
 
