@@ -32,6 +32,7 @@ Download files from url:
 
 https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/HG002_NA24385_son/PacBio_MtSinai_NIST/hdf5/
 
+https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/HG002_NA24385_son/PacBio_MtSinai_NIST/MtSinai_blasr_bam_GRCh37/
 
 ##non-B DNA annotation
 
@@ -254,31 +255,8 @@ Sequence composition obtained in: *CompoRegress/bash_comporegress.sh*
 
 ---
 
+##Data formatting
 
-#SUPPLEMENTARY NOTE 1
-
----
-
-#SUPPLEMENTARY NOTE 2
-
----
-
-#SUPPLEMENTARY NOTE 4
-
----
-
-#FIGURE S5
-
----
-
-
-
-
-
-
-#Data formatting
-
----
 
 generateFeatures.py
 
@@ -307,11 +285,10 @@ Input: folder with .mf files; we will generate 10 controls for these files
 Output: 10 folders with matching controls for each motif
 
 
-#Filtering
+##Filtering
 
----
 
-The accuracy analysis for Illumina and PacBio removed both repeatmasked regions and regions with variants in HG002 compared to hg19.
+The accuracy analysis for PacBio removed both repeatmasked regions and regions with variants in HG002 compared to hg19.
 Following high quality HG002 calls were used:
 HG002_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-22_v.3.3.2_highconf_triophased.vcf.gz
 
@@ -323,23 +300,9 @@ filter_out_true_variants.sh
 
 filter_out_repeatmasked.sh and filter_out_true_variants.sh can be run separately or together in the joint_filtering.sh. 
 
-#Data processing
 
----
+##Preparing the motif and motif-free windows
 
-Simple scripts for converting between formats used in our study:
-
-mf_into_gff_and_bed.sh
-
-mf2gff.sh
-
-convert_gff_to_mf.sh
-
-gff2mf.py
-
-#Preparing the motif and motif-free windows
-
----
 
 inputs : .mf files, RepeatMasked file, True Variants file
 
@@ -354,11 +317,50 @@ inputs : .mf files, RepeatMasked file, True Variants file
 
 ##SMRT sequencing errors
 
----
 
 runErrorStatistics_optimized.R, generateErrorsFullWindow.sh and generateErrors.sh scripts
 
 
+
+
+
+
+#SUPPLEMENTARY NOTE 1
+
+---
+
+
+Input needed: GQuadPlus (from FIGURE 2) , Genome in a Bottle bam file (only chr21 reported in manuscript)
+
+1. Create the flanks:
+
+	`python flanking.py'
+	
+2. Find the position of read ends:
+
+	`python readends.py`
+
+3. Intersect and return as tab-delimited file:
+
+	`bedtools intersect -wa -wb -a GQuadPlus2kflanks.gff -b chr21Ends.gff > GQuadPlus2kflanks_chr21Ends.intersect`
+
+	`python Intersect2csv.py`
+
+4. Build the histograms:
+
+	`Rscript plothistograms.r'
+
+
+
+
+
+#SUPPLEMENTARY NOTE 2
+
+---
+
+#SUPPLEMENTARY NOTE 4 & TABLE S9
+
+---
 
 ##Variants from human-orangutan divergence.
 
@@ -385,7 +387,7 @@ runErrorStatistics_optimized.R, generateErrorsFullWindow.sh and generateErrors.s
 	
 	`cat WGSNP.gff WGINDELS.gff > Divergence.gff`
 	
-6. Intersect variants with features coordinates:
+6. Intersect variants with features coordinates - use .gff created in TABLE 1:
 
 	`bedtools intersect -wa -wb -b Divergence.gff -a ${inp}.gff -loj > ${inp}.intersect`
 	
@@ -435,7 +437,7 @@ runErrorStatistics_optimized.R, generateErrorsFullWindow.sh and generateErrors.s
 	
 	`cat highfreqsnp.gff highfreqindel.gff > highfreq1kG.gff`
 	
-6. Intersect polymorphisms with features coordinates:
+6. Intersect polymorphisms with features coordinates - use .gff created in TABLE 1:
 
 	`bedtools intersect -wa -wb -b highfreq.gff -a ${inp}.gff -loj > ${inp}.intersect`
 	
@@ -447,7 +449,24 @@ runErrorStatistics_optimized.R, generateErrorsFullWindow.sh and generateErrors.s
 
 	`python rates.py ${inp}.intersect`
 	
-6. Redo steps 3 to 7 for lowfreq
+6. Redo steps 3 to 7 for lowfreq (not presented in manuscript)
+
+
+
+
+
+
+
+
+
+#FIGURE S5
+
+---
+
+
+
+
+
 
 
 
