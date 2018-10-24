@@ -8,8 +8,8 @@ This repository accompanies the paper *Non-B DNA affects polymerization speed an
 #Sofware versions
 
 Samtools : Version: 1.3.1 (using htslib 1.3.1)
-Bedtools : Version:   v2.26.0
-Bedops   : Version:  2.4.20
+Bedtools : Version: v2.26.0
+Bedops   : Version: 2.4.20
 
 PacificBiosciences SMRT-Link :  smrtanalysis-2.3.0
 
@@ -26,7 +26,6 @@ Download files from url:
 
 https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/HG002_NA24385_son/PacBio_MtSinai_NIST/hdf5/
 
-##Genome in a Bottle Son - Illumina
 
 ---
 
@@ -52,7 +51,7 @@ Query Type: all features for the region
 Features Types to Retrieve: choose all but Short Tandem Repeats
 
 
-##Microsat annotation:
+##Microsatellites annotation:
 
 Microsatellites annotation files obtained through STR-FM (see Fungtammasan, A. et al. Accurate typing of short tandem repeats from genome-wide sequencing data and its applications. Genome Res.2015.)
 
@@ -71,19 +70,6 @@ Download files from url (chromosomes 1 to 22):
 http://hgdownload-test.cse.ucsc.edu/goldenPath/hg19/multiz100way/maf/
 
 
-##TCGA:
-
-Url for portal:
-
-https://portal.gdc.cancer.gov/
-
-Proper authentification required, data is not public access. 
-
-##DeCode Trios:
-
-Url for portal:
-
-https://www.ebi.ac.uk/ena/data/view/PRJEB21300
 
 
 #FILE FORMATS
@@ -147,6 +133,7 @@ The .collapsed file describes the final error rates in given intervals.
 	`cat *pickle > 52X.pickle`
 	
 	`python cleanIPD.py 52X.pickle > 52XIPD`
+	
 9. Compute Depth:
 	`python cleanDepth.py 52X.pickle > 52XDepth`
 
@@ -188,7 +175,7 @@ The .collapsed file describes the final error rates in given intervals.
 	
 	`python ../collect_values_in_windows.py Windows_Sorted 52XIPD > Windows_Collected_R`
 	
-8. Split by Featurs:
+8. Split by Features:
 
 	`python ../../split_by_feature.py Windows_Collected_F`
 	
@@ -246,7 +233,7 @@ Sequence composition obtained in: *CompoRegress/bash_comporegress.sh*
 
 1. Analyze Tm and delta-epsilon experimental results: 
 	
-	`thermostability.r`
+	`IPD/thermostability.r`
 
 
 #Data formatting
@@ -255,21 +242,23 @@ Sequence composition obtained in: *CompoRegress/bash_comporegress.sh*
 
 generateFeatures.py
 
-
 This script restricts the intervals to features only.
 
 Input: .mf file
 
 Output: .mf file with FeatureOnly suffix
 
-generateEmptyTrack.py script, employing the Linux function shuf
 
+
+generateEmptyTrack.py script, employing the Linux function shuf
 
 This script generates matching controls for each motif by subsampling from motif-free windows.
 
 Input: .mf file, optionally output directory
 
 Output: .mf file
+
+
 
 generateControls.sh
 
@@ -315,7 +304,7 @@ gff2mf.py
 inputs : .mf files, RepeatMasked file, True Variants file
 
 1. mf2gff.sh
-2. filter_out_repeatmasked.sh (Diversity, Divergence, TCGA) & joint_filtering.sh (Genome in a Bottle - Pacbio + Illumina)
+2. filter_out_repeatmasked.sh (Diversity, Divergence) & joint_filtering.sh (Genome in a Bottle - Pacbio)
 	Create sepearte folders for RepeatMasked and Joint
 3. convert_gff_to_mf.sh (use on filtered files. Don't forget to remove the orginal GFFs. Only the output of step 2 will work with that script - needs gff2mf.py)
 4. generateFeatures.py (remove the flanking regions of motifs in their 100bp windows. When original motifs were bigger than 100bp, only kept the 100bp at the center of the motifs)
@@ -329,15 +318,7 @@ inputs : .mf files, RepeatMasked file, True Variants file
 
 runErrorStatistics_optimized.R, generateErrorsFullWindow.sh and generateErrors.sh scripts
 
-##Illumina sequencing errors.
 
----
-
-#bash_illumina.sh script and its dependencies
-
-Now with Naive Variant Caller:
-
-bash runIlluminaErrorDiscoveryTest.sh Joint/ bam/0 var_output collapsed_output
 
 ##Variants from human-orangutan divergence.
 
@@ -354,7 +335,7 @@ bash runIlluminaErrorDiscoveryTest.sh Joint/ bam/0 var_output collapsed_output
 	`mafparser.py WG.filtered.maf > WGSNP.gff`
 	
 4. With use.galaxy.org, parse for INDELs:
-	1. use .mf files for features and controls
+	1. upload .mf files for features and controls
 	2. use Extract MAF Blocks on .mf files
 	3. use Fetch Indels on extracted MAF blocks
 	
@@ -392,11 +373,13 @@ bash runIlluminaErrorDiscoveryTest.sh Joint/ bam/0 var_output collapsed_output
 	
 	`cat lowfreqindelchr* > lowfreqindel.intervals`
 	
-3. With use.galaxy.org, get multiple alignments (pan, gorilla, pongo, nomascus around indels:
+3. With use.galaxy.org, get multiple alignments (pan, gorilla, pongo, nomascus around indels):
 
-	1. extract MAF blocks
+	1. Upload the indel.intervals
+
+	2. extract MAF blocks
 	
-	2. maf to intervals
+	3. maf to intervals
 	
 4. Polarize indels:
 
@@ -426,42 +409,7 @@ bash runIlluminaErrorDiscoveryTest.sh Joint/ bam/0 var_output collapsed_output
 	
 6. Redo steps 3 to 7 for lowfreq
 
-##Somatic mutations from The Cancer Genome Atlas.
 
-1. Obtain somatic mutations as described in Material and Methods and format into GFF
-2. Count each segregation site once (a coordinate can happen only once)
-3. Intersect variants with features coordinates:
-
-	`bedtools intersect -wa -wb -b Divergence.gff -a ${inp}.gff -loj > ${inp}.intersect`
-	
-	`python parse_intersect.py ${inp}.intersect > ${inp}.collapsed`
-	
-	`python reorder.py ${inp}  ${inp}.collapsed`
-	
-4. Compute number of variants inside features:
-
-	`python rates.py ${inp}.intersect`
-	
-	
-##DeCode Trios:
-
-1. Extract De Novo Mutations from DeCode VCF files and format to GFF:
-
-	`python DeCode2GFF.py`
-	
-2. With use.galaxy.org, use liftOver to change coordinates from hg38 to hg19
-	
-3. Intersect variants with features coordinates:
-
-	`bedtools intersect -wa -wb -b DecodeDNMhg19.gff -a ${inp}.gff -loj > ${inp}.intersect`
-	
-	`python parse_intersect.py ${inp}.intersect > ${inp}.collapsed`
-	
-	`python reorder.py ${inp}  ${inp}.collapsed`
-	
-4. Compute number of variants inside features:
-
-	`python rates.py ${inp}.intersect`
 
 ##Estimation of falsely reported errors due to misalignment.
 
