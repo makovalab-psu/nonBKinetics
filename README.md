@@ -250,6 +250,31 @@ Sequence composition obtained in: *CompoRegress/bash_comporegress.sh*
 ---
 
 
+#TABLE 1
+
+---
+
+
+#SUPPLEMENTARY NOTE 1
+
+---
+
+#SUPPLEMENTARY NOTE 2
+
+---
+
+#SUPPLEMENTARY NOTE 4
+
+---
+
+#FIGURE S5
+
+---
+
+
+
+
+
 
 #Data formatting
 
