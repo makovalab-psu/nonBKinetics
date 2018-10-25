@@ -1,1 +1,0 @@
-array=(MISMATCHES INSERTION DELETION TOTAL); for X in "${array[@]}"; do echo $X; cat pacbio/pacbio_${X}.txt illumina/illumina_${X}.txt diversity/diversity_${X}.txt divergence/divergence_${X}.txt TCGA/TCGA_${X}.txt >features_${X}.txt; done;
