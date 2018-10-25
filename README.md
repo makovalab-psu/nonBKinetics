@@ -226,9 +226,6 @@ The .collapsed file describes the final error rates in given intervals.
 	
 5. ReDo steps 1 to 4 with Windows_Collected_R
 
-
-Sequence composition obtained in: *CompoRegress/bash_comporegress.sh*
-
 6. Perform sequence composition analysis: 
 
 	`sequence_composition_IPD.r`
