@@ -248,6 +248,18 @@ The .collapsed file describes the final error rates in given intervals.
 ---
 
 
+1. Create the dataframe:
+
+	`python MergeIPDvsErrors.py errors.collapsed .mf divergence.collapsed diversity.collapsed`
+	
+2. Paste with composition file:
+
+	`paste .compo _IPD_PbError_Div_1kG > _Compo_IPD_PbError_Div_1kG`
+	
+
+
+
+
 #TABLE 1
 
 ---
