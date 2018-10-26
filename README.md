@@ -243,22 +243,6 @@ The .collapsed file describes the final error rates in given intervals.
 	`IPD/thermostability.r`
 
 
-#FIGURE 4
-
----
-
-
-1. Create the dataframe:
-
-	`python MergeIPDvsErrors.py errors.collapsed .mf divergence.collapsed diversity.collapsed`
-	
-2. Paste with composition file:
-
-	`paste .compo _IPD_PbError_Div_1kG > _Compo_IPD_PbError_Div_1kG`
-	
-
-
-
 
 #TABLE 1
 
@@ -326,8 +310,32 @@ inputs : .mf files, RepeatMasked file, True Variants file
 
 ##SMRT sequencing errors
 
+Dependency: runErrorStatistics_optimized.R, reorder_pacbio.py
 
-runErrorStatistics_optimized.R, generateErrorsFullWindow.sh and generateErrors.sh scripts
+
+1. Compute errors:
+
+	`generateErrors.sh`
+
+2. Merge and reorder:
+
+	`merge_and_reorder.sh`
+
+
+
+#FIGURE 4
+
+---
+
+
+1. Create the dataframe:
+
+	`python MergeIPDvsErrors.py errors.collapsed .mf divergence.collapsed diversity.collapsed`
+	
+2. Paste with composition file:
+
+	`paste .compo _IPD_PbError_Div_1kG > _Compo_IPD_PbError_Div_1kG`
+	
 
 
 
