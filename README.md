@@ -188,7 +188,17 @@ The .collapsed file describes the final error rates in given intervals.
 	
 	`python ../../split_by_feature.py Windows_Collected_R`
 	
-9. IPD data now ready for IWT. ReDo step 7 and 8 with 52XDepth for IWT on Depth.
+9. Filter out windows with no IPD and create feature length files (repeat on all files generated at step 8):
+
+	`FILES=./*`
+	`for file in $FILES`
+	`do`
+	`	awk 'BEGIN {OFS=FS="\t"} {$1="chr"$1; if(gsub(/nan/,"NA")<100) print}' $file > $file"_filtered"`
+	`	awk 'BEGIN {OFS=FS="\t"} {print $1, $2, $3, $4}' $file"_filtered" > $file"_filtered_length"`
+	`	sed -i -r 's/(\s+)?\S+//4' $file"_filtered"`
+	`done`
+
+10. IPD data now ready for IWT. ReDo step 7, 8 and 9 with 52XDepth for IWT on Depth.
 
 
 ##Run IWT
@@ -197,7 +207,7 @@ The .collapsed file describes the final error rates in given intervals.
 
 	`load_IPD_data.r`
 
-2. Perform IWT test and plot results: 
+2. Perform IWTomics test and plot results: 
 
 	`IWT_IPD.r`
 
