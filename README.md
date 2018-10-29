@@ -251,7 +251,8 @@ The .collapsed file describes the final error rates in given intervals.
 
 ##Preparing the motif and motif-free windows
 
-inputs : .mf files, RepeatMasked file, True Variants file
+Requires: .mf files, RepeatMasked file with coordinates of repeats i na genome, and a file with high quality calls that contrast sequenced individal with a reference. 
+
 
 1. **Generate corresponding .gff file for each .mf file.** This is because .gff files are suitable for intersection with other datasets.
 
@@ -262,57 +263,32 @@ inputs : .mf files, RepeatMasked file, True Variants file
 	`filter_out_repeatmasked.sh` (Diversity, Divergence) 
 	`joint_filtering.sh` (Genome in a Bottle - Pacbio)
 	
+	Following high quality HG002 calls were used:
+	HG002_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-22_v.3.3.2_highconf_triophased.vcf.gz
+	
+	joint_filtering.sh calls both filter_out_repeatmasked.sh and filter_out_true_variants.sh
+	
 3. **Use new coordinates in order to re-create .mf files that are filtered.** Use on filtered files. Don't forget to remove the orginal GFFs. Only the output of step 2 will work with that script - requires gff2mf.py.
 	`convert_gff_to_mf.sh`
 4.	**Remove the flanking regions around motifs in their 100bp windows.** When original motifs are bigger than 100bp, only keep the 100bp at the center of the motifs (this only affects DirectRepeats).
 	`generateFeatures.py`
 5.  **Generates 10 random controls for each motif.** Requires generateEmptyTrack.py
 	`generateControls.sh`
-
+	Script that generates 10 sets of control datasets.
+	Input: folder with .mf files; we will generate 10 controls for each .mf file
+	Output: 10 folders with matching controls for each motif
 
 ##Data formatting
 
-generateFeatures.py
-
+**generateFeatures.py**
 This script restricts the intervals to features only.
-
 Input: .mf file
-
 Output: .mf file with FeatureOnly suffix
 
-
-
-generateEmptyTrack.py script, employing the Linux function shuf
-
-This script generates matching controls for each motif by subsampling from motif-free windows.
-
+**generateEmptyTrack.py** script
+This script generates matching controls for each motif by subsampling from motif-free windows. Sampling is implemented with the Linux function shuf.
 Input: .mf file, optionally output directory
-
 Output: .mf file
-
-
-
-generateControls.sh
-
-Script that generates 10 sets of control datasets.
-Input: folder with .mf files; we will generate 10 controls for these files
-Output: 10 folders with matching controls for each motif
-
-
-##Filtering
-
-
-The accuracy analysis for PacBio removed both repeatmasked regions and regions with variants in HG002 compared to hg19.
-Following high quality HG002 calls were used:
-HG002_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-22_v.3.3.2_highconf_triophased.vcf.gz
-
-joint_filtering.sh
-
-filter_out_repeatmasked.sh
-
-filter_out_true_variants.sh
-
-filter_out_repeatmasked.sh and filter_out_true_variants.sh can be run separately or together in the joint_filtering.sh. 
 
 
 ##SMRT sequencing errors
