@@ -251,32 +251,34 @@ The .collapsed file describes the final error rates in given intervals.
 
 ##Preparing the motif and motif-free windows
 
-Requires: .mf files, RepeatMasked file with coordinates of repeats i na genome, and a file with high quality calls that contrast sequenced individal with a reference. 
+Requires: .mf files, RepeatMasked file with coordinates of repeats in a genome, and a file with high quality calls that contrasts sequenced individal with a reference. 
 
 
 1. **Generate corresponding .gff file for each .mf file.** This is because .gff files are suitable for intersection with other datasets.
 
 	 `mf2gff.sh`
  
-2. **Filter out windows that meet certain criteria.** For example, for the results on Diversity and Divergence, remove windows overlapping with the repeats identified by RepeatMasker. For SMRT errors, additionally remove the known variants in a human individual analyzed (HG002). This allows one to analyze sequencing errors without confounding them with real variants in which the sequenced individual differs from a reference genome. *Create separate folders for RepeatMasked (RM) and Joint (joint)*
+2. **Filter out windows that meet certain criteria.** For example, for the results on Diversity and Divergence, remove windows overlapping with the known repeats in a human genome as identified by RepeatMasker. For analysis of SMRT errors, additionally remove the known variants in a human individual analyzed (HG002). This allows one to analyze sequencing errors without confounding them with real variants in which the sequenced individual differs from a reference genome. *Create separate folders for RepeatMasked (RM) and Joint (joint)*
 
-	`filter_out_repeatmasked.sh` (Diversity, Divergence) 
-	`joint_filtering.sh` (Genome in a Bottle - Pacbio)
+	`filter_out_repeatmasked.sh` (Diversity, Divergence, removes only repeats) 
+	`joint_filtering.sh` (SMRT errors, removes repeats and variants)
 	
-	Following high quality HG002 calls were used:
+	Following high quality HG002 calls were used for the filtering step:
 	HG002_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-22_v.3.3.2_highconf_triophased.vcf.gz
 	
 	joint_filtering.sh calls both filter_out_repeatmasked.sh and filter_out_true_variants.sh
 	
-3. **Use new coordinates in order to re-create .mf files that are filtered.** Use on filtered files. Don't forget to remove the orginal GFFs. Only the output of step 2 will work with that script - requires gff2mf.py.
+3. **Use new coordinates in order to re-create .mf files that are filtered.** Use on filtered files. Don't forget to remove the orginal GFFs. Only the output of step 2 will work with the script. Requires gff2mf.py.
 	`convert_gff_to_mf.sh`
-4.	**Remove the flanking regions around motifs in their 100bp windows.** When original motifs are bigger than 100bp, only keep the 100bp at the center of the motifs (this only affects DirectRepeats).
+	
+4.	**Keep only motifs and remove the flanking regions around motifs inside their 100bp windows.** When original motifs are bigger than 100bp, only keep the 100bp at the center of the motifs (this is only relevant for DirectRepeats).
 	`generateFeatures.py`
+	
 5.  **Generates 10 random controls for each motif.** Requires generateEmptyTrack.py
 	`generateControls.sh`
 	Script that generates 10 sets of control datasets.
-	Input: folder with .mf files; we will generate 10 controls for each .mf file
-	Output: 10 folders with matching controls for each motif
+	Input: folder with .mf files; will generate 10 sets of controls for each .mf file
+	Output: 10 folders with matching controls for all the motifs
 
 ##Data formatting
 
@@ -296,11 +298,11 @@ Output: .mf file
 Dependency: runErrorStatistics_optimized.R, reorder_pacbio.py
 
 
-1. Compute errors:
+1. **Compute errors.**
 
 	`generateErrors.sh`
 
-2. Merge and reorder:
+2. **Merge and reorder.** Since many windows are run in parallel, the results need to be merged and re-ordered to match the order in the original .mf files.
 
 	`merge_and_reorder.sh`
 
