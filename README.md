@@ -338,16 +338,21 @@ Requires: .mf files, RepeatMasked file with coordinates of repeats in a genome, 
 	*mf_file* is the .mf file for which the control should be generated
 	*control_file* is a large file with all the control windows (these would be regions of the genomes that do not contain non-B DNA)
 	*output_directory* is an optional parameter for the location of an output
+
 ##Data formatting
 
 **generateFeatures.py**
 This script restricts the intervals to features only.
+
 Input: .mf file
+
 Output: .mf file with FeatureOnly suffix
 
 **generateEmptyTrack.py** script
 This script generates matching controls for each motif by subsampling from motif-free windows. Sampling is implemented with the Linux function shuf.
+
 Input: .mf file, optionally output directory
+
 Output: .mf file
 
 
