@@ -19,8 +19,12 @@ G5 <- intermolecular[intermolecular$V1=='GGGAGGGAGGGAGGGAGGG',]
 G6 <- intermolecular[intermolecular$V1=='GGGAGGGAGGTGGGGGGGG',]
 G7 <- intermolecular[intermolecular$V1=='GGGTGGAGGGTGGGAGGAGGG',]
 
+# intramolecular G4
+select=c(1,3,4,8,9,10)
 
-# Compute meanIPD
+
+
+# Compute log meanIPD
 mean_G1 <- vector()
 for (i in 1:length(G1[,1])) {mean_G1 <- append(mean_G1, mean(as.numeric(G1[i,2:length(G1[1,])]),na.rm=TRUE))}
 mean_G1=mean_G1[!is.nan(mean_G1)]
@@ -55,8 +59,6 @@ mean_G10=mean_G10[!is.nan(mean_G10)]
 intra_G <- c(mean_G1,mean_G3,mean_G4,mean_G8,mean_G9,mean_G10)
 inter_G <- c(mean_G2,mean_G5,mean_G6,mean_G7)
 
-
-# Compute log meanIPD
 log_mean_G=list(G1=log(mean_G1+0.01),G2=log(mean_G2+0.01),G3=log(mean_G3+0.01),G4=log(mean_G4+0.01),G5=log(mean_G5+0.01),
                 G6=log(mean_G6+0.01),G7=log(mean_G7+0.01),G8=log(mean_G8+0.01),G9=log(mean_G9+0.01),G10=log(mean_G10+0.01))
 
@@ -65,6 +67,10 @@ log_mean_G=list(G1=log(mean_G1+0.01),G2=log(mean_G2+0.01),G3=log(mean_G3+0.01),G
 
 
 
+# Delta epsilon from experiments
+epsilons <- c(248,298,216,209,300,300,282,211,281,216)
+intra_epsilons <- rep(epsilons[c(1,3,4,8,9,10)],c(length(mean_G1),length(mean_G3),length(mean_G4),length(mean_G8),length(mean_G9),length(mean_G10)))
+inter_epsilons <- rep(epsilons[c(2,5,6,7)],c(length(mean_G2),length(mean_G5),length(mean_G6),length(mean_G7)))
 
 
 # Melting temperature TM from experiments
@@ -73,80 +79,172 @@ intra_TMs <- rep(TMs[c(1,3,4,8,9,10)],c(length(mean_G1),length(mean_G3),length(m
 inter_TMs <- rep(TMs[c(2,5,6,7)],c(length(mean_G2),length(mean_G5),length(mean_G6),length(mean_G7)))
 
 
-# Delta epsilon from experiments
-epsilons <- c(248,298,216,209,300,300,282,211,281,216)
-intra_epsilons <- rep(epsilons[c(1,3,4,8,9,10)],c(length(mean_G1),length(mean_G3),length(mean_G4),length(mean_G8),length(mean_G9),length(mean_G10)))
-inter_epsilons <- rep(epsilons[c(2,5,6,7)],c(length(mean_G2),length(mean_G5),length(mean_G6),length(mean_G7)))
+
+
 
 
 
 ###############################
-# REGRESSION MODEL WITH BOTH  #
-# INTRA AND INTERMOLECULAR G4 #
-# AND MOLECULARITY AS BINARY  #
-#         PREDICTOR           #
+#   ONLY INTRAMOLECULAR G4    #
 ###############################
 
-# Fit final regression model for Tm (after selecting relevant predictors)
+####### DELTAEPSILON ##########
+pdf('Figure3_deltaepsilon_only_intramolecular.pdf',width=10,height=5.8)
+par(mar=c(4,5,0.1,0.1)+0.1)
+
+
+# Boxplots
+col_transp=rgb(0,255,255,90,maxColorValue=255)
+box=boxplot(log_mean_G[select],plot=FALSE)
+box$stats[c(1,5),]=Reduce(cbind,lapply(log_mean_G[select],quantile,probs=c(0.05,0.95),na.rm=TRUE))
+bxp(box,at=epsilons[select],pars=list(xaxt='n',boxwex=diff(range(epsilons[select]))/15,whisklty=3,staplewex=0.8),varwidth=TRUE,
+    main="",ylab="Log mean IPD",xlab=expression(Delta*epsilon*" ["*M^{-1}*cm^{-1}*"]"),outline=FALSE,ylim=c(-0.45,0.85),
+    cex.main=2,cex.axis=1.5,cex.lab=1.8)
+text(epsilons[select],c(box$stats[5,1:2]+0.05,box$stats[1,3]-0.05,box$stats[5,4:6]+0.05),
+     c("G1","G2","G3","G4","G5","G6","G7","G8","G9","G10")[select], 
+     cex=1.8,col="black")
+axis(1,cex.axis=1.5)
+
+
+# REGRESSION MODEL WITH ONLY INTRAMOLECULAR G4
+
+# Fit model
 group = rep(0:1,c(length(c(mean_G1,mean_G3,mean_G4,mean_G8,mean_G9,mean_G10)),length(c(mean_G2,mean_G5,mean_G6,mean_G7))))
-res=lm(c(log(intra_G+0.01),log(inter_G+0.01))~c(intra_TMs,inter_TMs)+c(intra_TMs,inter_TMs)*group+group)
-summary(res)
-plot(res)
+res=lm(log(intra_G+0.01)~intra_epsilons)
 
-pdf('termostability_Tm_intra_inter.pdf',width=6,height=6)
-par(mar=c(5,4,2,2)+0.1)
-box=boxplot(log_mean_G,plot=FALSE)
-box$stats[c(1,5),]=Reduce(cbind,lapply(log_mean_G,quantile,probs=c(0.05,0.95),na.rm=TRUE))
-bxp(box,at=TMs,pars=list(xaxt='n',boxfill=c("cyan","gold","cyan","cyan","gold","gold","gold","cyan","cyan","cyan"),boxwex=diff(range(TMs))/50+0.03,whisklty=3,staplewex=0.8),
-        main="",ylab="Log mean IPD",xlab=expression(T[m]*" [Â°C]"),outline=FALSE,ylim=c(-0.55,0.85),
-        cex.main=2,cex.axis=1,cex.lab=1)
-text(TMs,c(box$stats[5,1:3]+0.05,box$stats[1,4]-0.05,box$stats[5,5:10]+0.05),
-     c("G1","G2","G3","G4","G5","G6","G7","G8","G9","G10"), 
-     cex=1,col="black")
-axis(1)
 
+# Boxplots and add points
 coef=res$coefficients
 abline(coef[1],coef[2],col="cyan",lwd=3)
-abline(coef[1]+coef[3],coef[2]+coef[4],col="gold",lwd=3)
-bxp(box,at=TMs,pars=list(xaxt='n',boxfill=c("cyan","gold","cyan","cyan","gold","gold","gold","cyan","cyan","cyan"),boxwex=diff(range(TMs))/50+0.03,whisklty=3,staplewex=0.8),
-    outline=FALSE,ylim=c(-0.55,0.85),
-    cex.main=2,cex.axis=1,cex.lab=1,add=TRUE)
+bxp(box,at=epsilons[select],pars=list(xaxt='n',boxwex=diff(range(epsilons[select]))/15,whisklty=3,staplewex=0.8),varwidth=TRUE,
+    outline=FALSE,ylim=c(-0.45,0.85),axes=FALSE,
+    cex.main=2,cex.axis=1.5,cex.lab=.5,add=TRUE)
 
-legend('topleft',legend=c('Inter','Intra'),col=c('gold','cyan'),lwd=3,border=FALSE)
+points(intra_epsilons+rnorm(length(intra_epsilons),sd=0.5),log(intra_G+0.01),col=col_transp,pch='.',cex=2)
+bxp(box,at=epsilons[select],pars=list(xaxt='n',boxwex=diff(range(epsilons[select]))/15,whisklty=3,staplewex=0.8),varwidth=TRUE,
+    outline=FALSE,ylim=c(-0.45,0.85),axes=FALSE,
+    cex.main=2,cex.axis=1,cex.lab=1,add=TRUE)
+text(epsilons[select],c(box$stats[5,1:2]+0.05,box$stats[1,3]-0.05,box$stats[5,4:6]+0.05),
+     c("G1","G2","G3","G4","G5","G6","G7","G8","G9","G10")[select], 
+     cex=1.8,col="black")
+
 dev.off()
 
 
 
 
-# Fit final regression model for delta-epsilon (after selecting relevant predictors)
-group = rep(0:1,c(length(c(mean_G1,mean_G3,mean_G4,mean_G8,mean_G9,mean_G10)),length(c(mean_G2,mean_G5,mean_G6,mean_G7))))
-res=lm(c(log(intra_G+0.01),log(inter_G+0.01))~c(intra_epsilons,inter_epsilons)+c(intra_epsilons,inter_epsilons)*group-group)
-summary(res)
-plot(res)
 
-pdf('termostability_deltaepsilon_intra_inter.pdf',width=6,height=6)
+
+###############################
+# BOTH REGRESSIONS TOGETHER   #
+###############################
+
+####### DELTAEPSILON ##########
+pdf('FigureS15A_deltaepsilon_both_regressions.pdf',width=6,height=6)
 par(mar=c(5,4,2,2)+0.1)
+
+# Boxplots
+col_transp=rgb(0,255,255,90,maxColorValue=255)
+col2_transp=rgb(255,185,15,90,maxColorValue=255)
 box=boxplot(log_mean_G,plot=FALSE)
 box$stats[c(1,5),]=Reduce(cbind,lapply(log_mean_G,quantile,probs=c(0.05,0.95),na.rm=TRUE))
-bxp(box,at=epsilons,pars=list(xaxt='n',boxfill=c("cyan","gold","cyan","cyan","gold","gold","gold","cyan","cyan","cyan"),boxwex=diff(range(epsilons))/50,whisklty=3,staplewex=0.8),
-    main="",ylab="Log mean IPD",xlab=expression(Delta*epsilon*" ["*M^{-1}*cm^{-1}*"]"),outline=FALSE,ylim=c(-0.55,0.85),
+bxp(box,at=epsilons,pars=list(xaxt='n',boxwex=diff(range(epsilons))/20,whisklty=3,staplewex=0.8),varwidth=TRUE,
+    main="",ylab="Log mean IPD",xlab=expression(Delta*epsilon*" ["*M^{-1}*cm^{-1}*"]"),outline=FALSE,ylim=c(-0.45,0.85),
     cex.main=2,cex.axis=1,cex.lab=1)
 text(epsilons,c(box$stats[5,1:2]+0.05,box$stats[1,3:4]-0.05,box$stats[5,5]+0.05,box$stats[1,6:7]-0.05,box$stats[5,8:10]+0.05),
      c("G1","G2","G3","G4","G5","G6","G7","G8","G9","G10"), 
      cex=1,col="black")
 axis(1)
 
-coef=res$coefficients
-abline(coef[1],coef[2],col="cyan",lwd=3)
-abline(coef[1],coef[2]+coef[3],col="gold",lwd=3)
-bxp(box,at=epsilons,pars=list(xaxt='n',boxfill=c("cyan","gold","cyan","cyan","gold","gold","gold","cyan","cyan","cyan"),boxwex=diff(range(epsilons))/50,whisklty=3,staplewex=0.8),
-    outline=FALSE,ylim=c(-0.55,0.85),
-    cex.main=2,cex.axis=1,cex.lab=1,add=TRUE)
 
-legend('topleft',legend=c('Inter','Intra'),col=c('gold','cyan'),lwd=3,border=FALSE)
+# REGRESSION MODEL WITH BOTH INTRA AND INTERMOLECULAR G4
+# AND MOLECULARITY AS BINARY PREDICTOR
+
+# Fit final regression model (after selecting relevant predictors)
+group = rep(0:1,c(length(c(mean_G1,mean_G3,mean_G4,mean_G8,mean_G9,mean_G10)),length(c(mean_G2,mean_G5,mean_G6,mean_G7))))
+res=lm(c(log(intra_G+0.01),log(inter_G+0.01))~c(intra_epsilons,inter_epsilons)+c(intra_epsilons,inter_epsilons)*group-group)
+coef=res$coefficients
+abline(coef[1],coef[2],col="cyan",lwd=3,lty=2)
+abline(coef[1],coef[2]+coef[3],col="darkgoldenrod1",lwd=3,lty=2)
+
+
+# REGRESSION MODEL WITH ONLY INTRAMOLECULAR G4
+
+# Fit model
+group = rep(0:1,c(length(c(mean_G1,mean_G3,mean_G4,mean_G8,mean_G9,mean_G10)),length(c(mean_G2,mean_G5,mean_G6,mean_G7))))
+res=lm(log(intra_G+0.01)~intra_epsilons)
+lines(c(200,280),predict(res,data.frame(intra_epsilons=c(200,280))),lwd=3,col='cyan')
+
+
+# Boxplots and add points
+bxp(box,at=epsilons,pars=list(boxwex=diff(range(epsilons))/20,whisklty=3,staplewex=0.8),varwidth=TRUE,
+    outline=FALSE,ylim=c(-0.55,0.85),axes=FALSE,
+    cex.main=2,cex.axis=1,cex.lab=1,add=TRUE)
+points(intra_epsilons+rnorm(length(intra_epsilons),sd=0.5),log(intra_G+0.01),col=col_transp,pch='.',cex=1.5)
+points(inter_epsilons+rnorm(length(inter_epsilons),sd=0.5),log(inter_G+0.01),col=col2_transp,pch='.',cex=1.5)
+bxp(box,at=epsilons,pars=list(boxwex=diff(range(epsilons))/20,whisklty=3,staplewex=0.8),varwidth=TRUE,
+    outline=FALSE,ylim=c(-0.55,0.85),axes=FALSE,
+    cex.main=2,cex.axis=1,cex.lab=1,add=TRUE)
+text(epsilons,c(box$stats[5,1:2]+0.05,box$stats[1,3:4]-0.05,box$stats[5,5]+0.05,box$stats[1,6:7]-0.05,box$stats[5,8:10]+0.05),
+     c("G1","G2","G3","G4","G5","G6","G7","G8","G9","G10"), 
+     cex=1,col="black")
+
+legend('topleft',legend=c('Inter','Intra'),fill=c('darkgoldenrod1','cyan'),border=TRUE)
 dev.off()
 
 
+####### Tm ##########
+pdf('FigureS15B_Tm_both_regressions.pdf',width=6,height=6)
+par(mar=c(5,4,2,2)+0.1)
+
+# Boxplots
+col_transp=rgb(0,255,255,90,maxColorValue=255)
+col2_transp=rgb(255,185,15,90,maxColorValue=255)
+box=boxplot(log_mean_G,plot=FALSE)
+box$stats[c(1,5),]=Reduce(cbind,lapply(log_mean_G,quantile,probs=c(0.05,0.95),na.rm=TRUE))
+bxp(box,at=TMs,pars=list(xaxt='n',boxwex=diff(range(TMs))/25+0.025,whisklty=3,staplewex=0.8),varwidth=TRUE,
+    main="",ylab="Log mean IPD",xlab=expression(T[m]*" [°C]"),outline=FALSE,ylim=c(-0.45,0.85),
+    cex.main=2,cex.axis=1,cex.lab=1)
+text(TMs,c(box$stats[5,1:2]+0.05,box$stats[1,3:4]-0.05,box$stats[5,5:9]+0.05,box$stats[1,10]-0.05),
+     c("G1","G2","G3","G4","G5","G6","G7","G8","G9","G10"), 
+     cex=1,col="black")
+axis(1)
+
+
+# REGRESSION MODEL WITH BOTH INTRA AND INTERMOLECULAR G4
+# AND MOLECULARITY AS BINARY PREDICTOR
+
+# Fit final regression model (after selecting relevant predictors)
+group = rep(0:1,c(length(c(mean_G1,mean_G3,mean_G4,mean_G8,mean_G9,mean_G10)),length(c(mean_G2,mean_G5,mean_G6,mean_G7))))
+res=lm(c(log(intra_G+0.01),log(inter_G+0.01))~c(intra_TMs,inter_TMs)+c(intra_TMs,inter_TMs)*group+group)
+coef=res$coefficients
+abline(coef[1],coef[2],col="cyan",lwd=3,lty=2)
+abline(coef[1]+coef[3],coef[2]+coef[4],col='darkgoldenrod1',lwd=3,lty=2)
+
+
+# REGRESSION MODEL WITH ONLY INTRAMOLECULAR G4
+
+# Fit model
+group = rep(0:1,c(length(c(mean_G1,mean_G3,mean_G4,mean_G8,mean_G9,mean_G10)),length(c(mean_G2,mean_G5,mean_G6,mean_G7))))
+res=lm(log(intra_G+0.01)~intra_TMs)
+lines(c(68,80),predict(res,data.frame(intra_TMs=c(68,80))),lwd=3,col='cyan')
+
+
+# Boxplots and add points
+bxp(box,at=TMs,pars=list(boxwex=diff(range(TMs))/25+0.025,whisklty=3,staplewex=0.8),varwidth=TRUE,
+    outline=FALSE,ylim=c(-0.55,0.85),axes=FALSE,
+    cex.main=2,cex.axis=1,cex.lab=1,add=TRUE)
+points(intra_TMs+rnorm(length(intra_TMs),sd=0.05),log(intra_G+0.01),col=col_transp,pch='.',cex=1)
+points(inter_TMs+rnorm(length(inter_TMs),sd=0.05),log(inter_G+0.01),col=col2_transp,pch='.',cex=1)
+bxp(box,at=TMs,pars=list(boxwex=diff(range(TMs))/25+0.025,whisklty=3,staplewex=0.8),varwidth=TRUE,
+    outline=FALSE,ylim=c(-0.55,0.85),axes=FALSE,
+    cex.main=2,cex.axis=1,cex.lab=1,add=TRUE)
+text(TMs,c(box$stats[5,1:2]+0.05,box$stats[1,3:4]-0.05,box$stats[5,5:9]+0.05,box$stats[1,10]-0.05),
+     c("G1","G2","G3","G4","G5","G6","G7","G8","G9","G10"), 
+     cex=1,col="black")
+
+legend('topleft',legend=c('Inter','Intra'),fill=c('darkgoldenrod1','cyan'),border=TRUE)
+dev.off()
 
 
 
@@ -178,7 +276,7 @@ par(mar=c(5,4,2,2)+0.1)
 box=boxplot(log_mean_G[select],plot=FALSE)
 box$stats[c(1,5),]=Reduce(cbind,lapply(log_mean_G[select],quantile,probs=c(0.05,0.95),na.rm=TRUE))
 bxp(box,at=TMs[select],pars=list(xaxt='n',boxfill=c("cyan","gold","cyan","cyan","gold","gold","gold","cyan","cyan","cyan")[select],boxwex=diff(range(TMs[select]))/50+0.025,whisklty=3,staplewex=0.8),
-    main="",ylab="Log mean IPD",xlab=expression(T[m]*" [Â°C]"),outline=FALSE,ylim=c(-0.45,0.85),
+    main="",ylab="Log mean IPD",xlab=expression(T[m]*" [°C]"),outline=FALSE,ylim=c(-0.45,0.85),
     cex.main=2,cex.axis=1,cex.lab=1)
 text(TMs[select],c(box$stats[5,1:2]+0.05,box$stats[1,3]-0.05,box$stats[5,4:6]+0.05),
      c("G1","G2","G3","G4","G5","G6","G7","G8","G9","G10")[select], 
