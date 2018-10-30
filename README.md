@@ -332,6 +332,9 @@ Requires: .mf files, RepeatMasked file with coordinates of repeats in a genome, 
 	Script that generates 10 sets of control datasets for the .mf files in a folder provided.
 	Output: 10 folders with matching controls for all the motifs
 	
+	The script requires a control file to be present. Typically, control file contains large number of windows. From this set of windows, as many will be used as are present in a motif file. For example, if motif file contains 2,500 windows, the subset of randomly selected 2,500 control windows will be used. This control file is expected to be named *Empty*.mf and therefore it's important to make sure that only one control file is present in a folder before running this script. Since the variation in sampling is to be expected, as many as 10 independent folders with controls will be created.
+	
+	
 	Requires generateEmptyTrack.py or generateEmptyTrack_regVar.py.
 	Note that these scripts can be run independently by running:
 	`python generateEmptyTrack.py mf_file control_file output_directory` where
