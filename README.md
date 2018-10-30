@@ -176,7 +176,7 @@ The .collapsed file describes the final error rates in given intervals.
 	
 	`cat Windows_Ready | env LC_ALL=C sort -k 1,1d -k 2,2n > Windows_Sorted`
 	
-7. Collect values in windows:	#adjust collect_values_in_windows.py for F or R
+7. Collect IPD values in windows:	#adjust collect_values_in_windows.py for F or R
 	
 	`python ../collect_values_in_windows.py Windows_Sorted 52XIPD > Windows_Collected_F`
 	
@@ -273,7 +273,11 @@ The .collapsed file describes the final error rates in given intervals.
 
 ##Experimental characterization of G-quadruplexes. 
 
-1. Analyze delta-epsilon and Tm experimental results (see detailed comments inside R script):
+1. Get the 10 most common G4 and collect IPD values:
+
+	WILFRIED TO ADD (files intramolecular.out and intermolecular.out)
+
+2. Analyze delta-epsilon and Tm experimental results (see detailed comments inside R script):
 	
 	`thermostability.r`
 
