@@ -352,6 +352,8 @@ Dependency: runErrorStatistics_optimized.R, reorder_pacbio.py
 ---
 
 
+Input needed: regression_composition_results_log.RData (from FIGURE 2)
+
 1. Create the dataframe:
 
 	`python MergeIPDvsErrors.py errors.collapsed .mf divergence.collapsed diversity.collapsed`
@@ -376,7 +378,7 @@ Dependency: runErrorStatistics_optimized.R, reorder_pacbio.py
 	
 	`done`
 
-3. Compute residuals from composition regression (use output from Figure2/sequence_composition_IPD.r:
+3. Compute residuals from composition regression:
 
 	`compute_residuals.r`
 
@@ -421,6 +423,8 @@ Input needed: GQuadPlus (from FIGURE 2) , Genome in a Bottle bam file (only chr2
 
 ---
 
+
+Input needed: IPD_forward.RData (from FIGURE 2)
 
 TODO
 
