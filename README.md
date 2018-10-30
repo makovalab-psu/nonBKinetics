@@ -295,7 +295,9 @@ Requires: .mf files, RepeatMasked file with coordinates of repeats in a genome, 
 
 1. **Generate corresponding .gff file for each .mf file.** This is because .gff files are suitable for intersection with other datasets.
 
-	 `mf2gff.sh`
+	 `mf2gff.sh folder_with_mf_files`
+	This script requires the name of the folder with .mf files as a single parameter. It will generate correspinding .gff file for each .mf file.
+  
  
 2. **Filter out windows that meet certain criteria.** For example, for the results on Diversity and Divergence, remove windows overlapping with the known repeats in a human genome as identified by RepeatMasker. For analysis of SMRT errors, additionally remove the known variants in a human individual analyzed (HG002). This allows one to analyze sequencing errors without confounding them with real variants in which the sequenced individual differs from a reference genome. *Create separate folders for RepeatMasked (RM) and Joint (joint)*
 
@@ -304,6 +306,8 @@ Requires: .mf files, RepeatMasked file with coordinates of repeats in a genome, 
 	
 	Following high quality HG002 calls were used for the filtering step:
 	HG002_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-22_v.3.3.2_highconf_triophased.vcf.gz
+	
+	The repeat track can be downloaded from http://genome.ucsc.edu/cgi-bin/hgTables as a bed file. We used human interspersed repeats for filtering and named it Human_interspersed.
 	
 	joint_filtering.sh calls both filter_out_repeatmasked.sh and filter_out_true_variants.sh
 	
