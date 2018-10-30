@@ -301,18 +301,23 @@ Requires: .mf files, RepeatMasked file with coordinates of repeats in a genome, 
  
 2. **Filter out windows that meet certain criteria.** For example, for the results on Diversity and Divergence, remove windows overlapping with the known repeats in a human genome as identified by RepeatMasker. For analysis of SMRT errors, additionally remove the known variants in a human individual analyzed (HG002). This allows one to analyze sequencing errors without confounding them with real variants in which the sequenced individual differs from a reference genome. *Create separate folders for RepeatMasked (RM) and Joint (joint)*
 
-	`filter_out_repeatmasked.sh` (Diversity, Divergence, removes only repeats) 
 	`joint_filtering.sh` (SMRT errors, removes repeats and variants)
 	
+	This step generates new files with suffixes _interspersed_containing.gff and _interspersed_filtered.gff (overlaps with repeats or not) and suffixes _varContaining.gff and _varFiltered.gff (overlapping with variants or not), as well as prefixes joint_ (both filters applied).
+	-----------------------------------------------------------------
 	Following high quality HG002 calls were used for the filtering step:
 	HG002_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-22_v.3.3.2_highconf_triophased.vcf.gz
 	
 	The repeat track can be downloaded from http://genome.ucsc.edu/cgi-bin/hgTables as a bed file. We used human interspersed repeats for filtering and named it Human_interspersed.
 	
 	joint_filtering.sh calls both filter_out_repeatmasked.sh and filter_out_true_variants.sh
+	`filter_out_repeatmasked.sh` (removes only repeats, suitable for Diversity, Divergence) 
 	
-3. **Use new coordinates in order to re-create .mf files that are filtered.** Use on filtered files. Don't forget to remove the orginal GFFs. Only the output of step 2 will work with the script. Requires gff2mf.py.
-	`convert_gff_to_mf.sh`
+3. **Use new coordinates in order to re-create .mf files that are filtered.** Use on filtered files. Only the output of step 2 will work with the script. 
+	Requires gff2mf.py (or gff2mf_regVar.py). These scripts take two input parameters: original .mf file (before filtering) and .gff file with coordinates of new subset of windows 
+	
+	One can run
+	`convert_gff_to_mf.sh` to automatically create .mf files for folders trueVariants, RM and joint.
 	
 4.	**Keep only motifs and remove the flanking regions around motifs inside their 100bp windows.** When original motifs are bigger than 100bp, only keep the 100bp at the center of the motifs (this is only relevant for DirectRepeats).
 	`generateFeatures.py`
