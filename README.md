@@ -105,7 +105,7 @@ The .collapsed file describes the final error rates in given intervals.
 
 ---
 
-##Steps to prepare IPD and Depth data in PacBio:
+##Steps to prepare IPD and Depth data in PacBio.
 
 1. Download and extract the data
 2. Recover *.bax.h5
@@ -145,7 +145,7 @@ The .collapsed file describes the final error rates in given intervals.
 	`python cleanDepth.py 52X.pickle > 52XDepth`
 
 
-##Steps to prepare IWT input:
+##Steps to prepare IWT input.
 
 1. Download non-B DNA annotation
 2. Filter G4 into G4Plus and G4Minus and format:
@@ -273,9 +273,9 @@ The .collapsed file describes the final error rates in given intervals.
 
 ##Experimental characterization of G-quadruplexes. 
 
-1. Analyze Tm and delta-epsilon experimental results: 
+1. Analyze delta-epsilon and Tm experimental results (see detailed comments inside R script):
 	
-	`IPD/thermostability.r`
+	`thermostability.r`
 
 
 
