@@ -360,7 +360,13 @@ Dependency: runErrorStatistics_optimized.R, reorder_pacbio.py
 
 	`paste .compo _IPD_PbError_Div_1kG > _Compo_IPD_PbError_Div_1kG`
 	
+3. Compute residuals:
 
+	MARZIA ADD HERE (files *Compo_IPD_PbError_Div_1kG_residuals_FILTERED_CONTROLS)
+
+4. Analyze errors vs residual IPD:
+
+	`mismatches_vs_residualIPD`
 
 
 
