@@ -360,9 +360,19 @@ Dependency: runErrorStatistics_optimized.R, reorder_pacbio.py
 
 	`paste .compo _IPD_PbError_Div_1kG > _Compo_IPD_PbError_Div_1kG`
 	
-3. Compute residuals:
+3. Select compositions (repeat on all files generated at step 2):
 
-	MARZIA ADD HERE (files *Compo_IPD_PbError_Div_1kG_residuals_FILTERED_CONTROLS)
+	`FILES=./*`
+	`for file in $FILES`
+	`do`
+	`	tr ' ' \\t < $file > $file"_tab"`
+	`	awk 'BEGIN {OFS=FS="\t"} {gsub(/[A]/,"",$2); gsub(/[TCG]/,"\t",$2); gsub(/[N]/,"",$1); print $4, $5, $6, $7, $1, $2}' $file"_tab" > $file"_composition"`
+	`	awk 'BEGIN {OFS=FS="\t"} {gsub(/[A]/,"",$3); gsub(/[TCG][TCG]/,"\t",$3); gsub(/[TCG]/,"\t",$3); gsub(/[N]/,"",$1); print $4, $5, $6, $7, $1, $3}' $file"_tab" > $file"_composition_di"`
+	`done`
+
+3. Compute residuals from composition regression (use output from Figure2/sequence_composition_IPD.r:
+
+	`compute_residuals.r`
 
 4. Analyze errors vs residual IPD:
 
