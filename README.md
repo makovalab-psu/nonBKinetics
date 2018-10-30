@@ -273,9 +273,9 @@ The .collapsed file describes the final error rates in given intervals.
 
 ##Experimental characterization of G-quadruplexes. 
 
-1. Get the 10 most common G4 and collect IPD values:
+1. Get the 10 most common G4 and collect IPD values. Use the following line to retrieve the sequences of interest.
 
-	WILFRIED TO ADD (files intramolecular.out and intermolecular.out)
+	'awk '{if ($4 == "GGGTGGAGGGTGGGAGGAGGG") print $0}' Windows_Collected_F >> intermolecular'
 
 2. Analyze delta-epsilon and Tm experimental results (see detailed comments inside R script):
 	
