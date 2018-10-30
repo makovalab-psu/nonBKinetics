@@ -207,17 +207,17 @@ The .collapsed file describes the final error rates in given intervals.
 10. IPD data now ready for IWT. ReDo step 7, 8 and 9 with 52XDepth for IWT on Depth.
 
 
-##Run IWT
+##Run IWT.
 
-1. Loading data in R in IWTomics format and creating subsamples for test: 
+1. Loading data in R in IWTomics format and creating subsamples for test (see detailed comments inside R script): 
 
 	`load_IPD_data.r`
 
-2. Perform IWTomics test and plot results: 
+2. Perform IWTomics test and plot results (see detailed comments inside R script): 
 
 	`IWT_IPD.r`
 
-3. IPD analysis and IWT test for motifs with different length: 
+3. IPD analysis and IWT test for motifs with different length (see detailed comments inside R script): 
 
 	`feature_length_IPD.r`
 
@@ -240,9 +240,28 @@ The .collapsed file describes the final error rates in given intervals.
 
 	`python split_by_feature.py Windows_Collected_F.compo`
 	
-5. ReDo steps 1 to 4 with Windows_Collected_R
+5. Filter out windows with no IPD and create composition files (repeat on all files generated at step 4):
 
-6. Perform sequence composition analysis: 
+	`FILES=./*`
+	
+	`for file in $FILES`
+	
+	`do`
+	
+	`	awk 'BEGIN {OFS=FS="\t"} {gsub(/[A]/,"",$1); gsub(/[TCG]/,"\t",$1); $3=$3+1; print $2, $3, $4, $1}' $file > $file"_composition"`
+	
+	`	intersectBed -wa -f 1 -a $file"_composition" -b $file"_filtered" > "../forward/"$file"_filtered_composition"`
+	
+	`	awk 'BEGIN {OFS=FS="\t"} {gsub(/[A]/,"",$1); gsub(/[TCG][TCG]/,"\t",$1); gsub(/[TCG]/,"\t",$1); $3=$3+1; print $2, $3, $4, $1}' $file > $file"_composition_di"`
+	
+	`	intersectBed -wa -f 1 -a $file"_composition_di" -b $file"_filtered" > "../forward/"$file"_filtered_composition_di"`
+	
+	`done`
+
+	
+6. ReDo steps 1 to 5 with Windows_Collected_R
+
+7. Perform sequence composition analysis (see detailed comments inside R script): 
 
 	`sequence_composition_IPD.r`
 
