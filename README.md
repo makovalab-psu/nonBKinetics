@@ -355,90 +355,6 @@ Dependency: runErrorStatistics_optimized.R, reorder_pacbio.py
 
 ---
 
-
-Input needed: regression_composition_results_log.RData (from FIGURE 2)
-
-1. Create the dataframe:
-
-	`python MergeIPDvsErrors.py errors.collapsed .mf divergence.collapsed diversity.collapsed`
-	
-2. Paste with composition file:
-
-	`paste .compo _IPD_PbError_Div_1kG > _Compo_IPD_PbError_Div_1kG`
-	
-3. Select compositions (repeat on all files generated at step 2):
-
-	`FILES=./*`
-	
-	`for file in $FILES`
-	
-	`do`
-	
-	`	tr ' ' \\t < $file > $file"_tab"`
-	
-	`	awk 'BEGIN {OFS=FS="\t"} {gsub(/[A]/,"",$2); gsub(/[TCG]/,"\t",$2); gsub(/[N]/,"",$1); print $4, $5, $6, $7, $1, $2}' $file"_tab" > $file"_composition"`
-	
-	`	awk 'BEGIN {OFS=FS="\t"} {gsub(/[A]/,"",$3); gsub(/[TCG][TCG]/,"\t",$3); gsub(/[TCG]/,"\t",$3); gsub(/[N]/,"",$1); print $4, $5, $6, $7, $1, $3}' $file"_tab" > $file"_composition_di"`
-	
-	`done`
-
-3. Compute residuals from composition regression:
-
-	`compute_residuals.r`
-
-4. Analyze errors vs residual IPD:
-
-	`mismatches_vs_residualIPD.r`
-
-
-
-
-
-#SUPPLEMENTARY NOTE 1
-
----
-
-
-Input needed: GQuadPlus (from FIGURE 2) , Genome in a Bottle bam file (only chr21 reported in manuscript)
-
-1. Create the flanks:
-
-	`python flanking.py`
-	
-2. Find the position of read ends:
-
-	`python readends.py`
-
-3. Intersect and return as tab-delimited file:
-
-	`bedtools intersect -wa -wb -a GQuadPlus2kflanks.gff -b chr21Ends.gff > GQuadPlus2kflanks_chr21Ends.intersect`
-
-	`python Intersect2csv.py`
-
-4. Build the histograms:
-
-	`Rscript plothistograms.r`
-
-
-
-
-
-#SUPPLEMENTARY NOTE 2
-
----
-
-
-Input needed: IPD_forward.RData (from FIGURE 2)
-
-TODO
-
-
-
-
-#SUPPLEMENTARY NOTE 4 & TABLE S9
-
----
-
 ##Variants from human-orangutan divergence.
 
 1. Concatenate all chomosomes multiple alignment:
@@ -528,10 +444,96 @@ TODO
 	
 6. Redo steps 3 to 7 for lowfreq (not presented in manuscript)
 
+##Create the figure
+
+Input needed: regression_composition_results_log.RData (from FIGURE 2)
+
+1. Create the dataframe:
+
+	`python MergeIPDvsErrors.py errors.collapsed .mf divergence.collapsed diversity.collapsed`
+	
+2. Paste with composition file:
+
+	`paste .compo _IPD_PbError_Div_1kG > _Compo_IPD_PbError_Div_1kG`
+	
+3. Select compositions (repeat on all files generated at step 2):
+
+	`FILES=./*`
+	
+	`for file in $FILES`
+	
+	`do`
+	
+	`	tr ' ' \\t < $file > $file"_tab"`
+	
+	`	awk 'BEGIN {OFS=FS="\t"} {gsub(/[A]/,"",$2); gsub(/[TCG]/,"\t",$2); gsub(/[N]/,"",$1); print $4, $5, $6, $7, $1, $2}' $file"_tab" > $file"_composition"`
+	
+	`	awk 'BEGIN {OFS=FS="\t"} {gsub(/[A]/,"",$3); gsub(/[TCG][TCG]/,"\t",$3); gsub(/[TCG]/,"\t",$3); gsub(/[N]/,"",$1); print $4, $5, $6, $7, $1, $3}' $file"_tab" > $file"_composition_di"`
+	
+	`done`
+
+3. Compute residuals from composition regression:
+
+	`compute_residuals.r`
+
+4. Analyze errors vs residual IPD:
+
+	`mismatches_vs_residualIPD.r`
 
 
-TO FINISH
 
+
+
+#SUPPLEMENTARY NOTE 1
+
+---
+
+
+Input needed: GQuadPlus (from FIGURE 2) , Genome in a Bottle bam file (only chr21 reported in manuscript)
+
+1. Create the flanks:
+
+	`python flanking.py`
+	
+2. Find the position of read ends:
+
+	`python readends.py`
+
+3. Intersect and return as tab-delimited file:
+
+	`bedtools intersect -wa -wb -a GQuadPlus2kflanks.gff -b chr21Ends.gff > GQuadPlus2kflanks_chr21Ends.intersect`
+
+	`python Intersect2csv.py`
+
+4. Build the histograms:
+
+	`Rscript plothistograms.r`
+
+
+
+
+
+#SUPPLEMENTARY NOTE 2
+
+---
+
+
+Input needed: IPD_forward.RData (from FIGURE 2)
+
+TODO
+
+
+
+
+#SUPPLEMENTARY NOTE 4 & TABLE S9
+
+---
+
+
+Input from Figure 4.
+
+1. All quantile calculations found in Supplementary Note 4 & Table S9 can be found in:
+	`quantiles.r`
 
 
 
