@@ -543,7 +543,8 @@ Input needed: GQuadPlus (from FIGURE 2) , Genome in a Bottle bam file (only chr2
 
 Input needed: IPD_forward.RData (from FIGURE 2)
 
-TODO
+1. Create autocorrelation plots and fast fourier transform plots using script:
+	`IPD_periodicity.r`
 
 
 
