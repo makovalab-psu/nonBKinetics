@@ -303,7 +303,7 @@ Requires: .mf files, RepeatMasked file with coordinates of repeats in a genome, 
 
 	`joint_filtering.sh` (SMRT errors, removes repeats and variants)
 	
-	This step generates new files with suffixes _interspersed_containing.gff and _interspersed_filtered.gff (overlaps with repeats or not) and suffixes _varContaining.gff and _varFiltered.gff (overlapping with variants or not), as well as prefixes joint_ (both filters applied).
+	This step generates new files with suffixes *interspersed_containing.gff and *interspersed_filtered.gff (overlaps with repeats or not) and suffixes *varContaining.gff and *varFiltered.gff (overlapping with variants or not), as well as prefixes joint_ (both filters applied).
 	-----------------------------------------------------------------
 	Following high quality HG002 calls were used for the filtering step:
 	HG002_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-22_v.3.3.2_highconf_triophased.vcf.gz
@@ -321,15 +321,23 @@ Requires: .mf files, RepeatMasked file with coordinates of repeats in a genome, 
 	to automatically create .mf files for folders trueVariants, RM and joint.
 	This will create new .mf files that are filtered.
 	
-4.	**Keep only motifs and remove the flanking regions around motifs inside their 100bp windows.** When original motifs are bigger than 100bp, only keep the 100bp at the center of the motifs (this is only relevant for DirectRepeats).
-	`generateFeatures.py`
-	
-5.  **Generates 10 random controls for each motif.** Requires generateEmptyTrack.py
-	`generateControls.sh`
-	Script that generates 10 sets of control datasets.
-	Input: folder with .mf files; will generate 10 sets of controls for each .mf file
-	Output: 10 folders with matching controls for all the motifs
+4.	**Keep only motifs and remove the flanking regions around motifs inside their 100bp windows.**
+	This step is optional, depending on whether you plan to analyze only features or full 100bp windows.
+	`generateFeatures.py mf_file` will modify the file to only include features
+	(Note that when original motifs are bigger than 100bp, only keep the 100bp at the center of the motifs; this is only relevant for DirectRepeats.)
 
+	
+5.  **Generates 10 random controls for each motif.** 
+	`generateControls.sh folder_wit_mf files`
+	Script that generates 10 sets of control datasets for the .mf files in a folder provided.
+	Output: 10 folders with matching controls for all the motifs
+	
+	Requires generateEmptyTrack.py or generateEmptyTrack_regVar.py.
+	Note that these scripts can be run independently by running:
+	`python generateEmptyTrack.py mf_file control_file output_directory` where
+	*mf_file* is the .mf file for which the control should be generated
+	*control_file* is a large file with all the control windows (these would be regions of the genomes that do not contain non-B DNA)
+	*output_directory* is an optional parameter for the location of an output
 ##Data formatting
 
 **generateFeatures.py**
