@@ -570,8 +570,15 @@ Input from Figure 4.
 #FIGURE S5
 
 ---
+For this analysis, we retrieved the information about the individual molecules during PacBio sequencing. Therefore we extracted the information about MoleculeId, TemplateStart, TemplateEnd, ReadStart, ReadEnd, and Strand using cmph5tools. Next, we intersected this information with the coordinates of our motifs. This was achieved using the script
 
+`runPasses.sh bam_folder original_mf_gff_folder`
 
-IPD_different_passes.r , passes.Rnw , runPasses.sh
+where a first argument (bam_folder) stores the alignments to human reference in a cmp.h5 file format, as one file per each chromosome. The second argument is a directory that contains .gff files to be used for an intersection.
 
+Next, *each pass of a molecule that intersects either the G-Quadruplexes or the control windows* is analyzed using the following R script:
+`passes.Rnw`
+Note that this script uses R libraries h5r and pbh5. While pbh5 library is very useful for accessing IPD information from within an R script, it might be difficult to install due to its dependencies.
 
+Finally, statistical analysis is performed using the script
+`IPD_different_passes.r`
