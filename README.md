@@ -290,13 +290,13 @@ The .collapsed file describes the final error rates in given intervals.
 
 ##Preparing the motif and motif-free windows
 
-Requires: .mf files, RepeatMasked file with coordinates of repeats in a genome, and a file with high quality calls that contrasts sequenced individal with a reference. 
+Requires: .mf files, RepeatMasked file with coordinates of repeats in a genome, and a file with high quality calls that contrasts sequenced individual with a reference. 
 
 
-1. **Generate corresponding .gff file for each .mf file.** The reason for this conversion is that .gff files are suitable format for the intersection with other datasets.
+1. **Generate corresponding .gff file for each .mf file.** The reason for this conversion is that .gff files are a suitable format for the intersection with other datasets.
 
 	`mf2gff.sh folder_with_mf_files`
-	This script requires the name of the folder with .mf files as a single parameter. It will generate corresponding .gff file for each .mf file.
+	This script requires the name of the folder with .mf files as a single parameter. It will generate a corresponding .gff file for each .mf file.
   
  
 2. **Filter out windows that meet certain criteria.** For example, one might wish to remove windows overlapping with the known repeats in a human genome as identified by RepeatMasker. For analysis of SMRT errors, it might be also desirable to additionally remove the known variants in an analyzed human individual  (HG002). This allows one to analyze sequencing errors without confounding them with the real variants in which the sequenced individual differs from a reference genome. 
@@ -307,7 +307,7 @@ Requires: .mf files, RepeatMasked file with coordinates of repeats in a genome, 
 	
 	This step generates new files with suffixes *interspersed_containing.gff and *interspersed_filtered.gff (overlaps with repeats or not) and suffixes *varContaining.gff and *varFiltered.gff (overlapping with variants or not), as well as prefixes joint_ (both filters applied).
 	
-	Following high quality HG002 calls were used for the filtering step:
+	Following high-quality HG002 calls were used for the filtering step:
 	HG002_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-22_v.3.3.2_highconf_triophased.vcf.gz
 	
 	The repeat track can be downloaded from http://genome.ucsc.edu/cgi-bin/hgTables as a bed file. We used human interspersed repeats for filtering and named the file Human_interspersed.
@@ -318,7 +318,7 @@ Requires: .mf files, RepeatMasked file with coordinates of repeats in a genome, 
 	`filter_out_true_variants.sh` (removes only variants)
 	
 3. **Use new coordinates in order to re-create .mf files that are filtered.** Use on filtered .gff files. Only the output of step 2 will work with the script. 
-	Requires gff2mf.py (or gff2mf_regVar.py). These scripts take two input parameters: original .mf file (before filtering) and .gff file with coordinates of new subset of windows 
+	Requires gff2mf.py (or gff2mf_regVar.py). These scripts take two input parameters: original .mf file (before filtering) and .gff file with coordinates of a new subset of windows 
 	
 	To automatically create filtered .mf files for folders trueVariants, RM and joint that should contain filtered .gff files, one can run:
 	`convert_gff_to_mf.sh original_folder_with_mf_files`
@@ -327,7 +327,7 @@ Requires: .mf files, RepeatMasked file with coordinates of repeats in a genome, 
 4.	**Keep only motifs and remove the flanking regions around motifs inside their 100bp windows.**
 	This step is optional, depending on whether you plan to analyze only features or full 100bp windows.
 	`generateFeatures.py mf_file` will generate a new file that will only include features
-	(Note that when original motifs are bigger than 100bp, only 100bp centered arount the motifs will be kept; note that this is only relevant for DirectRepeats that can be very long.)
+	(Note that when original motifs are bigger than 100bp, only 100bp centered around the motifs will be kept; note that this is only relevant for DirectRepeats that can be very long.)
 
 	
 5.  **Generates 10 random controls for each motif.** 
@@ -335,7 +335,7 @@ Requires: .mf files, RepeatMasked file with coordinates of repeats in a genome, 
 	Script that generates 10 sets of control datasets for the .mf files inside the provided folder.
 	Output: 10 folders with matching controls for all the motifs
 	
-	The script *requires a control file to be present*. Typically, control file contains large number of windows. From this set of windows, as many will be used as are present in a motif file. For example, if motif file contains 2,500 windows, the subset of randomly selected 2,500 control windows will be used. This control file is expected to be named *Empty*.mf and therefore it's important to make sure that only one control file is present in a folder before running this script. Since small variation in sampling is to be expected, as many as 10 independent folders with controls will be created.
+	The script *requires a control file to be present*. Typically, a control file contains a large number of windows. From this set of windows, as many will be used as are present in a motif file. For example, if a motif file contains 2,500 windows, the subset of randomly selected 2,500 control windows will be used. This control file is expected to be named *Empty*.mf and therefore it's important to make sure that only one control file is present in a folder before running this script. Since small variation in sampling is to be expected, as many as 10 independent folders with controls will be created.
 	
 	
 	Requires generateEmptyTrack.py (or generateEmptyTrack_regVar.py).
@@ -345,7 +345,7 @@ Requires: .mf files, RepeatMasked file with coordinates of repeats in a genome, 
 	*control_file* is a large file with all the control windows (these would be regions of the genomes that do not contain non-B DNA)
 	*output_directory* is an optional parameter for the location of an output
 	
-Important note: the generated controls can be either from anywhere in the genome or localized in a close proximity of a motif (such as 0.5 Mb upstream or downstream) in order to account for the regional variation. In such case, scripts in a folder controls_regVar can be used. These scripts differ slightly from the scripts described above; for example generateEmptyTrackRegVar.py instead of generateEmptyTrack.py, or gff2mf_regVar.py instead of gff2mf.py
+Important note: the generated controls can be either from anywhere in the genome or localized in a close proximity of a motif (such as 0.5 Mb upstream or downstream) in order to account for the regional variation. In such case, scripts in a folder controls_regVar can be used. These scripts differ slightly from the scripts described above; for example, generateEmptyTrackRegVar.py instead of generateEmptyTrack.py, or gff2mf_regVar.py instead of gff2mf.py
 
 ##Data formatting
 
