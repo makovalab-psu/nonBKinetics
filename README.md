@@ -382,7 +382,7 @@ Dependency: runErrorStatistics_optimized.R, reorder_pacbio.py
 
 4. Analyze errors vs residual IPD:
 
-	`mismatches_vs_residualIPD`
+	`mismatches_vs_residualIPD.r`
 
 
 
