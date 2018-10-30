@@ -313,11 +313,13 @@ Requires: .mf files, RepeatMasked file with coordinates of repeats in a genome, 
 	joint_filtering.sh calls both filter_out_repeatmasked.sh and filter_out_true_variants.sh
 	`filter_out_repeatmasked.sh` (removes only repeats, suitable for Diversity, Divergence) 
 	
-3. **Use new coordinates in order to re-create .mf files that are filtered.** Use on filtered files. Only the output of step 2 will work with the script. 
+3. **Use new coordinates in order to re-create .mf files that are filtered.** Use on filtered .gff files. Only the output of step 2 will work with the script. 
 	Requires gff2mf.py (or gff2mf_regVar.py). These scripts take two input parameters: original .mf file (before filtering) and .gff file with coordinates of new subset of windows 
 	
 	One can run
-	`convert_gff_to_mf.sh` to automatically create .mf files for folders trueVariants, RM and joint.
+	`convert_gff_to_mf.sh original_folder_with_mf_files`
+	to automatically create .mf files for folders trueVariants, RM and joint.
+	This will create new .mf files that are filtered.
 	
 4.	**Keep only motifs and remove the flanking regions around motifs inside their 100bp windows.** When original motifs are bigger than 100bp, only keep the 100bp at the center of the motifs (this is only relevant for DirectRepeats).
 	`generateFeatures.py`
