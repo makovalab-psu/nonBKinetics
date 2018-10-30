@@ -304,7 +304,7 @@ Requires: .mf files, RepeatMasked file with coordinates of repeats in a genome, 
 	`joint_filtering.sh` (SMRT errors, removes repeats and variants)
 	
 	This step generates new files with suffixes *interspersed_containing.gff and *interspersed_filtered.gff (overlaps with repeats or not) and suffixes *varContaining.gff and *varFiltered.gff (overlapping with variants or not), as well as prefixes joint_ (both filters applied).
-	-----------------------------------------------------------------
+	
 	Following high quality HG002 calls were used for the filtering step:
 	HG002_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-22_v.3.3.2_highconf_triophased.vcf.gz
 	
