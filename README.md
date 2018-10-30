@@ -295,7 +295,7 @@ Requires: .mf files, RepeatMasked file with coordinates of repeats in a genome, 
 
 1. **Generate corresponding .gff file for each .mf file.** The reason for this conversion is that .gff files are suitable format for the intersection with other datasets.
 
-	 `mf2gff.sh folder_with_mf_files`
+	`mf2gff.sh folder_with_mf_files`
 	This script requires the name of the folder with .mf files as a single parameter. It will generate corresponding .gff file for each .mf file.
   
  
@@ -313,6 +313,7 @@ Create separate folders for *RM* (repeatmasked), *trueVariants* (personal varian
 	The repeat track can be downloaded from http://genome.ucsc.edu/cgi-bin/hgTables as a bed file. We used human interspersed repeats for filtering and named the file Human_interspersed.
 	
 	joint_filtering.sh calls both filter_out_repeatmasked.sh and filter_out_true_variants.sh; these can be also run independently.
+	
 	`filter_out_repeatmasked.sh` (removes only repeats, suitable for Diversity, Divergence) 
 	`filter_out_true_variants.sh` (removes only variants)
 	
