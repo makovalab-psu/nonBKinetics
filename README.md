@@ -363,11 +363,17 @@ Dependency: runErrorStatistics_optimized.R, reorder_pacbio.py
 3. Select compositions (repeat on all files generated at step 2):
 
 	`FILES=./*`
+	
 	`for file in $FILES`
+	
 	`do`
+	
 	`	tr ' ' \\t < $file > $file"_tab"`
+	
 	`	awk 'BEGIN {OFS=FS="\t"} {gsub(/[A]/,"",$2); gsub(/[TCG]/,"\t",$2); gsub(/[N]/,"",$1); print $4, $5, $6, $7, $1, $2}' $file"_tab" > $file"_composition"`
+	
 	`	awk 'BEGIN {OFS=FS="\t"} {gsub(/[A]/,"",$3); gsub(/[TCG][TCG]/,"\t",$3); gsub(/[TCG]/,"\t",$3); gsub(/[N]/,"",$1); print $4, $5, $6, $7, $1, $3}' $file"_tab" > $file"_composition_di"`
+	
 	`done`
 
 3. Compute residuals from composition regression (use output from Figure2/sequence_composition_IPD.r:
