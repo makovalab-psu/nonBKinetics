@@ -9,7 +9,7 @@ Please check that your version of this repository is up to date (https://bitbuck
 * 1.0.0
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
 
-#Sofware versions
+# Sofware versions
 
 Samtools : Version: 1.3.1 (using htslib 1.3.1)
 Bedtools : Version: v2.26.0
@@ -22,11 +22,11 @@ Python 2.7.3 (default, Mar 13 2014, 11:03:55)
 Naive Variant Caller, from modified version at tools-blankenberg/tools/naive_variant_caller/tools/naive_variant_caller.py
 
 
-#DATA SOURCE
+# DATA SOURCE
 
 ---
 
-##Genome in a Bottle Son - PacBio
+## Genome in a Bottle Son - PacBio
 
 Download files from url:
 
@@ -34,7 +34,7 @@ https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/HG002_NA24385_so
 
 https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/HG002_NA24385_son/PacBio_MtSinai_NIST/MtSinai_blasr_bam_GRCh37/
 
-##non-B DNA annotation
+## non-B DNA annotation
 
 Url for portal:
 
@@ -55,30 +55,30 @@ Query Type: all features for the region
 Features Types to Retrieve: choose all but Short Tandem Repeats
 
 
-##Microsatellites annotation:
+## Microsatellites annotation:
 
 Microsatellites annotation files obtained through STR-FM (see Fungtammasan, A. et al. Accurate typing of short tandem repeats from genome-wide sequencing data and its applications. Genome Res.2015.)
 
 
-##1000Genomes Project VCF files :
+## 1000Genomes Project VCF files :
 
 Download files from url:
 
 ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/
 
 
-##Multi-Z Alignment:
+## Multi-Z Alignment:
 
 Download files from url (chromosomes 1 to 22):
 
 http://hgdownload-test.cse.ucsc.edu/goldenPath/hg19/multiz100way/maf/
 
 
-#CUSTOM FILE FORMATS
+# CUSTOM FILE FORMATS
 
 ---
 
-##.mf
+## .mf
 
 The .mf file describes the interval of interest and thus overlaps with non-B DNA annotations. This file format will either contain feature-restricted intervals or full 100bp windows.
 This tab delimited file contains 4 required columns:
@@ -89,7 +89,7 @@ This tab delimited file contains 4 required columns:
 4. **feature length** number of nucleotides in feature, note that this field is present in both feature-restricted and 100bp windows. Occassionally, feature can be longer than 100bp. In such cases, we trim it down to 100bp and restrict our analysis to trimmed windows.
 5. **IPD values** variable number of columns containing IPD values from ipdSummary, each column represents one nucleotide from feature or 100bp window, thus at most 100 IPD values are present
 
-##.collapsed
+## .collapsed
 The .collapsed file describes the final error rates in given intervals.
 
 1. **chromosome**
@@ -101,11 +101,11 @@ The .collapsed file describes the final error rates in given intervals.
 7. **deletion rate** as fraction <0,1>
 
 
-#FIGURE 2
+# FIGURE 2
 
 ---
 
-##Steps to prepare IPD and Depth data in PacBio.
+## Steps to prepare IPD and Depth data in PacBio.
 
 1. Download and extract the data
 2. Recover *.bax.h5
@@ -145,7 +145,7 @@ The .collapsed file describes the final error rates in given intervals.
 	`python cleanDepth.py 52X.pickle > 52XDepth`
 
 
-##Steps to prepare IWT input.
+## Steps to prepare IWT input.
 
 1. Download non-B DNA annotation
 2. Filter G4 into G4Plus and G4Minus and format:
@@ -207,7 +207,7 @@ The .collapsed file describes the final error rates in given intervals.
 10. IPD data now ready for IWT. ReDo step 7, 8 and 9 with 52XDepth for IWT on Depth.
 
 
-##Run IWT.
+## Run IWT.
 
 1. Loading data in R in IWTomics format and creating subsamples for test (see detailed comments inside R script): 
 
@@ -222,7 +222,7 @@ The .collapsed file describes the final error rates in given intervals.
 	`feature_length_IPD.r`
 
 
-##Effect of sequence composition on IPD.
+## Effect of sequence composition on IPD.
 
 1. Obtain coordinates of windows: 
 
@@ -267,11 +267,11 @@ The .collapsed file describes the final error rates in given intervals.
 
 
 
-#FIGURE 3
+# FIGURE 3
 
 ---
 
-##Experimental characterization of G-quadruplexes. 
+## Experimental characterization of G-quadruplexes. 
 
 1. Get the 10 most common G4 and collect IPD values. Use the following line to retrieve the sequences of interest.
 
@@ -283,12 +283,12 @@ The .collapsed file describes the final error rates in given intervals.
 
 
 
-#TABLE 1
+# TABLE 1
 
 ---
 
 
-##Preparing the motif and motif-free windows
+## Preparing the motif and motif-free windows
 
 Requires: .mf files, RepeatMasked file with coordinates of repeats in a genome, and a file with high quality calls that contrasts sequenced individual with a reference. 
 
@@ -347,7 +347,7 @@ Requires: .mf files, RepeatMasked file with coordinates of repeats in a genome, 
 	
 Important note: the generated controls can be either from anywhere in the genome or localized in a close proximity of a motif (such as 0.5 Mb upstream or downstream) in order to account for the regional variation. In such case, scripts in a folder controls_regVar can be used. These scripts differ slightly from the scripts described above; for example, generateEmptyTrackRegVar.py instead of generateEmptyTrack.py, or gff2mf_regVar.py instead of gff2mf.py
 
-##Data formatting
+## Data formatting
 
 **generateFeatures.py**
 This script restricts the intervals to features only.
@@ -364,7 +364,7 @@ Input: .mf file, optionally output directory
 Output: .mf file
 
 
-##SMRT sequencing errors
+## SMRT sequencing errors
 
 Dependency: runErrorStatistics_optimized.R, reorder_pacbio.py
 
@@ -379,11 +379,11 @@ Dependency: runErrorStatistics_optimized.R, reorder_pacbio.py
 
 
 
-#FIGURE 4
+# FIGURE 4
 
 ---
 
-##Variants from human-orangutan divergence.
+## Variants from human-orangutan divergence.
 
 1. Concatenate all chomosomes multiple alignment:
 
@@ -420,7 +420,7 @@ Dependency: runErrorStatistics_optimized.R, reorder_pacbio.py
 
 	`python rates.py ${inp}.intersect`
 
-##Variants from the 1000 Genomes project.
+## Variants from the 1000 Genomes project.
 
 1. Extract polymorphisms from 1000G VCF files, split by type and frequency range:
 
@@ -472,7 +472,7 @@ Dependency: runErrorStatistics_optimized.R, reorder_pacbio.py
 	
 6. Redo steps 3 to 7 for lowfreq (not presented in manuscript)
 
-##Create the figure
+## Create the figure
 
 Input needed: regression_composition_results_log.RData (from FIGURE 2)
 
@@ -512,7 +512,7 @@ Input needed: regression_composition_results_log.RData (from FIGURE 2)
 
 
 
-#SUPPLEMENTARY NOTE 1
+# SUPPLEMENTARY NOTE 1
 
 ---
 
@@ -541,7 +541,7 @@ Input needed: GQuadPlus (from FIGURE 2) , Genome in a Bottle bam file (only chr2
 
 
 
-#SUPPLEMENTARY NOTE 2
+# SUPPLEMENTARY NOTE 2
 
 ---
 
@@ -554,7 +554,7 @@ Input needed: IPD_forward.RData (from FIGURE 2)
 
 
 
-#SUPPLEMENTARY NOTE 4 & TABLE S9
+# SUPPLEMENTARY NOTE 4 & TABLE S9
 
 ---
 
@@ -567,7 +567,7 @@ Input from Figure 4.
 
 
 
-#FIGURE S5
+# FIGURE S5
 
 ---
 For this analysis, we retrieved the information about the individual molecules during PacBio sequencing. Therefore we extracted the information about MoleculeId, TemplateStart, TemplateEnd, ReadStart, ReadEnd, and Strand using cmph5tools. Next, we intersected this information with the coordinates of our motifs. This was achieved using the script
