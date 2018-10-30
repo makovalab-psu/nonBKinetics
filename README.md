@@ -182,7 +182,7 @@ The .collapsed file describes the final error rates in given intervals.
 	
 	`python ../collect_values_in_windows.py Windows_Sorted 52XIPD > Windows_Collected_R`
 	
-8. Split by Features:
+8. Split by Features: #/!\ Files created are .mf files. The extension requires to be added manually. /!\ Windows with no IPD not filtered out in this step.
 
 	`python ../../split_by_feature.py Windows_Collected_F`
 	
