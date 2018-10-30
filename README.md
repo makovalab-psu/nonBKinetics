@@ -301,7 +301,7 @@ Requires: .mf files, RepeatMasked file with coordinates of repeats in a genome, 
  
 2. **Filter out windows that meet certain criteria.** For example, one might wish to remove windows overlapping with the known repeats in a human genome as identified by RepeatMasker. For analysis of SMRT errors, it might be also desirable to additionally remove the known variants in an analyzed human individual  (HG002). This allows one to analyze sequencing errors without confounding them with the real variants in which the sequenced individual differs from a reference genome. 
 
-Create separate folders for *RM* (repeatmasked), *trueVariants* (personal variants) and *joint* (both).
+3. Create separate folders for *RM* (repeatmasked), *trueVariants* (personal variants) and *joint* (both).
 
 	`joint_filtering.sh` (SMRT errors, removes repeats and variants)
 	
